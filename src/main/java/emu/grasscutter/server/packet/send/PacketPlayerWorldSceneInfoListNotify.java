@@ -3,10 +3,10 @@ package emu.grasscutter.server.packet.send;
 import emu.grasscutter.config.Configuration;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.game.player.Player;
-import emu.grasscutter.game.props.SceneType;
 import emu.grasscutter.net.packet.BaseTypedPacket;
 import org.anime_game_servers.multi_proto.gi.messages.scene.PlayerWorldSceneInfo;
 import org.anime_game_servers.multi_proto.gi.messages.scene.PlayerWorldSceneInfoListNotify;
+import org.anime_game_servers.game_data_models.gi.data.scene.SceneType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class PacketPlayerWorldSceneInfoListNotify extends BaseTypedPacket<Player
         // Iterate over all scenes
         for (var scene : GameData.getSceneDataMap().values()) {
             //only send big world info
-            if (scene.getSceneType() != SceneType.SCENE_WORLD) continue;
+            if (scene.getType() != SceneType.SCENE_WORLD) continue;
 
             var worldInfoBuilder = new PlayerWorldSceneInfo();
             var isSceneUnlocked = player.getWorld().getHost().getUnlockedScenes()
