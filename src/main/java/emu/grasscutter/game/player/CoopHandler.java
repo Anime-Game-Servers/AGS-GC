@@ -4,7 +4,6 @@ import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Transient;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.excels.CoopChapterData;
 import emu.grasscutter.server.packet.send.PacketCoopChapterUpdateNotify;
 import emu.grasscutter.server.packet.send.PacketCoopPointUpdateNotify;
 import emu.grasscutter.server.packet.send.PacketCoopProgressUpdateNotify;
@@ -13,6 +12,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import org.anime_game_servers.core.gi.enums.QuestState;
+import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopChapterData;
+import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopPointType;
+import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopTaskCondType;
 import org.anime_game_servers.multi_proto.gi.messages.coop.*;
 
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ import java.util.Map;
 
 @Entity
 public class CoopHandler extends BasePlayerDataManager {
-    @Getter private Map<Integer, CoopCardEntry> coopCards;
+    @Getter private final Map<Integer, CoopCardEntry> coopCards;
     @Getter @Setter private int curCoopPoint;
 
     @Deprecated // Morphia
@@ -97,9 +99,12 @@ public class CoopHandler extends BasePlayerDataManager {
     }
 
     //todo: modifying finishedEndCount needs to call this with "COOP_COND_CHAPTER_END_ALL_FINISH"
-    public void conditionMetChapterUpdateNotify(int arg, String condType) {
+    public void conditionMetChapterUpdateNotify(int arg, CoopTaskCondType condType) {
         //get a list of everything we need to update
-        val updateList = GameData.getCoopChapterDataMap().values().stream().filter(x -> !x.getUnlockCond().stream().filter(y -> y.getArgs()[0] == arg && y.getType().equals(condType)).toList().isEmpty());
+        val updateList = GameData.getCoopChapterDataMap().values().stream()
+            .filter(x -> x.getUnlockCond() != null && !x.getUnlockCond().stream()
+                .filter(y -> y.getArgs() != null && y.getArgs().get(0) == arg && y.getCondType() == condType)
+                .toList().isEmpty());
         val coopChapterList = new ArrayList<CoopChapter>();
         updateList.forEach(chapter -> {
             coopChapterList.add(initializeCoopChapter(chapter));
@@ -163,27 +168,37 @@ public class CoopHandler extends BasePlayerDataManager {
 
     private List<Integer> getLockReasonList(CoopChapterData chapter) {
         val lockReasonList = new ArrayList<Integer>();
+        if(chapter.getUnlockCond() == null){
+            Grasscutter.getLogger().warn("Coop unlock conditions null for {}", chapter.getId());
+            return lockReasonList;
+        }
 
         for (int i = 0; i < chapter.getUnlockCond().size(); ++i) {
             val condition = chapter.getUnlockCond().get(i);
-            val arg = condition.getArgs()[0];
-            switch (condition.getType()) {
-                case "COOP_COND_FINISH_QUEST" -> {
+            if(condition.getCondType() == null || condition.getArgs() == null || condition.getArgs().isEmpty()){
+                Grasscutter.getLogger().warn("Coop condition type null or args null or empty in coop chapter {} : {} {}",
+                    chapter.getId(), condition.getCondTypeString(), condition.getArgs());
+                continue;
+            }
+
+            val arg = condition.getArgs().get(0);
+            switch (condition.getCondType()) {
+                case COOP_COND_FINISH_QUEST -> {
                     val quest = this.player.getQuestManager().getQuestById(arg);
                     if (quest == null || !quest.getState().equals(QuestState.QUEST_STATE_FINISHED))
                         lockReasonList.add(i + 1);
                 }
-                case "COOP_COND_PLAYER_LEVEL" -> {
+                case COOP_COND_PLAYER_LEVEL -> {
                     if (this.player.getLevel() < arg)
                         lockReasonList.add(i + 1);
                 }
-                case "COOP_COND_CHAPTER_END_ALL_FINISH" -> {
+                case COOP_COND_CHAPTER_END_ALL_FINISH -> {
                     val card = this.coopCards.get(arg);
                     if (card.getFinishedEndCount() != card.getTotalEndCount())
                         lockReasonList.add(i + 1);
                 }
                 default -> {
-                    Grasscutter.getLogger().warn("Unknown Coop condition type {} in coop chapter {}", condition.getType(), chapter.getId());
+                    Grasscutter.getLogger().warn("Unknown Coop condition type {} in coop chapter {}", condition.getCondTypeString(), chapter.getId());
                     lockReasonList.add(i + 1);
                 }
             }
@@ -266,7 +281,7 @@ public class CoopHandler extends BasePlayerDataManager {
                     .filter(j -> j.getChapterId() == chapterId)
                     .toList();
             this.totalEndCount = (int) coopPoints.stream()
-                    .filter(j -> j.getType().equals("POINT_END"))
+                    .filter(j -> j.getType() == CoopPointType.POINT_END)
                     .count();
             this.points = new HashMap<>();
             coopPoints.forEach(j -> this.points.put(j.getId(), new CoopPointEntry()));

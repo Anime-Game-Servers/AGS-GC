@@ -9,11 +9,10 @@ import emu.grasscutter.game.entity.EntityAvatar;
 import emu.grasscutter.game.entity.EntityItem;
 import emu.grasscutter.game.entity.GameEntity;
 import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
-import emu.grasscutter.game.props.ItemUseOp;
-import emu.grasscutter.game.props.SceneType;
 import emu.grasscutter.utils.Position;
 import org.anime_game_servers.multi_proto.gi.messages.ability.action.AbilityActionGenerateElemBall;
 import lombok.val;
+import org.anime_game_servers.game_data_models.gi.data.scene.SceneType;
 
 @AbilityAction(AbilityModifierAction.Type.GenerateElemBall)
 public class ActionGenerateElemBall extends AbilityActionHandler {
@@ -37,7 +36,7 @@ public class ActionGenerateElemBall extends AbilityActionHandler {
                 return true;
             }
         } else if(action.dropType == DropType.BigWorldOnly) {
-            if(owner.getScene().getSceneData().getSceneType() != SceneType.SCENE_WORLD) {
+            if(owner.getScene().getSceneData().getType() != SceneType.SCENE_WORLD) {
                 logger.warn("This level config only allows element balls on big world");
                 return true;
             }

@@ -6,9 +6,7 @@ import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.binout.config.ConfigLevelEntity;
 import emu.grasscutter.data.binout.config.fields.ConfigAbilityData;
-import emu.grasscutter.data.excels.AvatarData;
 import emu.grasscutter.data.excels.PlayerLevelData;
-import emu.grasscutter.data.excels.SceneTagData;
 import emu.grasscutter.data.excels.WeatherData;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.Account;
@@ -79,6 +77,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopTaskCondType;
 import org.anime_game_servers.multi_proto.gi.messages.ability.AbilityInvokeEntry;
 import org.anime_game_servers.multi_proto.gi.messages.battle.CombatInvokeEntry;
 import org.anime_game_servers.multi_proto.gi.messages.battle.event.AttackResult;
@@ -96,6 +95,7 @@ import org.anime_game_servers.multi_proto.gi.messages.scene.PlayerLocationInfo;
 import org.anime_game_servers.multi_proto.gi.messages.scene.PlayerWorldLocationInfo;
 import org.anime_game_servers.multi_proto.gi.messages.scene.entity.MpSettingType;
 import org.anime_game_servers.multi_proto.gi.messages.scene.entity.OnlinePlayerInfo;
+import org.anime_game_servers.game_data_models.gi.data.scene.scene_tag.SceneTagConfigData;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.DayOfWeek;
@@ -421,17 +421,18 @@ public class Player {
         this.scene = scene;
     }
 
-    public void visitScene(int visitSceneId) {
-        val tags = this.sceneTags.computeIfAbsent(visitSceneId, k -> new HashMap<>());
-        GameData.getSceneTagDataMap().values().stream()
-            .filter(tagData -> tagData.getSceneId() == visitSceneId && tagData.isDefaultValid())
-                .map(SceneTagData::getId)
+    public void visitScene(int sceneId) {
+        val sceneTagData = GameData.getSceneTagConfigDataMap().values();
+        val tags = this.sceneTags.computeIfAbsent(sceneId, k -> new HashMap<>());
+        sceneTagData.stream()
+                .filter(tagData -> tagData.getSceneId() == sceneId && tagData.isDefaultValid())
+                .map(SceneTagConfigData::getId)
                 .forEach(k -> tags.putIfAbsent(k, true));
     }
 
     public void initializeLevelTags() {
         GameData.getLevelTagGroupsDataMap().values()
-            .forEach(group -> Arrays.stream(group.getInitialLevelTagIdList()).boxed()
+            .forEach(group -> group.getInitialLevelTagIdList()
                 .forEach(tagId -> this.levelTags.put(tagId, true)));
     }
 
@@ -520,7 +521,7 @@ public class Player {
             this.getDailyTaskManager().updateTaskLevel();
             this.getQuestManager().queueEvent(QuestContent.QUEST_CONTENT_PLAYER_LEVEL_UP, level);
             this.getQuestManager().queueEvent(QuestCond.QUEST_COND_PLAYER_LEVEL_EQUAL_GREATER, level);
-            this.getCoopHandler().conditionMetChapterUpdateNotify(level, "COOP_COND_PLAYER_LEVEL");
+            this.getCoopHandler().conditionMetChapterUpdateNotify(level, CoopTaskCondType.COOP_COND_PLAYER_LEVEL);
 
             return true;
         }
@@ -991,45 +992,6 @@ public class Player {
         this.getServer().getChatSystem().sendPrivateMessageFromServer(getUid(), message.toString());
     }
 
-    public void setAvatarsAbilityForScene(Scene scene){
-        try{
-            String levelEntityConfig = scene.getSceneData().getLevelEntityConfig();
-            ConfigLevelEntity config = GameData.getConfigLevelEntityDataMap().get(levelEntityConfig);
-            if (config == null){
-                return;
-            }
-            List<Integer> avatarIds = scene.getSceneData().getSpecifiedAvatarList();
-            List<EntityAvatar> specifiedAvatarList = getTeamManager().getActiveTeam();
-
-            if (avatarIds != null && avatarIds.size() > 0){
-                // certain scene could limit specifc avatars' entry
-                specifiedAvatarList.clear();
-                for (int id : avatarIds){
-                    Avatar avatar = getAvatars().getAvatarById(id);
-                    if (avatar == null){
-                        continue;
-                    }
-                    specifiedAvatarList.add(new EntityAvatar(scene, avatar));
-                }
-            }
-
-            for (EntityAvatar entityAvatar : specifiedAvatarList){
-                AvatarData avatarData = entityAvatar.getAvatar().getAvatarData();
-                if (avatarData == null){
-                    continue;
-                }
-                avatarData.rebuildAbilityEmbryo();
-                if (config.getAvatarAbilities() == null){
-                    continue; // continue and not break because has to rebuild ability for the next avatar if any
-                }
-                for (ConfigAbilityData abilities : config.getAvatarAbilities()){
-                    avatarData.getAbilities().add(Utils.abilityHash(abilities.getAbilityName()));
-                }
-            }
-        } catch (Exception e){
-            Grasscutter.getLogger().error("Error applying level entity config for scene {}", scene.getSceneData().getId(), e);
-        }
-    }
     /**
      * Sends a message to another player.
      *
@@ -1623,9 +1585,9 @@ public class Player {
     public void setLevelTag(int levelTag) {
         //set all other levelTags in the levelTag groups to false
         GameData.getLevelTagGroupsDataMap().values()
-            .forEach(group -> Arrays.stream(group.getLevelTagGroupList())
+            .forEach(group -> group.getLevelTagGroupList()
                 .forEach(subgroup -> {
-                    val tagList = Arrays.stream(subgroup.getLevelTagIdList()).boxed().toList();
+                    val tagList = subgroup.getLevelTagIdList();
                     if (tagList.contains(levelTag)) {
                         tagList.forEach(tag -> {
                             if (tag != levelTag) {
@@ -1639,29 +1601,35 @@ public class Player {
         val levelTagData = GameData.getLevelTagDataMap().get(levelTag);
 
         //add sceneTags
-        Arrays.stream(levelTagData.getAddSceneTagIdList()).forEach(sceneTagId -> {
-            val sceneTag = GameData.getSceneTagDataMap().get(sceneTagId);
-            if (sceneTag == null) {
-                Grasscutter.getLogger().warn("trying to load unknown scene tag {} in level tag {}", sceneTagId, levelTag);
-            }
-            val sceneTagSceneId = sceneTag != null ? sceneTag.getSceneId() : levelTagData.getSceneId();
-            this.sceneTags.computeIfAbsent(sceneTagSceneId, k -> new HashMap<>())
-                .put(sceneTagId, true);
-        });
+        if(levelTagData.getAddSceneTagIdList() != null) {
+            levelTagData.getAddSceneTagIdList().forEach(sceneTagId -> {
+                val sceneTag = GameData.getSceneTagConfigDataMap().get(sceneTagId);
+                if (sceneTag == null) {
+                    Grasscutter.getLogger().warn("trying to load unknown scene tag {} in level tag {}", sceneTagId, levelTag);
+                }
+                val sceneTagSceneId = sceneTag != null ? sceneTag.getSceneId() : levelTagData.getSceneId();
+                this.sceneTags.computeIfAbsent(sceneTagSceneId, k -> new HashMap<>())
+                    .put(sceneTagId, true);
+            });
+        }
 
         //remove sceneTags
-        Arrays.stream(levelTagData.getRemoveSceneTagIdList()).forEach(sceneTagId -> {
-            val sceneTag = GameData.getSceneTagDataMap().get(sceneTagId);
-            if (sceneTag == null) {
-                Grasscutter.getLogger().warn("trying to unload unknown scene tag {} in level tag {}", sceneTagId, levelTag);
-            }
-            val sceneTagSceneId = sceneTag != null ? sceneTag.getSceneId() : levelTagData.getSceneId();
-            this.sceneTags.computeIfAbsent(sceneTagSceneId, k -> new HashMap<>())
-                .put(sceneTagId, false);
-        });
+        if(levelTagData.getRemoveSceneTagIdList() != null) {
+            levelTagData.getRemoveSceneTagIdList().forEach(sceneTagId -> {
+                val sceneTag = GameData.getSceneTagConfigDataMap().get(sceneTagId);
+                if (sceneTag == null) {
+                    Grasscutter.getLogger().warn("trying to unload unknown scene tag {} in level tag {}", sceneTagId, levelTag);
+                }
+                val sceneTagSceneId = sceneTag != null ? sceneTag.getSceneId() : levelTagData.getSceneId();
+                this.sceneTags.computeIfAbsent(sceneTagSceneId, k -> new HashMap<>())
+                    .put(sceneTagId, false);
+            });
+        }
 
         //load dynamic groups
-        Arrays.stream(levelTagData.getLoadDynamicGroupList()).forEach(groupId -> this.scene.loadDynamicGroup(groupId));
+        if(levelTagData.getLoadDynamicGroupList() != null) {
+            levelTagData.getLoadDynamicGroupList().forEach(groupId -> this.scene.loadDynamicGroup(groupId));
+        }
 
         this.levelTags.put(levelTag, true);
 

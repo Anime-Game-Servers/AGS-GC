@@ -5,6 +5,7 @@ import emu.grasscutter.data.GameResource;
 import emu.grasscutter.data.ResourceType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.anime_game_servers.game_data_models.gi.data.watcher.WatcherTriggerConfig;
 
 @ResourceType(name = "TrialAvatarActivityDataExcelConfigData.json")
 @EqualsAndHashCode(callSuper=false)
@@ -18,12 +19,11 @@ public class TrialAvatarActivityDataData extends GameResource {
     private int dungeonId;
     private String battleAvatarsList;
     private int firstPassReward;
-    private ActivityWatcherData.WatcherTrigger triggerConfig;
+    private WatcherTriggerConfig triggerConfig;
     private int progress;
 
     @Override
     public void onLoad() {
-        triggerConfig.onLoad();
         GameData.getTrialAvatarIndexIdTrialActivityDataDataMap().put(trialAvatarIndexId, id);
     }
 }
