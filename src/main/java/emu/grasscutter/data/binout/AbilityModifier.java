@@ -144,6 +144,7 @@ public class AbilityModifier implements Serializable {
         public DynamicFloat valueRangeMin;
         public DynamicFloat valueRangeMax;
         public String overrideMapKey;
+        public String tag;
 
         public int paramNum;
         public DynamicFloat param1 = DynamicFloat.ZERO;
