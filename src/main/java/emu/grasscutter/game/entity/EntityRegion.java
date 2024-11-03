@@ -20,6 +20,7 @@ public class EntityRegion extends GameEntity<CreateRegionEntityConfig> {
     private boolean hasNewEntities;
     private boolean entityLeave;
     private final Set<GameEntity> entities; // Ids of entities inside this region
+    private final Set<GameEntity> notContainEntities; // Ids of entities outside this region
     private final Set<GameEntity> newEntities; // Ids that entered this region since the last check
     private final Set<GameEntity> leftEntities; // Ids that left this region since the last check
 
@@ -28,17 +29,20 @@ public class EntityRegion extends GameEntity<CreateRegionEntityConfig> {
         this.id = getScene().getWorld().getNextEntityId(EntityIdType.REGION);
         this.position = createConfig.getPos();
         this.entities = ConcurrentHashMap.newKeySet();
+        this.notContainEntities = ConcurrentHashMap.newKeySet();
         this.newEntities = ConcurrentHashMap.newKeySet();
         this.leftEntities = ConcurrentHashMap.newKeySet();
     }
 
     public void addEntity(GameEntity<?> entity) {
-        if (this.getEntities().contains(entity)) {
+        if (this.entities.contains(entity)) {
             return;
         }
-        this.getEntities().add(entity);
-        this.getNewEntities().add(entity);
-        this.hasNewEntities = true;
+        this.entities.add(entity);
+        if (this.notContainEntities.remove(entity)) {
+            this.newEntities.add(entity);
+            this.hasNewEntities = true;
+        }
     }
 
     @Override
@@ -46,29 +50,25 @@ public class EntityRegion extends GameEntity<CreateRegionEntityConfig> {
         return getConfigId();
     }
 
-    public boolean hasNewEntities() {
-        return hasNewEntities;
-    }
-
     public void resetNewEntities() {
-        hasNewEntities = false;
-        newEntities.clear();
-    }
-
-    public void removeEntity(int entityId) {
-        this.getEntities().removeIf(e-> e.getId() == entityId);
-        this.entityLeave = true;
+        this.hasNewEntities = false;
+        this.newEntities.clear();
     }
 
     public void removeEntity(GameEntity entity) {
-        this.getEntities().remove(entity);
-        this.getLeftEntities().add(entity);
-        this.entityLeave = true;
+        if (this.notContainEntities.contains(entity)) {
+            return;
+        }
+        this.notContainEntities.add(entity);
+        if (this.entities.remove(entity)) {
+            this.leftEntities.add(entity);
+            this.entityLeave = true;
+        }
     }
-    public boolean entityLeave() {return this.entityLeave;}
+
     public void resetEntityLeave() {
         this.entityLeave = false;
-        leftEntities.clear();
+        this.leftEntities.clear();
     }
 
     public boolean isPosInRegion(Vector position) {

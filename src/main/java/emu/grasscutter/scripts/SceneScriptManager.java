@@ -11,6 +11,7 @@ import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
 import emu.grasscutter.game.entity.create_config.CreateMonsterEntityConfig;
 import emu.grasscutter.game.entity.create_config.CreateNpcEntityConfig;
 import emu.grasscutter.game.entity.create_config.CreateRegionEntityConfig;
+import emu.grasscutter.game.props.EntityType;
 import emu.grasscutter.game.quest.GameQuest;
 import emu.grasscutter.game.quest.QuestGroupSuite;
 import emu.grasscutter.game.quest.enums.QuestCond;
@@ -590,11 +591,13 @@ public class SceneScriptManager {
 
         for (var region : this.regions.values()) {
             getScene().getEntities().values().stream()
+                .filter(e -> e.getEntityType() == EntityType.Avatar)
                 .filter(e -> region.isPosInRegion(e.getPosition()) && !region.getEntities().contains(e))
                 .forEach(region::addEntity);
 
-            region.getEntities().stream()
-                .filter(e -> !region.isPosInRegion(e.getPosition()))
+            getScene().getEntities().values().stream()
+                .filter(e -> e.getEntityType() == EntityType.Avatar)
+                .filter(e -> !region.isPosInRegion(e.getPosition()) && !region.getNotContainEntities().contains(e))
                 .forEach(region::removeEntity);
 
             // call enter region events for new entities
