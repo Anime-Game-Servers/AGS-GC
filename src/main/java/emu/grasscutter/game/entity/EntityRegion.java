@@ -13,6 +13,7 @@ import org.anime_game_servers.gi_lua.models.scene.group.SceneRegion;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Getter
 public class EntityRegion extends GameEntity<CreateRegionEntityConfig> {
@@ -71,9 +72,18 @@ public class EntityRegion extends GameEntity<CreateRegionEntityConfig> {
         this.leftEntities.clear();
     }
 
+    public void clearDeadEntities() {
+        entities.removeAll(entities.stream()
+            .filter(entity -> this.getScene().getEntityById(entity.id) == null)
+            .collect(Collectors.toSet()));
+        notContainEntities.removeAll(notContainEntities.stream()
+            .filter(entity -> this.getScene().getEntityById(entity.id) == null)
+            .collect(Collectors.toSet()));
+    }
+
     public boolean isPosInRegion(Vector position) {
         val initialDataSource = getSpawnConfig().getInitDataSource();
-        if(initialDataSource instanceof SceneRegion region){
+        if (initialDataSource instanceof SceneRegion region) {
             return region.contains(position);
         }
         return false;

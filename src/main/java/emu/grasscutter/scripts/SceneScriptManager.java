@@ -590,6 +590,8 @@ public class SceneScriptManager {
         }
 
         for (var region : this.regions.values()) {
+            region.clearDeadEntities();
+
             getScene().getEntities().values().stream()
                 .filter(e -> e.getEntityType() == EntityType.Avatar)
                 .filter(e -> region.isPosInRegion(e.getPosition()) && !region.getEntities().contains(e))
