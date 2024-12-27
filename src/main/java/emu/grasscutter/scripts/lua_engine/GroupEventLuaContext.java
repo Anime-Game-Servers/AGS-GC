@@ -15,9 +15,7 @@ public class GroupEventLuaContext implements org.anime_game_servers.gi_lua.scrip
     final private SceneGroup groupInstance;
     @Getter
     final private ScriptArgs args;
-
-    public int target_entity_id;
-    public int source_entity_id;
+    final private int ownerUid;
 
     final private SceneScriptManager scriptManager;
 
@@ -29,8 +27,7 @@ public class GroupEventLuaContext implements org.anime_game_servers.gi_lua.scrip
         this.args = args;
         this.scriptManager = scriptManager;
         this.engine = engine;
-        this.target_entity_id = args.getTargetEntityId();
-        this.source_entity_id = args.getSourceEntityId();
+        this.ownerUid = 0;
     }
 
     public SceneGroup getCurrentGroup() {
@@ -53,33 +50,22 @@ public class GroupEventLuaContext implements org.anime_game_servers.gi_lua.scrip
     }
 
     @Override
-    public int getSourceEntityId() {
+    public int uid() {
+        return args.getUid();
+    }
+
+    @Override
+    public int sourceEntityId() {
         return args.getSourceEntityId();
     }
 
     @Override
-    public int getTargetEntityId() {
+    public int targetEntityId() {
         return args.getTargetEntityId();
     }
 
-
     @Override
-    public int getUid() {
-        return args.getUid();
+    public int ownerUid() {
+        return ownerUid;
     }
-
-    /*@Override
-    public int source_entity_id() {
-        return args.source_eid;
-    }
-
-    @Override
-    public int target_entity_id() {
-        return args.target_eid;
-    }
-
-    @Override
-    public int uid() {
-        return args.uid;
-    }*/
 }

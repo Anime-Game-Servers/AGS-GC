@@ -57,8 +57,12 @@ public class PacketOpcodesUtils {
 
     public static String getOpcodeName(int opcode, GameSession session) {
         if (opcode <= 0) return "UNKNOWN";
-        val name = session.getPackageIdProvider().getPacketName(opcode);
-        return name != null ? name : opcodeMap.getOrDefault(opcode, "UNKNOWN");
+        val provider = session.getPackageIdProvider();
+        if (provider != null) {
+            val name = provider.getPacketName(opcode);
+            if (name != null) return name;
+        }
+        return opcodeMap.getOrDefault(opcode, "UNKNOWN");
     }
 
     public static void dumpPacketIds() {

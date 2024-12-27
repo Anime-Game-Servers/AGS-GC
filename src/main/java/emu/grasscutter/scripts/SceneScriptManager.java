@@ -31,6 +31,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.val;
+import org.anime_game_servers.gi_lua.GIScriptHandler;
 import org.anime_game_servers.gi_lua.models.Position;
 import org.anime_game_servers.gi_lua.models.ScriptArgs;
 import org.anime_game_servers.gi_lua.models.constants.EventType;
@@ -847,21 +848,12 @@ public class SceneScriptManager {
             return false;
         }
 
-        if (funcName.isEmpty()) {
-            logger.warn("callScriptFunc funcName is empty");
-            return false;
-        }
-        if (!script.hasMethod(funcName)) {
-            logger.warn("callScriptFunc script has no method {}", funcName);
-            return false;
-        }
-
         val context = new GroupEventLuaContext(script.getEngine(), group, params, this);
-        try {
-            val luaArgs = new Object[args.length + 1];
-            luaArgs[0] = context;
-            System.arraycopy(args, 0, luaArgs, 1, args.length);
-            val result = script.callMethod(funcName, luaArgs);
+        try{
+            //val luaArgs = new Object[args.length+1];
+            //luaArgs[0] = context;
+            //System.arraycopy(args, 0, luaArgs, 1, args.length);
+            val result = GIScriptHandler.callGroupFunction(script, funcName, context, args);
             return true;
         } catch (RuntimeException | ScriptException | NoSuchMethodException error) {
             logger.error("[LUA] call trigger failed in group {} with {},{}", group.getGroupInfo().getId(), funcName, params, error);
@@ -876,21 +868,12 @@ public class SceneScriptManager {
             return BooleanLuaValue.FALSE;
         }
 
-        if(funcName.isEmpty()){
-            logger.warn("callScriptFunc funcName is empty");
-            return BooleanLuaValue.FALSE;
-        }
-        if(!script.hasMethod(funcName)){
-            logger.warn("callScriptFunc script has no method {}",funcName);
-            return BooleanLuaValue.FALSE;
-        }
-
         val context = new GroupEventLuaContext(script.getEngine(), group, params, this);
         try{
-            return script.callMethod(funcName, context, params);
+            return GIScriptHandler.callGroupFunction(script, funcName, context, params);
         } catch (RuntimeException | ScriptException | NoSuchMethodException error){
             logger.error("[LUA] call trigger failed in group {} with {},{}",group.getGroupInfo().getId(),funcName,params,error);
-            return new BooleanLuaValue(false);
+            return BooleanLuaValue.FALSE;
         }
     }
 

@@ -9,6 +9,9 @@ import org.anime_game_servers.gi_lua.script_lib.ScriptLibHandler;
 import org.anime_game_servers.lua.engine.LuaEngine;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * TODO handle uid
+ */
 public class ControllerLuaContext implements org.anime_game_servers.gi_lua.script_lib.ControllerLuaContext<EntityGadget> {
     @Getter
     final private EntityGadget gadget;
@@ -29,5 +32,25 @@ public class ControllerLuaContext implements org.anime_game_servers.gi_lua.scrip
     @Override
     public ScriptLibControllerHandlerProvider<EntityGadget, ControllerLuaContext> getScriptLibHandlerProvider() {
         return Grasscutter.getGameServer().getScriptSystem().getScriptLibControllerHandlerProvider();
+    }
+
+    @Override
+    public int uid() {
+        return 0;
+    }
+
+    @Override
+    public int sourceEntityId() {
+        return gadget.getId();
+    }
+
+    @Override
+    public int targetEntityId() {
+        return 0;
+    }
+
+    @Override
+    public int ownerUid() {
+        return 0;
     }
 }
