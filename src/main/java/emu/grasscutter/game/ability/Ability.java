@@ -3,6 +3,7 @@ package emu.grasscutter.game.ability;
 import java.util.HashMap;
 import java.util.Map;
 
+import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.binout.AbilityData;
 import emu.grasscutter.game.entity.GameEntity;
@@ -59,6 +60,10 @@ public class Ability {
 
     @Nullable
     public static String getAbilityName(AbilityString abString) {
+        if (abString == null){
+            Grasscutter.getLogger().error("AbilityString is null");
+            return null;
+        }
         if(abString.getType() instanceof AbilityString.Type.Str abStr){
             return abStr.getValue();
         }if(abString.getType() instanceof AbilityString.Type.Hash abHash){

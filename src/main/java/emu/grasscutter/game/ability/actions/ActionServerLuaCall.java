@@ -2,9 +2,9 @@ package emu.grasscutter.game.ability.actions;
 
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.binout.AbilityModifier.AbilityModifierAction;
+import emu.grasscutter.data.binout.LuaCallType;
 import emu.grasscutter.game.ability.Ability;
 import emu.grasscutter.game.entity.GameEntity;
-import emu.grasscutter.scripts.lua_engine.GroupEventLuaContext;
 import lombok.val;
 import org.anime_game_servers.gi_lua.models.ScriptArgs;
 
@@ -12,25 +12,26 @@ import org.anime_game_servers.gi_lua.models.ScriptArgs;
 public class ActionServerLuaCall extends AbilityActionHandler {
     @Override
     public boolean execute(Ability ability, AbilityModifierAction action, byte[] abilityData, GameEntity target) {
-        switch (action.luaCallType) {
-            case "FromGroup" -> {
+        var callType = LuaCallType.fromString(action.luaCallType);
+
+        switch (callType) {
+            case FROM_GROUP -> {
                 return serverLuaCallForGroup(target.getGroupId(), ability, action, abilityData, target);
             }
-            case "SpecificGroup" -> {
+            case SPECIFIC_GROUP -> {
                 var returnBool = true;
                 for (val groupId : action.callParamList) {
                     returnBool = returnBool && serverLuaCallForGroup(groupId, ability, action, abilityData, target);
                 }
                 return returnBool;
             }
-            default -> {
-                Grasscutter.getLogger().error("Unimplemented ActionServerLuaCall {}", action.luaCallType);
-//                "AbilityGroupSourceGroup"
-//                "CurChallengeGroup"
-//                "CurGalleryControlGroup"
-//                "CurRogueBossGroup"
-//                "CurScenePlay"
+            case GADGET, OWNER_FROM_GROUP, CUR_SCENE_PLAY, CUR_CHALLENGE_GROUP, CUR_GALLERY_CONTROL_GROUP,
+                 CUR_ROGUE_BOSS_GROUP, ABILITY_GROUP_SOURCE_GROUP -> {
+                Grasscutter.getLogger().error("Unimplemented ActionServerLuaCall {} {}", action.luaCallType, callType);
             }
+            /*default -> {
+                Grasscutter.getLogger().error("Unimplemented ActionServerLuaCall {} {}", action.luaCallType, callType);
+            }*/
         }
         return false;
     }

@@ -25,7 +25,7 @@ public class ScriptSystem extends BaseGameSystem {
     ScriptLibGroupHandlerProvider scriptLibGroupHandlerProvider = new ScriptLibGroupHandlerProvider();
     public ScriptSystem(GameServer server) {
         super(server);
-        ScriptLib.staticHandler = new StaticScriptLibHandler();
+        ScriptLib.setStaticHandler(new StaticScriptLibHandler());
     }
 
     public SceneMeta getSceneMeta(int sceneId) {

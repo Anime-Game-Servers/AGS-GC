@@ -135,7 +135,8 @@ public class TrialAvatar extends Avatar{
     public TrialAvatarInfo trialAvatarInfoProto(){
         val trialAvatar = new TrialAvatarInfo(this.getTrialAvatarId());
 
-        trialAvatar.setGrantRecord(new TrialAvatarGrantRecord(this.getGrantReason().encodeToByteArray(getPlayer().getSession().getVersion()), this.getFromParentQuestId()));
+        val grantReason = this.getGrantReason().encodeToByteArray(getPlayer().getSession().getVersion());
+        trialAvatar.setGrantRecord(new TrialAvatarGrantRecord(grantReason!=null ? grantReason : 0, this.getFromParentQuestId()));
 
         if (this.getTrialAvatarId() > 0){ // if it is actual trial avatar
             // add artifacts and weapon for trial character

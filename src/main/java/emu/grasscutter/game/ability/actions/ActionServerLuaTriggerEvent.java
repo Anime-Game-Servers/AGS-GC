@@ -3,6 +3,7 @@ package emu.grasscutter.game.ability.actions;
 import com.github.davidmoten.guavamini.Lists;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.binout.AbilityModifier.AbilityModifierAction;
+import emu.grasscutter.data.binout.LuaCallType;
 import emu.grasscutter.game.ability.Ability;
 import emu.grasscutter.game.entity.GameEntity;
 import lombok.val;
@@ -18,13 +19,14 @@ public class ActionServerLuaTriggerEvent extends AbilityActionHandler {
     public boolean execute(Ability ability, AbilityModifierAction action, byte[] abilityData, GameEntity target) {
         val scene = target.getScene();
         val scriptManager = scene.getScriptManager();
+        val callType = LuaCallType.fromString(action.luaCallType);
 
-        val params = switch (action.luaCallType) {
-            case "FromGroup" -> {
+        val params = switch (callType) {
+            case FROM_GROUP -> {
                 var groupId = target.getGroupId();
                 yield Lists.newArrayList(new ScriptArgs(groupId, EventType.EVENT_LUA_NOTIFY));
             }
-            case "SpecificGroup" -> Arrays.stream(action.callParamList)
+            case SPECIFIC_GROUP -> Arrays.stream(action.callParamList)
                 .mapToObj(groupId -> new ScriptArgs(groupId, EventType.EVENT_LUA_NOTIFY))
                 .toList();
             default -> {
