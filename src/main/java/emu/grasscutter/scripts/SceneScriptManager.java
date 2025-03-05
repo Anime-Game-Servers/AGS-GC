@@ -3,14 +3,14 @@ package emu.grasscutter.scripts;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.Loggers;
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.excels.MonsterData;
 import emu.grasscutter.data.excels.WorldLevelData;
 import emu.grasscutter.data.server.Grid;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.entity.*;
 import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
 import emu.grasscutter.game.entity.create_config.CreateMonsterEntityConfig;
-import emu.grasscutter.game.entity.gadget.platform.BaseRoute;
+import emu.grasscutter.game.entity.create_config.CreateNpcEntityConfig;
+import emu.grasscutter.game.entity.create_config.CreateRegionEntityConfig;
 import emu.grasscutter.game.quest.GameQuest;
 import emu.grasscutter.game.quest.QuestGroupSuite;
 import emu.grasscutter.game.quest.enums.QuestContent;
@@ -329,10 +329,10 @@ public class SceneScriptManager {
 
     public void registerRegion(EntityRegion region) {
         regions.put(region.getId(), region);
-        logger.debug("Registered region {} from group {}", region.getMetaRegion().getConfigId(), region.getGroupId());
+        logger.debug("Registered region {} from group {}", region.getConfigId(), region.getGroupId());
     }
     public void registerRegionInGroupSuite(SceneGroup group, SceneSuite suite) {
-        suite.getSceneRegions().stream().map(region -> new EntityRegion(this.getScene(), region))
+        suite.getSceneRegions().stream().map(region -> new EntityRegion(this.getScene(), new CreateRegionEntityConfig(region)))
             .forEach(this::registerRegion);
     }
     public synchronized void deregisterRegion(SceneRegion region) {
@@ -571,14 +571,12 @@ public class SceneScriptManager {
         }
 
         for (var region : this.regions.values()) {
-            val metaRegion = region.getMetaRegion();
-
             getScene().getEntities().values().stream()
-                .filter(e -> metaRegion.contains(e.getPosition()) && !region.getEntities().contains(e))
+                .filter(e -> region.isPosInRegion(e.getPosition()) && !region.getEntities().contains(e))
                 .forEach(region::addEntity);
 
             region.getEntities().stream()
-                .filter(e -> !metaRegion.contains(e.getPosition()))
+                .filter(e -> !region.isPosInRegion(e.getPosition()))
                 .forEach(region::removeEntity);
 
             // call enter region events for new entities
@@ -867,8 +865,8 @@ public class SceneScriptManager {
 
         return entity;
     }
-    public EntityNPC createNPC(SceneNPC npc, int blockId, int suiteId) {
-        return new EntityNPC(getScene(), npc, blockId, suiteId);
+    public EntityNPC createNPC(SceneNPC npc) {
+        return new EntityNPC(getScene(), new CreateNpcEntityConfig(npc));
     }
     public EntityMonster createMonster(SceneMonster monster) {
         if (monster == null) {

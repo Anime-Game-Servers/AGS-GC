@@ -30,7 +30,7 @@ import org.anime_game_servers.multi_proto.gi.messages.scene.entity.SceneEntityIn
 import javax.annotation.Nullable;
 import java.util.*;
 
-public abstract class GameEntity<T extends CreateEntityConfig> {
+public abstract class GameEntity<T extends CreateEntityConfig<?>> {
     @Getter private final Scene scene;
     @Getter protected int id;
     @Getter @Setter private SpawnDataEntry spawnEntry;

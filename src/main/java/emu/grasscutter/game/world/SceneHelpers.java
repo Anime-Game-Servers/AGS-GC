@@ -5,6 +5,7 @@ import emu.grasscutter.data.GameData;
 import emu.grasscutter.game.entity.*;
 import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
 import emu.grasscutter.game.entity.create_config.CreateMonsterEntityConfig;
+import emu.grasscutter.game.entity.create_config.CreateNpcEntityConfig;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.EntityType;
 import lombok.AllArgsConstructor;
@@ -46,6 +47,9 @@ public class SceneHelpers {
                 gameEntity = new EntityMonster(scene, createConfig);
             }
             case NPC -> {
+                val npcId = entityIdInfo.getId();
+                val createConfig = new CreateNpcEntityConfig(createEntityInfo, npcId);
+                gameEntity = new EntityNPC(scene, createConfig);
             }
         }
 

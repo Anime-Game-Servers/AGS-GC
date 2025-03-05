@@ -22,28 +22,44 @@ public class CreateMonsterEntityConfig extends CreateEntityConfig<CreateMonsterE
     private int aiId = 0;
     private int poseId = 0;
     private int campId = 0;
+    private int titleId = 0;
+    private int specialNameId = 0;
+    private int weaponId = 0;
     //TODO
 
     public CreateMonsterEntityConfig(int monsterId){
         this.monsterId = monsterId;
+
+        setupMonsterData(monsterId);
+        setupConfigEntity(monsterId);
+        setupFromMonsterData();
     }
+
     public CreateMonsterEntityConfig(MonsterData monsterData){
         this.monsterId = monsterData.getId();
         this.monsterData = monsterData;
+        this.campId = monsterData.getCampID();
+
+        setupConfigEntity(monsterId);
+        setupFromMonsterData();
     }
 
     public CreateMonsterEntityConfig(GameEntity<?> parent, int monsterId){
         super(parent);
         this.monsterId = monsterId;
+
         setupMonsterData(monsterId);
         setupConfigEntity(monsterId);
+        setupFromMonsterData();
     }
 
     public CreateMonsterEntityConfig(CreateEntityInfo requestedConfig, int monsterId){
         super(requestedConfig);
         this.monsterId = monsterId;
+
         setupMonsterData(monsterId);
         setupConfigEntity(monsterId);
+        setupFromMonsterData();
     }
 
     public CreateMonsterEntityConfig(SceneMonster monster){
@@ -52,10 +68,15 @@ public class CreateMonsterEntityConfig extends CreateEntityConfig<CreateMonsterE
         this.dropId = monster.getDropId();
         this.aiId = monster.getAiConfigId();
         this.poseId = monster.getPoseId();
+        if(monster.getSpecialNameId() != 0){
+            this.specialNameId = monster.getSpecialNameId();
+            this.titleId = monster.getTitleId();
+        }
         // TODO
 
         setupMonsterData(monsterId);
         setupConfigEntity(monsterId);
+        setupFromMonsterData();
     }
 
     public CreateMonsterEntityConfig(SpawnDataEntry spawnDataEntry){
@@ -66,6 +87,7 @@ public class CreateMonsterEntityConfig extends CreateEntityConfig<CreateMonsterE
 
         setupMonsterData(monsterId);
         setupConfigEntity(monsterId);
+        setupFromMonsterData();
     }
 
     private void setupConfigEntity(int monsterId){
@@ -77,11 +99,21 @@ public class CreateMonsterEntityConfig extends CreateEntityConfig<CreateMonsterE
 
     private void setupMonsterData(int monsterId){
         this.monsterData = GameData.getMonsterDataMap().get(monsterId);
+    }
+
+    private void setupFromMonsterData(){
         if(this.monsterData == null){
             return;
         }
         if(campId == 0) {
             this.campId = this.monsterData.getCampID();
+        }
+        if(weaponId == 0) {
+            this.weaponId = this.monsterData.getWeaponId();
+        }
+        if(monsterData.getDescribeData() != null && specialNameId == 0){
+            this.titleId = monsterData.getDescribeData().getTitleId();
+            this.specialNameId = monsterData.getSpecialNameId();
         }
     }
 }

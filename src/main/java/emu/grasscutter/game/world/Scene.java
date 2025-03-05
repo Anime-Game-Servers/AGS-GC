@@ -18,6 +18,7 @@ import emu.grasscutter.game.dungeons.challenge.WorldChallenge;
 import emu.grasscutter.game.dungeons.enums.DungeonPassConditionType;
 import emu.grasscutter.game.dungeons.settle_listeners.DungeonSettleListener;
 import emu.grasscutter.game.entity.*;
+import emu.grasscutter.game.entity.create_config.CreateRegionEntityConfig;
 import emu.grasscutter.game.entity.gadget.platform.ConfigRoute;
 import emu.grasscutter.game.entity.create_config.CreateEntityConfig;
 import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
@@ -780,7 +781,7 @@ public class Scene {
         //Load triggers and regions
         this.scriptManager.registerTrigger(group.getTriggers().values().stream().filter(p -> p.getName().contains(triggerName)).toList());
         group.getRegions().values().stream().filter(q -> q.getConfigId() == Integer.parseInt(triggerName.substring(13)))
-            .map(region -> new EntityRegion(this, region)).forEach(this.scriptManager::registerRegion);
+            .map(region -> new EntityRegion(this, new CreateRegionEntityConfig(region))).forEach(this.scriptManager::registerRegion);
     }
 
 

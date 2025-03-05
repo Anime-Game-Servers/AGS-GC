@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 
 import static org.anime_game_servers.gi_lua.models.constants.EventType.EVENT_SPECIFIC_MONSTER_HP_CHANGE;
 
+@Getter
 public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> implements StringAbilityEntity {
     @Getter(onMethod = @__(@Override))
     private final Int2FloatOpenHashMap fightProperties;
@@ -49,17 +50,18 @@ public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> impleme
     private final Position position;
     @Getter(onMethod = @__(@Override))
     private final Position rotation;
-    @Getter private final MonsterData monsterData;
-    @Getter private final ConfigEntityMonster configEntityMonster;
-    @Getter private final Position bornPos;
-    @Getter private final Position bornRot;
-    @Getter private EntityWeapon weaponEntity;
-    @Getter @Setter private int poseId;
-    @Getter @Setter private int aiId = -1;
+    private final MonsterData monsterData;
+    private final ConfigEntityMonster configEntityMonster;
+    private final Position bornPos;
+    private final Position bornRot;
+    private EntityWeapon weaponEntity;
+    @Setter private int poseId;
+    @Setter private int aiId = -1;
+    private int titleId = 0;
+    private int specialNameId = 0;
+    private int weaponId = 0;
 
-    @Getter private List<Player> playerOnBattle;
-
-    @Getter @Setter private SceneMonster metaMonster;
+    private List<Player> playerOnBattle;
 
     public EntityMonster(Scene scene, CreateMonsterEntityConfig config) {
         super(scene, config);
@@ -76,19 +78,18 @@ public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> impleme
 
         this.configEntityMonster = config.getConfigEntity();
 
-        if(getSpawnConfig().getInitDataSource() instanceof SceneMonster sceneMonster){
-            this.metaMonster = sceneMonster;
-        }
-
         // Monster weapon
-        if (getMonsterWeaponId() > 0) {
-            val weaponConfig = new CreateGadgetEntityConfig(getMonsterWeaponId());
+        this.weaponId = config.getWeaponId();
+        if (weaponId > 0) {
+            val weaponConfig = new CreateGadgetEntityConfig(weaponId);
             this.weaponEntity = new EntityWeapon(scene, weaponConfig);
             scene.getWeaponEntities().put(this.weaponEntity.getId(), this.weaponEntity);
             //this.weaponEntityId = getWorld().getNextEntityId(EntityIdType.WEAPON);
         }
         this.aiId = config.getAiId();
         this.poseId = config.getPoseId();
+        this.titleId = config.getTitleId();
+        this.specialNameId = config.getSpecialNameId();
 
         this.recalcStats();
 
@@ -188,12 +189,8 @@ public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> impleme
         return getMonsterId();
     }
 
-    public int getMonsterWeaponId() {
-        return this.getMonsterData().getWeaponId();
-    }
-
     private int getMonsterId() {
-        return this.getMonsterData().getId();
+        return this.getSpawnConfig().getMonsterId();
     }
 
     @Override
@@ -281,8 +278,8 @@ public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> impleme
         }
 
         SceneGroupInstance groupInstance = scene.getScriptManager().getGroupInstanceById(this.getGroupId());
-        if(groupInstance != null && metaMonster != null)
-            groupInstance.getDeadEntities().add(metaMonster.getConfigId());
+        if(groupInstance != null)
+            groupInstance.getDeadEntities().add(getConfigId());
 
         scene.triggerDungeonEvent(DungeonPassConditionType.DUNGEON_COND_KILL_GROUP_MONSTER, this.getGroupId());
         scene.triggerDungeonEvent(DungeonPassConditionType.DUNGEON_COND_KILL_TYPE_MONSTER, this.getMonsterData().getType().getValue());
@@ -346,17 +343,12 @@ public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> impleme
         monsterInfo.setBlockId(getScene().getId());
         monsterInfo.setBornType(MonsterBornType.MONSTER_BORN_DEFAULT);
 
-        if(metaMonster!=null && metaMonster.getSpecialNameId()!=0){
-            monsterInfo.setTitleId(this.metaMonster.getTitleId());
-            monsterInfo.setSpecialNameId(this.metaMonster.getSpecialNameId());
-        } else if (monsterData.getDescribeData() != null) {
-            monsterInfo.setTitleId(monsterData.getDescribeData().getTitleId());
-            monsterInfo.setSpecialNameId(monsterData.getSpecialNameId());
-        }
+        monsterInfo.setTitleId(getTitleId());
+        monsterInfo.setSpecialNameId(getSpecialNameId());
 
-        if (this.getMonsterWeaponId() > 0) {
+        if (this.getWeaponId() > 0) {
             val entityId = this.getWeaponEntity() != null ? this.getWeaponEntity().getId() : 0;
-            val weaponInfo = new SceneWeaponInfo(entityId, this.getMonsterWeaponId());
+            val weaponInfo = new SceneWeaponInfo(entityId, this.getWeaponId());
             weaponInfo.setAbilityInfo(new AbilitySyncStateInfo());
 
             monsterInfo.setWeaponList(List.of(weaponInfo));
