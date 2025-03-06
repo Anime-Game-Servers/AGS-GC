@@ -27,7 +27,7 @@ jobs:
           distribution: temurin
           java-version: '17'
       - name: Cache gradle files
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -39,7 +39,7 @@ jobs:
       - name: Run Gradle
         run: ./gradlew --refresh-dependencies && ./gradlew --refresh-dependencies shadowJar
       - name: Upload build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Grasscutter
           path: grasscutter-*.jar

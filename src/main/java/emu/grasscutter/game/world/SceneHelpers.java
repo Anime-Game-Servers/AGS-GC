@@ -29,7 +29,10 @@ public class SceneHelpers {
                 val gadgetData = createConfig.getGadgetData();
                 val gadgetType = gadgetData != null ? gadgetData.getType() : EntityType.None;
                 gameEntity = switch (gadgetType){
-                    case Vehicle -> new EntityVehicle(scene, player, createConfig);
+                    case Vehicle -> {
+                        createConfig.setPlayerOwner(player);
+                        yield new EntityVehicle(scene, createConfig);
+                    }
                     default -> new EntityGadget(scene, createConfig);
                 };
             }

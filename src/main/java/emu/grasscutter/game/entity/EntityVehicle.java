@@ -33,9 +33,9 @@ public class EntityVehicle extends EntityBaseGadget {
     @Getter @Setter private float curStamina;
     @Getter private final List<VehicleMember> vehicleMembers;
 
-    public EntityVehicle(Scene scene, Player player, CreateGadgetEntityConfig createConfig) {
+    public EntityVehicle(Scene scene, CreateGadgetEntityConfig createConfig) {
         super(scene, createConfig);
-        this.owner = player;
+        this.owner = createConfig.getPlayerOwner();
         this.id = getScene().getWorld().getNextEntityId(EntityIdType.GADGET);
         this.curStamina = 240; // might be in configGadget.GCALKECLLLP.JBAKBEFIMBN.ANBMPHPOALP
         this.vehicleMembers = new ArrayList<>();

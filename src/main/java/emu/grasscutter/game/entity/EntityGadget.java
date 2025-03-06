@@ -15,7 +15,6 @@ import emu.grasscutter.game.props.PlayerProperty;
 import emu.grasscutter.game.world.Scene;
 import emu.grasscutter.game.world.SceneGroupInstance;
 import emu.grasscutter.game.world.SpawnDataEntry;
-import emu.grasscutter.scripts.EntityControllerScriptManager;
 import emu.grasscutter.server.packet.send.PacketGadgetStateNotify;
 import emu.grasscutter.server.packet.send.PacketPlatformStartRouteNotify;
 import emu.grasscutter.server.packet.send.PacketPlatformStopRouteNotify;
@@ -26,7 +25,6 @@ import it.unimi.dsi.fastutil.ints.Int2FloatOpenHashMap;
 import lombok.*;
 import org.anime_game_servers.gi_lua.models.ScriptArgs;
 import org.anime_game_servers.gi_lua.models.constants.EventType;
-import org.anime_game_servers.gi_lua.models.scene.group.SceneGadget;
 import org.anime_game_servers.multi_proto.gi.messages.gadget.GadgetInteractReq;
 import org.anime_game_servers.multi_proto.gi.messages.general.ability.AbilitySyncStateInfo;
 import org.anime_game_servers.multi_proto.gi.messages.scene.entity.*;
@@ -39,7 +37,6 @@ public class EntityGadget extends EntityBaseGadget implements ConfigAbilityDataA
 
     @Getter @Setter private int pointType;
     private Int2FloatMap fightProperties;
-    @Getter @Setter private SceneGadget metaGadget;
     @Getter @Setter private BaseRoute routeConfig;
     @Getter @Setter private int draftId;
     @Getter @Setter private int chestDropId;
@@ -56,16 +53,8 @@ public class EntityGadget extends EntityBaseGadget implements ConfigAbilityDataA
         this.id = this.getScene().getWorld().getNextEntityId(EntityIdType.GADGET);
         this.pointType = createData.getPointType();
         this.routeConfig = createData.getRouteConfig();
-        if(createData.getInitDataSource() instanceof SceneGadget gadget)
-            this.metaGadget = gadget;
 
-        if(GameData.getGadgetMappingMap().containsKey(gadgetId)) {
-            String controllerName = GameData.getGadgetMappingMap().get(gadgetId).getServerController();
-            setEntityController(EntityControllerScriptManager.getGadgetController(controllerName));
-            if(getEntityController() == null) {
-                Grasscutter.getLogger().warn("Gadget controller {} not found", controllerName);
-            }
-        }
+        setEntityController(createData.getLuaController());
         this.draftId = createData.getDraftId();
         this.chestDropId = createData.getChestDropId();
         this.chestShowCutscene = createData.isChestShowCutscene();
@@ -145,8 +134,7 @@ public class EntityGadget extends EntityBaseGadget implements ConfigAbilityDataA
 
     @Override
     public void afterCreate(List<Player> players) {
-        if (this.getMetaGadget() != null && !this.getMetaGadget().isStartRoute()) return;
-        if (this.routeConfig == null) return;
+        if (this.routeConfig == null || !this.getSpawnConfig().isStartRoute()) return;
         this.routeConfig.startRoute(this.getScene());
         players.forEach(p -> p.sendPacket(new PacketPlatformStartRouteNotify(this)));
     }

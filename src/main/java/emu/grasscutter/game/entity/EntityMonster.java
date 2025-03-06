@@ -56,10 +56,10 @@ public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> impleme
     private final Position bornRot;
     private EntityWeapon weaponEntity;
     @Setter private int poseId;
-    @Setter private int aiId = -1;
-    private int titleId = 0;
-    private int specialNameId = 0;
-    private int weaponId = 0;
+    @Setter private int aiId;
+    private final int titleId;
+    private final int specialNameId;
+    private int weaponId;
 
     private List<Player> playerOnBattle;
 
@@ -84,7 +84,6 @@ public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> impleme
             val weaponConfig = new CreateGadgetEntityConfig(weaponId);
             this.weaponEntity = new EntityWeapon(scene, weaponConfig);
             scene.getWeaponEntities().put(this.weaponEntity.getId(), this.weaponEntity);
-            //this.weaponEntityId = getWorld().getNextEntityId(EntityIdType.WEAPON);
         }
         this.aiId = config.getAiId();
         this.poseId = config.getPoseId();

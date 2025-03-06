@@ -1471,17 +1471,16 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
         }
 
         var routeConfig = entityGadget.getRouteConfig();
-        if(!(routeConfig instanceof PointArrayRoute)){
-            routeConfig = new PointArrayRoute((entityGadget).getMetaGadget());
+        if(routeConfig instanceof PointArrayRoute pointArrayRoute) {
+            if(pointArrayRoute.getPointArrayId() == pointArrayId){
+                return -1;
+            }
+            pointArrayRoute.setPointArrayId(pointArrayId);
+        } else {
+            routeConfig = new PointArrayRoute(entityGadget.getRotation(), pointArrayId);
             entityGadget.setRouteConfig(routeConfig);
         }
 
-        val configRoute = (PointArrayRoute) routeConfig;
-        if(configRoute.getPointArrayId() == pointArrayId){
-            return -1;
-        }
-
-        configRoute.setPointArrayId(pointArrayId);
         val pointIndexList = Arrays.stream(var3.getAsIntArray()).boxed().toList();
         if (!entityGadget.scheduleArrayPoints(pointArrayId, pointIndexList)) {
             return -1;
@@ -1505,19 +1504,18 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
         }
 
         var routeConfig = entityGadget.getRouteConfig();
-        if(!(routeConfig instanceof ConfigRoute)){
-            routeConfig = new ConfigRoute((entityGadget).getMetaGadget());
+        if(routeConfig instanceof ConfigRoute configRoute){
+            if(configRoute.getRouteId() == routeId){
+                return 0;
+            }
+            configRoute.setRouteId(routeId);
+        } else {
+            routeConfig = new ConfigRoute(entityGadget.getRotation().clone(), routeId);
             entityGadget.setRouteConfig(routeConfig);
         }
 
-        val configRoute = (ConfigRoute) routeConfig;
-        if(configRoute.getRouteId() == routeId){
-            return 0;
-        }
-
-        configRoute.setRouteId(routeId);
-        configRoute.setStartSceneTime(scene.getSceneTime());
-        configRoute.setStartIndex(0);
+        routeConfig.setStartSceneTime(scene.getSceneTime());
+        routeConfig.setStartIndex(0);
         entityGadget.schedulePlatform();
         scene.broadcastPacket(new PacketPlatformChangeRouteNotify(entityGadget));
         return 0;

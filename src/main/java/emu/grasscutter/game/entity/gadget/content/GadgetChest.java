@@ -57,9 +57,8 @@ public class GadgetChest extends GadgetContent {
      * */
     public void onBuildProto(SceneGadgetInfo gadgetInfo) {
         val playersUid = getGadget().getScene().getPlayers().stream().map(Player::getUid).toList();
-        val configSource = getGadget().getSpawnConfig().getInitDataSource();
-        if(configSource instanceof SceneGadget sceneGadget && sceneGadget.getBossChest()!=null){
-            val bossChest = sceneGadget.getBossChest();
+        val bossChest = getGadget().getSpawnConfig().getBossChestInfo();
+        if(bossChest != null){
             val chestProto = new BossChestInfo(bossChest.getMonsterConfigId(), bossChest.getResin());
 
             // removing instead of creating new list directly below is because

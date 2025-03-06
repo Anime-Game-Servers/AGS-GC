@@ -32,7 +32,7 @@ public class GadgetGatherPoint extends GadgetContent {
             .setBornRot(originalConfig.getBornRot().clone())
             .setGadgetState(originalConfig.getGadgetState())
             .setPointType(originalConfig.getPointType());
-        createConfig.setInitDataSource(gadget.getMetaGadget());
+        createConfig.setInitDataSource(gadget.getSpawnConfig().getInitDataSource());
 
         gatherObjectChild = new EntityGadget(scene, createConfig);
 

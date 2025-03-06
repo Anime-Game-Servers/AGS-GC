@@ -157,7 +157,8 @@ public final class SpawnCommand implements CommandHandler {
 
         EntityBaseGadget entity;
         if (gadgetData.getType() == EntityType.Vehicle) {
-            entity = new EntityVehicle(param.scene, targetPlayer, config);
+            config.setPlayerOwner(targetPlayer);
+            entity = new EntityVehicle(param.scene, config);
         } else {
             entity = new EntityGadget(param.scene, config);
         }

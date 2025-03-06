@@ -22,10 +22,11 @@ public class ItemUseMakeGadget extends ItemUseInt {
         var rot = player.getRotation().clone();
         CreateGadgetEntityConfig config = new CreateGadgetEntityConfig(this.i)
             .setBornPos(pos)
-            .setBornRot(rot);
+            .setBornRot(rot)
+            .setPlayerOwner(player);
 
         // TODO this should probably not be a vehicle, since its used for spawning gadget 70300080 and 70800017
-        var e = new EntityVehicle(scene, player, config);
+        var e = new EntityVehicle(scene, config);
         scene.addEntity(e);
         return true;
     }

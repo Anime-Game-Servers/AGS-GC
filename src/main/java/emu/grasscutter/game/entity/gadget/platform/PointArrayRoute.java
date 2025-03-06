@@ -19,15 +19,16 @@ public class PointArrayRoute extends BaseRoute {
     @Getter @Setter int pointArrayId;
     @Getter @Setter List<RoutePoint> routePoints;
 
-    public PointArrayRoute(SceneGadget gadget) {
-        super(gadget);
-        routePoints = new ArrayList<>();
+    public PointArrayRoute(Position startRot, int pointArrayId) {
+        super(startRot);
+        this.pointArrayId = pointArrayId;
+        this.routePoints = new ArrayList<>();
     }
 
     public PointArrayRoute(Position startRot, boolean startRoute, boolean isActive, int pointArrayId) {
         super(startRot, startRoute, isActive);
         this.pointArrayId = pointArrayId;
-        routePoints = new ArrayList<>();
+        this.routePoints = new ArrayList<>();
     }
 
     @Override

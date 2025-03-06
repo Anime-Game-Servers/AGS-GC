@@ -157,7 +157,7 @@ public class GadgetControllerHandler extends BaseHandler implements org.anime_ga
     @NotNull
     @Override
     public int[] GetGadgetArguments(@NotNull ControllerLuaContext controllerLuaContext) {
-        val gadgetArguments = controllerLuaContext.getGadget().getMetaGadget().getArguments();
+        val gadgetArguments = controllerLuaContext.getGadget().getSpawnConfig().getArguments();
         return gadgetArguments != null ? gadgetArguments.stream().mapToInt(Integer::intValue).toArray() : new int[0];
     }
 }

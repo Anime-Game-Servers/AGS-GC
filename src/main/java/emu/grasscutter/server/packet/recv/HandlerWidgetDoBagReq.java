@@ -44,8 +44,9 @@ public class HandlerWidgetDoBagReq extends TypedPacketHandler<WidgetDoBagReq> {
         var scene = player.getScene();
         val config = new CreateGadgetEntityConfig(gadgetId)
             .setBornPos(pos)
-            .setBornRot(rot);
-        var entity = new EntityVehicle(scene, player, config);
+            .setBornRot(rot)
+            .setPlayerOwner(player);
+        var entity = new EntityVehicle(scene, config);
         scene.addEntity(entity);
         session.send(new PacketWidgetGadgetDataNotify(gadgetId, entity.getId()));
     }

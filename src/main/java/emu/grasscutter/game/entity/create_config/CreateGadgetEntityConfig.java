@@ -1,5 +1,6 @@
 package emu.grasscutter.game.entity.create_config;
 
+import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.binout.AbilityModifier;
 import emu.grasscutter.data.binout.config.ConfigEntityGadget;
@@ -12,18 +13,17 @@ import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.CampTargetType;
 import emu.grasscutter.game.world.SpawnDataEntry;
+import emu.grasscutter.scripts.EntityControllerScriptManager;
+import emu.grasscutter.scripts.data.controller.EntityController;
 import emu.grasscutter.utils.Position;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
-import lombok.val;
+import org.anime_game_servers.gi_lua.models.scene.group.SceneBossChest;
 import org.anime_game_servers.gi_lua.models.scene.group.SceneGadget;
 import org.anime_game_servers.multi_proto.gi.messages.ability.action.AbilityActionCreateGadget;
 import org.anime_game_servers.multi_proto.gi.messages.battle.event.EvtCreateGadgetNotify;
 import org.anime_game_servers.multi_proto.gi.messages.general.entity.CreateEntityInfo;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +36,7 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
     private int campType = 0;
     private int roomId = 0;
     private int sceneId = 0;
+    private boolean isStartRoute = false;
     private BaseRoute routeConfig = null;
     private GadgetContent content = null;
     private int pointType;
@@ -57,18 +58,20 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
     private List<Integer> targetEntityIds = new ArrayList<>();
     private GameItem item = null;
     private boolean shareItem = true;
+    private EntityController luaController = null;
+    private BossChestInfo bossChestInfo = null;
 
 
     public CreateGadgetEntityConfig(int gadgetId){
         super(gadgetId);
         this.gadgetId = gadgetId;
-        initGadgetData(gadgetId);
+        initBaseData();
     }
 
     public CreateGadgetEntityConfig(GameEntity<?> parent, int gadgetId){
         super(parent);
         this.gadgetId = gadgetId;
-        initGadgetData(gadgetId);
+        initBaseData();
     }
 
     public CreateGadgetEntityConfig(CreateEntityInfo requestedConfig, int gadgetId){
@@ -80,7 +83,7 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
             this.chestDropId = gadgetInfo.getChest().getChestDropId();
             this.chestShowCutscene = gadgetInfo.getChest().isShowCutscene();
         }
-        initGadgetData(gadgetId);
+        initBaseData();
     }
 
     public CreateGadgetEntityConfig(SceneGadget gadget){
@@ -99,8 +102,10 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
         }
         this.chestDropId = gadget.getChestDropId();
         this.chestShowCutscene = gadget.isShowCutscene();
+        this.bossChestInfo = BossChestInfo.fromSceneBossChest(gadget.getBossChest());
         this.arguments = gadget.getArguments();
-        initGadgetData(gadgetId);
+        this.isStartRoute = gadget.isStartRoute();
+        initBaseData();
     }
 
     public CreateGadgetEntityConfig(EvtCreateGadgetNotify evtCreateGadgetNotify){
@@ -118,7 +123,7 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
         if(evtCreateGadgetNotify.getTargetEntityId() != 0){
             this.targetEntityId = evtCreateGadgetNotify.getTargetEntityId();
         }
-        initGadgetData(gadgetId);
+        initBaseData();
     }
 
     public CreateGadgetEntityConfig(AbilityModifier.AbilityModifierAction action, AbilityActionCreateGadget createGadgetInfo){
@@ -128,7 +133,7 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
         setBornRot(new Position(createGadgetInfo.getRot()));
         this.campId = action.campID;
         this.campType = CampTargetType.getTypeByName(action.campTargetType).getValue();
-        initGadgetData(gadgetId);
+        initBaseData();
     }
 
     public CreateGadgetEntityConfig(CreateEntityInfo requestedConfig, ItemData itemData){
@@ -142,7 +147,7 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
         super(itemData);
         this.gadgetId = itemData.getGadgetId();
         this.item = new GameItem(itemData, count);
-        initGadgetData(gadgetId);
+        initBaseData();
     }
     public CreateGadgetEntityConfig(SpawnDataEntry spawnDataEntry){
         super(spawnDataEntry);
@@ -150,7 +155,12 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
         if (spawnDataEntry.getGadgetState() > 0) {
             this.gadgetState = spawnDataEntry.getGadgetState();
         }
+        initBaseData();
+    }
+
+    private void initBaseData(){
         initGadgetData(gadgetId);
+        initController();
     }
 
     private void initGadgetData(int gadgetId){
@@ -163,6 +173,31 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
         }
         if(campId == 0){
             campId = gadgetData.getCampID();
+        }
+    }
+
+    private void initController(){
+        if(GameData.getGadgetMappingMap().containsKey(gadgetId)) {
+            String controllerName = GameData.getGadgetMappingMap().get(gadgetId).getServerController();
+            luaController = EntityControllerScriptManager.getGadgetController(controllerName);
+            if(luaController == null) {
+                Grasscutter.getLogger().warn("Gadget controller {} not found", controllerName);
+            }
+        }
+    }
+
+    @AllArgsConstructor @Data
+    public static class BossChestInfo {
+        private int lifeTime;
+        private int monsterConfigId;
+        private int resin;
+        private int takeNum;
+        static BossChestInfo fromSceneBossChest(SceneBossChest sceneBossChest){
+            if (sceneBossChest == null) {
+                return null;
+            }
+            return new BossChestInfo(sceneBossChest.getLifeTime(), sceneBossChest.getMonsterConfigId(),
+                sceneBossChest.getResin(), sceneBossChest.getTakeNum());
         }
     }
 }
