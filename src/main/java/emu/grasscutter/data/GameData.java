@@ -1,45 +1,23 @@
 package emu.grasscutter.data;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.binout.*;
-import emu.grasscutter.data.binout.config.ConfigEntityAvatar;
-import emu.grasscutter.data.binout.config.ConfigEntityGadget;
-import emu.grasscutter.data.binout.config.ConfigEntityMonster;
-import emu.grasscutter.data.binout.config.ConfigGlobalCombat;
-import emu.grasscutter.data.binout.config.ConfigLevelEntity;
-import emu.grasscutter.game.dungeons.dungeon_entry.DungeonEntries;
+import emu.grasscutter.data.binout.config.*;
+import emu.grasscutter.data.binout.routes.Route;
+import emu.grasscutter.data.common.ScenePointArrayData;
 import emu.grasscutter.data.common.WeatherAreaPointData;
 import emu.grasscutter.data.common.quest.MainQuestData;
 import emu.grasscutter.data.common.quest.SubQuestData;
-import emu.grasscutter.data.binout.routes.Route;
-import emu.grasscutter.data.custom.*;
-import emu.grasscutter.data.server.ActivityCondGroup;
-import emu.grasscutter.data.server.DropSubfieldMapping;
-import emu.grasscutter.data.server.DropTableExcelConfigData;
-import emu.grasscutter.data.server.GadgetMapping;
-import emu.grasscutter.data.server.MonsterMapping;
-import emu.grasscutter.data.server.SubfieldMapping;
-import emu.grasscutter.data.server.WeatherMapping;
+import emu.grasscutter.data.custom.TrialAvatarActivityCustomData;
+import emu.grasscutter.data.custom.TrialAvatarCustomData;
+import emu.grasscutter.data.excels.*;
+import emu.grasscutter.data.server.*;
 import emu.grasscutter.game.dungeons.DungeonDropEntry;
+import emu.grasscutter.game.dungeons.dungeon_entry.DungeonEntries;
 import emu.grasscutter.game.quest.QuestEncryptionKey;
 import emu.grasscutter.game.quest.enums.QuestCond;
 import emu.grasscutter.utils.Utils;
-import emu.grasscutter.data.excels.*;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Tolerate;
@@ -50,6 +28,8 @@ import org.anime_game_servers.gi_lua.models.scene.DummyPoint;
 import org.anime_game_servers.gi_lua.models.scene.SceneGroupReplacement;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
+import java.util.*;
 
 public class GameData {
     // BinOutputs
@@ -76,7 +56,8 @@ public class GameData {
     @Getter private static final Int2ObjectMap<DungeonPassConfigData> dungeonPassConfigDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<DungeonChallengeConfigData> dungeonChallengeConfigDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<Int2ObjectMap<Route>> sceneRouteData = new Int2ObjectOpenHashMap<>();
-
+    @Getter private static final Int2ObjectMap<LevelTagData> levelTagDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<LevelTagGroupsData> levelTagGroupsDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final ArrayList<CodexReliquaryData> codexReliquaryArrayList = new ArrayList<>();
     @Getter private static final Int2ObjectMap<ActivityData> activityDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<ActivityShopData> activityShopDataMap = new Int2ObjectOpenHashMap<>();
@@ -107,6 +88,7 @@ public class GameData {
     @Getter private static final Int2ObjectMap<CodexQuestData> codexQuestDataIdMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<CodexReliquaryData> codexReliquaryDataIdMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<CodexWeaponData> codexWeaponDataIdMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<CodexViewpointData> codexViewpointDataIdMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<CombineData> combineDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<CookBonusData> cookBonusDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<CookRecipeData> cookRecipeDataMap = new Int2ObjectOpenHashMap<>();
@@ -128,6 +110,7 @@ public class GameData {
     @Getter private static final Int2ObjectMap<ForgeData> forgeDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<FurnitureMakeConfigData> furnitureMakeConfigDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<GadgetData> gadgetDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<GadgetInteractData> gadgetInteractDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<GatherData> gatherDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<GuideTriggerData> guideTriggerDataMap = new Int2ObjectOpenHashMap<>(); // Don't use, just to prevent resource loader from crashing
     @Getter private static final Int2ObjectMap<HomeWorldBgmData> homeWorldBgmDataMap = new Int2ObjectOpenHashMap<>();
@@ -186,6 +169,7 @@ public class GameData {
     private static final Int2ObjectMap<CodexQuestData> codexQuestDataMap = new Int2ObjectOpenHashMap<>();
     private static final Int2ObjectMap<CodexReliquaryData> codexReliquaryDataMap = new Int2ObjectOpenHashMap<>();
     private static final Int2ObjectMap<CodexWeaponData> codexWeaponDataMap = new Int2ObjectOpenHashMap<>();
+    private static final Int2ObjectMap<CodexViewpointData> codexViewpointDataMap = new Int2ObjectOpenHashMap<>();
 
     @Getter private static final Int2ObjectMap<List<DungeonDropEntry>> dungeonDropDataMap = new Int2ObjectOpenHashMap<>();
 
@@ -220,6 +204,7 @@ public class GameData {
     @Getter private static final Map<Integer, TrialAvatarActivityDataData> trialAvatarActivityDataCustomData = new HashMap<>();
     @Getter private static final Int2IntMap trialAvatarIndexIdTrialActivityDataDataMap = new Int2IntOpenHashMap();
     @Getter private static final Map<Integer, List<WeatherAreaPointData>> weatherAreaPointData = new HashMap<>();
+    @Getter private static final Map<Integer, List<ScenePointArrayData>> scenePointArrayData = new HashMap<>();
 
     // Getters with wrong names, remove later
     @Deprecated(forRemoval = true) public static Int2ObjectMap<CodexReliquaryData> getcodexReliquaryIdMap() {return codexReliquaryDataIdMap;}
@@ -337,6 +322,10 @@ public class GameData {
         return sceneRouteData.computeIfAbsent(sceneId, k -> new Int2ObjectOpenHashMap<>());
     }
 
+    public static List<ScenePointArrayData> getScenePointArrays(int sceneId) {
+        return scenePointArrayData.computeIfAbsent(sceneId, k -> List.of(new ScenePointArrayData()));
+    }
+
     @Nullable
     public static TrialAvatarActivityDataData getTrialAvatarActivityDataByAvatarIndex(int trialAvatarIndexId){
         // prefer custom data over official data
@@ -353,5 +342,9 @@ public class GameData {
 
     public static TriggerExcelConfigData getQuestTriggerDataByName(int groupId, String triggerName){
         return triggerDataByNameMap.get(groupId + triggerName);
+    }
+
+    public static CodexViewpointData getViewCodexByGroupdCfg(int groupId, int cfgId){
+        return codexViewpointDataIdMap.get(CodexViewpointData.getViewpointId(groupId, cfgId));
     }
 }

@@ -5,8 +5,8 @@ import emu.grasscutter.utils.Position;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import messages.general.MathQuaternion;
-import messages.scene.entity.PlatformInfo;
+import org.anime_game_servers.multi_proto.gi.messages.general.MathQuaternion;
+import org.anime_game_servers.multi_proto.gi.messages.scene.entity.PlatformInfo;
 import org.anime_game_servers.gi_lua.models.scene.group.SceneGadget;
 
 public abstract class BaseRoute {
@@ -22,18 +22,16 @@ public abstract class BaseRoute {
         this.isStarted = isStarted;
         this.isActive = isActive;
     }
-
-    BaseRoute(SceneGadget gadget) {
-        this.startRot = new Position(gadget.getRot());
-        this.isStarted = false;
-        this.isActive = true;
+    BaseRoute(Position startRot) {
+        this(startRot, false, true);
     }
 
     public static BaseRoute fromSceneGadget(SceneGadget sceneGadget) {
+        val startRot = new Position(sceneGadget.getRot());
         if (sceneGadget.getRouteId() != 0) {
-            return new ConfigRoute(sceneGadget);
+            return new ConfigRoute(startRot, sceneGadget.getRouteId());
         } else if (sceneGadget.isUsePointArray()) {
-            return new PointArrayRoute(sceneGadget);
+            return new PointArrayRoute(startRot, 0);
         }
         return null;
     }

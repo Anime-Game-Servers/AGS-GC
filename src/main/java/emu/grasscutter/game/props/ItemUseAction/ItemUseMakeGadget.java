@@ -1,6 +1,7 @@
 package emu.grasscutter.game.props.ItemUseAction;
 
 import emu.grasscutter.game.entity.EntityVehicle;
+import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
 import emu.grasscutter.game.props.ItemUseOp;
 
 public class ItemUseMakeGadget extends ItemUseInt {
@@ -19,7 +20,13 @@ public class ItemUseMakeGadget extends ItemUseInt {
         var scene = player.getScene();
         var pos = player.getPosition().nearby2d(1f);
         var rot = player.getRotation().clone();
-        var e = new EntityVehicle(scene, player, this.i, 0, pos, rot);
+        CreateGadgetEntityConfig config = new CreateGadgetEntityConfig(this.i)
+            .setBornPos(pos)
+            .setBornRot(rot)
+            .setPlayerOwner(player);
+
+        // TODO this should probably not be a vehicle, since its used for spawning gadget 70300080 and 70800017
+        var e = new EntityVehicle(scene, config);
         scene.addEntity(e);
         return true;
     }

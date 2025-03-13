@@ -4,20 +4,21 @@ import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 import dev.morphia.annotations.Indexed;
 import dev.morphia.annotations.Transient;
+import emu.grasscutter.Grasscutter;
 import emu.grasscutter.Loggers;
 import emu.grasscutter.data.GameData;
+import emu.grasscutter.data.binout.ScriptSceneData;
 import emu.grasscutter.data.common.quest.MainQuestData;
 import emu.grasscutter.data.common.quest.MainQuestData.TalkData;
-import emu.grasscutter.data.binout.ScriptSceneData;
 import emu.grasscutter.data.common.quest.SubQuestData;
 import emu.grasscutter.data.excels.RewardData;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.ActionReason;
-import emu.grasscutter.game.quest.enums.*;
+import emu.grasscutter.game.quest.enums.ParentQuestState;
+import emu.grasscutter.game.quest.enums.QuestCond;
+import emu.grasscutter.game.quest.enums.QuestContent;
 import emu.grasscutter.game.world.World;
-import emu.grasscutter.net.proto.ChildQuestOuterClass.ChildQuest;
-import emu.grasscutter.net.proto.ParentQuestOuterClass.ParentQuest;
 import emu.grasscutter.server.packet.send.PacketCodexDataUpdateNotify;
 import emu.grasscutter.server.packet.send.PacketFinishedParentQuestUpdateNotify;
 import emu.grasscutter.server.packet.send.PacketQuestUpdateQuestVarNotify;
@@ -25,13 +26,14 @@ import emu.grasscutter.utils.Position;
 import emu.grasscutter.utils.Utils;
 import lombok.Getter;
 import lombok.val;
+import org.anime_game_servers.core.gi.enums.QuestState;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
+import org.anime_game_servers.multi_proto.gi.messages.quest.parent.ParentQuest;
+import org.anime_game_servers.multi_proto.gi.messages.quest.parent.ChildQuest;
 
 import javax.annotation.Nullable;
 import java.util.*;
-
-import org.anime_game_servers.core.gi.enums.QuestState;
 
 @Entity(value = "quests", useDiscriminator = false)
 public class GameMainQuest {
@@ -253,7 +255,7 @@ public class GameMainQuest {
         return null;
     }
 
-    public GameQuest getRewindTarget(){
+    public GameQuest getHighestActiveQuest() {
         var activeQuests = getChildQuests().values().stream()
             .filter(p -> (p.getState() == QuestState.QUEST_STATE_UNFINISHED || p.getState() == QuestState.QUEST_STATE_FINISHED)).toList();
         var highestActiveQuest = activeQuests.stream()
@@ -265,7 +267,7 @@ public class GameMainQuest {
             var firstUnstarted = getChildQuests().values().stream()
                 .filter(q -> q.getQuestData() != null && q.getState().getValue() != QuestState.QUEST_STATE_FINISHED.getValue())
                 .min(Comparator.comparingInt(a -> a.getQuestData().getOrder()));
-            if(firstUnstarted.isEmpty()){
+            if (firstUnstarted.isEmpty()) {
                 // all quests are probably finished, do don't rewind and maybe also set the mainquest to finished?
                 return null;
             }
@@ -273,14 +275,20 @@ public class GameMainQuest {
             //todo maybe try to accept quests if there is no active quest and no rewind target?
             //tryAcceptSubQuests(QuestTrigger.QUEST_COND_NONE, "", 0);
         }
+        return highestActiveQuest;
+    }
+
+    public GameQuest getRewindTarget(){
+        var highestActiveQuest = getHighestActiveQuest();
 
         var highestOrder = highestActiveQuest.getQuestData().getOrder();
         var rewindTarget = getChildQuests().values().stream()
             .filter(q -> q.getQuestData() != null)
             .filter(q -> q.getQuestData().isRewind() && q.getQuestData().getOrder() <= highestOrder)
             .max(Comparator.comparingInt(a -> a.getQuestData().getOrder()))
-            .orElse(highestActiveQuest);
+            .orElse(null);
 
+        Grasscutter.getLogger().trace("For quest {}, the rewindTarget is {}", this.getParentQuestId(), rewindTarget);
         return rewindTarget;
     }
 
@@ -353,10 +361,10 @@ public class GameMainQuest {
         return true;
     }
 
-    public void checkProgress(){
+    public void checkProgress(boolean shouldReset) {
         for (var quest : getChildQuests().values()){
             if(quest.getState() == QuestState.QUEST_STATE_UNFINISHED) {
-                questManager.checkQuestAlreadyFullfilled(quest);
+                questManager.checkQuestAlreadyFulfilled(quest, shouldReset);
             }
         }
     }
@@ -422,30 +430,22 @@ public class GameMainQuest {
     }
 
     public ParentQuest toProto(boolean withChildQuests) {
-        ParentQuest.Builder proto = ParentQuest.newBuilder()
-                .setParentQuestId(getParentQuestId())
-                .setIsFinished(isFinished())
-                .setParentQuestState(getState().getValue())
-                .setCutsceneEncryptionKey(QuestManager.getQuestKey(parentQuestId));
+        ParentQuest proto = new ParentQuest();
+        proto.setParentQuestId(getParentQuestId());
+        proto.setFinished(isFinished());
+        proto.setParentQuestState(getState().getValue());
+        proto.setVideoKey(QuestManager.getQuestKey(parentQuestId));
+
+
         if(withChildQuests) {
-            for (GameQuest quest : this.getChildQuests().values()) {
-                if (quest.getState() != QuestState.QUEST_STATE_UNSTARTED) {
-                    ChildQuest childQuest = ChildQuest.newBuilder()
-                        .setQuestId(quest.getSubQuestId())
-                        .setState(quest.getState().getValue())
-                        .build();
-
-                    proto.addChildQuestList(childQuest);
-                }
-            }
+            proto.setChildQuestList(this.getChildQuests().values().stream()
+                .filter(quest->quest.getState() != QuestState.QUEST_STATE_UNSTARTED)
+                .map(quest->new ChildQuest(quest.getSubQuestId(), quest.getState().getValue()))
+                .toList());
         }
 
-        for (int i : getQuestVars()) {
-            proto.addQuestVar(i);
-        }
-
-
-        return proto.build();
+        proto.setQuestVar(Arrays.stream(getQuestVars()).boxed().toList());
+        return proto;
     }
 
     // TimeVar handling TODO check if ingame or irl time

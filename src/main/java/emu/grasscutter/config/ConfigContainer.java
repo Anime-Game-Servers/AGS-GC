@@ -95,8 +95,8 @@ public class ConfigContainer {
     }
 
     public static class Server {
-        public Set<Integer> debugWhitelist = Set.of();
-        public Set<Integer> debugBlacklist = Set.of();
+        public Set<String> debugWhitelist = Set.of();
+        public Set<String> debugBlacklist = Set.of();
         public ServerRunMode runMode = ServerRunMode.HYBRID;
         public boolean logCommands = false;
 
@@ -253,6 +253,7 @@ public class ConfigContainer {
         public ResinOptions resinOptions = new ResinOptions();
         public Rates rates = new Rates();
         public boolean questing = false;
+        public boolean unlockScenesByDefault = false;
 
         public static class InventoryLimits {
             public int weapons = 2000;

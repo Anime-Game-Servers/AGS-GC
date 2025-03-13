@@ -6,23 +6,30 @@ import emu.grasscutter.data.GameDepot;
 import emu.grasscutter.data.binout.SceneNpcBornEntry;
 import emu.grasscutter.data.binout.routes.Route;
 import emu.grasscutter.data.binout.routes.RouteType;
-import emu.grasscutter.data.excels.*;
+import emu.grasscutter.data.common.ScenePointArrayData;
+import emu.grasscutter.data.excels.CodexAnimalData;
+import emu.grasscutter.data.excels.DungeonData;
+import emu.grasscutter.data.excels.SceneData;
+import emu.grasscutter.data.excels.WorldLevelData;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.avatar.Avatar;
 import emu.grasscutter.game.dungeons.DungeonManager;
-import emu.grasscutter.game.dungeons.settle_listeners.DungeonSettleListener;
 import emu.grasscutter.game.dungeons.challenge.WorldChallenge;
 import emu.grasscutter.game.dungeons.enums.DungeonPassConditionType;
+import emu.grasscutter.game.dungeons.settle_listeners.DungeonSettleListener;
 import emu.grasscutter.game.entity.*;
-import emu.grasscutter.game.entity.gadget.GadgetWorktop;
+import emu.grasscutter.game.entity.create_config.CreateRegionEntityConfig;
 import emu.grasscutter.game.entity.gadget.platform.ConfigRoute;
+import emu.grasscutter.game.entity.create_config.CreateEntityConfig;
+import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
+import emu.grasscutter.game.entity.create_config.CreateMonsterEntityConfig;
+import emu.grasscutter.game.entity.gadget.content.GadgetWorktop;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.player.TeamInfo;
 import emu.grasscutter.game.props.*;
 import emu.grasscutter.game.quest.QuestGroupSuite;
 import emu.grasscutter.game.world.data.TeleportProperties;
 import emu.grasscutter.net.packet.BasePacket;
-import emu.grasscutter.net.proto.VisionTypeOuterClass;
 import emu.grasscutter.scripts.SceneIndexManager;
 import emu.grasscutter.scripts.SceneScriptManager;
 import emu.grasscutter.server.event.player.PlayerTeleportEvent;
@@ -34,10 +41,6 @@ import kotlin.Pair;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import messages.battle.AttackResult;
-import messages.gadget.SelectWorktopOptionReq;
-import messages.scene.EnterType;
-import messages.scene.VisionType;
 import org.anime_game_servers.gi_lua.models.SceneGroupUserData;
 import org.anime_game_servers.gi_lua.models.ScriptArgs;
 import org.anime_game_servers.gi_lua.models.constants.EventType;
@@ -46,10 +49,13 @@ import org.anime_game_servers.gi_lua.models.scene.block.SceneGroupInfo;
 import org.anime_game_servers.gi_lua.models.scene.group.SceneGroup;
 import org.anime_game_servers.gi_lua.models.scene.group.SceneInitConfig;
 import org.anime_game_servers.gi_lua.utils.GroupUtils;
+import org.anime_game_servers.multi_proto.gi.messages.battle.event.AttackResult;
+import org.anime_game_servers.multi_proto.gi.messages.gadget.SelectWorktopOptionReq;
+import org.anime_game_servers.multi_proto.gi.messages.scene.EnterType;
+import org.anime_game_servers.multi_proto.gi.messages.scene.VisionType;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -62,8 +68,8 @@ public class Scene {
     @Getter private final SceneData sceneData;
     @Getter private final SceneInstanceData sceneInstanceData;
     @Getter private final List<Player> players = new CopyOnWriteArrayList<>();
-    @Getter private final Map<Integer, GameEntity> entities = new ConcurrentHashMap<>();
-    @Getter private final Map<Integer, GameEntity> weaponEntities = new ConcurrentHashMap<>();
+    @Getter private final Map<Integer, GameEntity<?>> entities = new ConcurrentHashMap<>();
+    @Getter private final Map<Integer, GameEntity<?>> weaponEntities = new ConcurrentHashMap<>();
     private final Set<SpawnDataEntry> spawnedEntities = ConcurrentHashMap.newKeySet();
     @Getter private final Set<SpawnDataEntry> deadSpawnedEntities = ConcurrentHashMap.newKeySet();
     private final Set<SceneBlock> loadedBlocks = ConcurrentHashMap.newKeySet();
@@ -74,6 +80,7 @@ public class Scene {
     private final long startWorldTime;
     @Getter @Setter DungeonManager dungeonManager;
     @Getter Int2ObjectMap<Route> sceneRoutes;
+    @Getter List<ScenePointArrayData> pointArrays;
     private Set<SpawnDataEntry.GridBlockId> loadedGridBlocks = new HashSet<>();
     @Getter @Setter private boolean dontDestroyWhenEmpty;
     @Getter private final SceneScriptManager scriptManager;
@@ -105,6 +112,7 @@ public class Scene {
 
         this.prevScene = 3;
         this.sceneRoutes = GameData.getSceneRoutes(getId());
+        this.pointArrays = GameData.getScenePointArrays(getId());
 
         this.startWorldTime = world.getWorldTime();
 
@@ -126,30 +134,32 @@ public class Scene {
         return this.players.size();
     }
 
-    public GameEntity getEntityById(int id) {
+    public GameEntity<?> getEntityById(int id) {
         if (id == 0x13800001) return this.sceneEntity;
         else if (id == this.world.getLevelEntityId()) return this.world.getEntity();
 
         val teamEntityPlayer = this.players.stream().filter(p -> p.getTeamManager().getEntity().getId() == id).findAny();
         if(teamEntityPlayer.isPresent()) return teamEntityPlayer.get().getTeamManager().getEntity();
-
-        Optional<GameEntity> entity = Optional.ofNullable(this.entities.get(id)).or(() -> Optional.ofNullable(this.weaponEntities.get(id)));
-        if (entity.isEmpty() && EntityIdType.idFromEntityId(id) == EntityIdType.AVATAR.getId()) {
+        GameEntity<?> entity = this.entities.get(id);
+        if (entity == null) entity = this.weaponEntities.get(id);
+        if (entity == null && EntityIdType.idFromEntityId(id) == EntityIdType.AVATAR.getId()) {
             entity = this.players.stream().map(p -> p.getTeamManager().getActiveTeam()).flatMap(List::stream)
-                .filter(entityAvatar -> entityAvatar.getId() == id).findFirst().map(GameEntity.class::cast);
+                .filter(entityAvatar -> entityAvatar.getId() == id)
+                .findFirst()
+                .map(GameEntity.class::cast).orElse(null);
         }
 
-        return entity.orElse(null);
+        return entity;
     }
 
-    public GameEntity getEntityByConfigId(int configId) {
+    public GameEntity<?> getEntityByConfigId(int configId) {
         return this.entities.values().stream()
             .filter(x -> x.getConfigId() == configId)
             .findFirst()
             .orElse(null);
     }
 
-    public GameEntity getEntityByConfigId(int configId, int groupId) {
+    public GameEntity<?> getEntityByConfigId(int configId, int groupId) {
         return this.entities.values().stream()
             .filter(x -> x.getConfigId() == configId && x.getGroupId() == groupId)
             .findFirst()
@@ -159,6 +169,11 @@ public class Scene {
     @Nullable
     public Route getSceneRouteById(int routeId) {
         return this.sceneRoutes.get(routeId);
+    }
+
+    @Nullable
+    public ScenePointArrayData getPointArrayById(int routeId) {
+        return this.pointArrays.stream().filter(x -> x.getPointArrayId() == routeId).findFirst().orElse(null);
     }
 
     public void setPaused(boolean paused) {
@@ -241,7 +256,7 @@ public class Scene {
     }
 
     private synchronized void removePlayerAvatars(@NotNull Player player) {
-        removeEntities(player.getTeamManager().getActiveTeam(), VisionTypeOuterClass.VisionType.VISION_TYPE_MISS);
+        removeEntities(player.getTeamManager().getActiveTeam(), VisionType.VISION_MISS);
     }
 
     public void spawnPlayer(Player player) {
@@ -268,6 +283,22 @@ public class Scene {
         addEntityDirectly(entity);
         broadcastPacket(new PacketSceneEntityAppearNotify(entity));
         entity.afterCreate(this.players);
+    }
+    public synchronized void addEntity(CreateEntityConfig config) {
+        GameEntity<?> entity = null;
+        if(config.getClass() == CreateMonsterEntityConfig.class) {
+            entity = new EntityMonster(this, (CreateMonsterEntityConfig) config);
+        } else if(config.getClass() == CreateGadgetEntityConfig.class) {
+            entity = new EntityGadget(this, (CreateGadgetEntityConfig) config);
+        }
+
+        if(entity == null) {
+            Grasscutter.getLogger().warn("Unknown/Unhandled entity config type: {}", config.getClass());
+            return;
+        }
+
+        addEntityDirectly(entity);
+        broadcastPacket(new PacketSceneEntityAppearNotify(entity));
     }
 
     public synchronized void addEntityToSingleClient(Player player, GameEntity entity) {
@@ -320,15 +351,15 @@ public class Scene {
     }
 
     public void removeEntity(GameEntity entity) {
-        removeEntity(entity, VisionTypeOuterClass.VisionType.VISION_TYPE_DIE);
+        removeEntity(entity, VisionType.VISION_DIE);
     }
 
-    private synchronized void removeEntity(GameEntity entity, VisionTypeOuterClass.VisionType visionType) {
+    private synchronized void removeEntity(GameEntity entity, VisionType visionType) {
         Optional.ofNullable(removeEntityDirectly(entity)).ifPresent(removed ->
             broadcastPacket(new PacketSceneEntityDisappearNotify(removed, visionType)));
     }
 
-    public synchronized void removeEntities(Collection<? extends GameEntity> entity, VisionTypeOuterClass.VisionType visionType) {
+    public synchronized void removeEntities(Collection<? extends GameEntity> entity, VisionType visionType) {
         val toRemove = entity.stream().filter(Objects::nonNull)
             .map(this::removeEntityDirectly).filter(Objects::nonNull)
             .toList();
@@ -340,7 +371,7 @@ public class Scene {
     public synchronized void replaceEntity(EntityAvatar oldEntity, EntityAvatar newEntity) {
         removeEntityDirectly(oldEntity);
         addEntityDirectly(newEntity);
-        broadcastPacket(new PacketSceneEntityDisappearNotify(oldEntity, VisionTypeOuterClass.VisionType.VISION_TYPE_REPLACE));
+        broadcastPacket(new PacketSceneEntityDisappearNotify(oldEntity, VisionType.VISION_REPLACE));
         broadcastPacket(new PacketSceneEntityAppearNotify(newEntity, VisionType.VISION_REPLACE, oldEntity.getId()));
     }
 
@@ -388,7 +419,7 @@ public class Scene {
             if (attacker instanceof EntityClientGadget gadgetAttacker) {
                 val clientGadgetOwner = getEntityById(gadgetAttacker.getOwnerEntityId());
                 if (clientGadgetOwner instanceof EntityAvatar) {
-                    ((EntityClientGadget) attacker).getOwner().getCodex().checkAnimal(target, CodexAnimalData.CountType.CODEX_COUNT_TYPE_KILL);
+                    gadgetAttacker.getOwner().getCodex().checkAnimal(target, CodexAnimalData.CountType.CODEX_COUNT_TYPE_KILL);
                 }
             } else if (attacker instanceof EntityAvatar avatarAttacker) {
                 avatarAttacker.getPlayer().getCodex().checkAnimal(target, CodexAnimalData.CountType.CODEX_COUNT_TYPE_KILL);
@@ -560,33 +591,20 @@ public class Scene {
             // If spawn entry is in our view and hasn't been spawned/killed yet, we should spawn it
             if (spawnedEntities.contains(entry) || this.deadSpawnedEntities.contains(entry)) continue;
             // Entity object holder
-            GameEntity entity = null;
+            GameEntity<?> entity = null;
 
             // Check if spawn entry is monster or gadget
             if (entry.getMonsterId() > 0) {
-                val data = GameData.getMonsterDataMap().get(entry.getMonsterId());
+                final int level = getEntityLevel(entry.getLevel(), worldLevelOverride);
+                val config = new CreateMonsterEntityConfig(entry)
+                    .setLevel(level);
+                val data = config.getMonsterData();
                 if (data == null) continue;
 
-                final int level = getEntityLevel(entry.getLevel(), worldLevelOverride);
-
-                val monster = new EntityMonster(this, data, entry.getPos(), level);
-                monster.getRotation().set(entry.getRot());
-                monster.setGroupId(entry.getGroup().getGroupId());
-                monster.setPoseId(entry.getPoseId());
-                monster.setConfigId(entry.getConfigId());
-                monster.setSpawnEntry(entry);
-
-                entity = monster;
+                entity = new EntityMonster(this, config);
             } else if (entry.getGadgetId() > 0) {
-                val gadget = new EntityGadget(this, entry.getGadgetId(), entry.getPos(), entry.getRot());
-                gadget.setGroupId(entry.getGroup().getGroupId());
-                gadget.setConfigId(entry.getConfigId());
-                gadget.setSpawnEntry(entry);
-                int state = entry.getGadgetState();
-                if (state > 0) {
-                    gadget.setState(state);
-                }
-                gadget.buildContent();
+                val createConfig = new CreateGadgetEntityConfig(entry);
+                val gadget = new EntityGadget(this, createConfig);
 
                 gadget.setFightProperty(FightProperty.FIGHT_PROP_BASE_HP, Float.POSITIVE_INFINITY);
                 gadget.setFightProperty(FightProperty.FIGHT_PROP_CUR_HP, Float.POSITIVE_INFINITY);
@@ -614,7 +632,7 @@ public class Scene {
         }
         if (!toRemove.isEmpty()) {
             toRemove.forEach(this::removeEntityDirectly);
-            broadcastPacket(new PacketSceneEntityDisappearNotify(toRemove, VisionTypeOuterClass.VisionType.VISION_TYPE_REMOVE));
+            broadcastPacket(new PacketSceneEntityDisappearNotify(toRemove, VisionType.VISION_REMOVE));
         }
     }
 
@@ -763,7 +781,7 @@ public class Scene {
         //Load triggers and regions
         this.scriptManager.registerTrigger(group.getTriggers().values().stream().filter(p -> p.getName().contains(triggerName)).toList());
         group.getRegions().values().stream().filter(q -> q.getConfigId() == Integer.parseInt(triggerName.substring(13)))
-            .map(region -> new EntityRegion(this, region)).forEach(this.scriptManager::registerRegion);
+            .map(region -> new EntityRegion(this, new CreateRegionEntityConfig(region))).forEach(this.scriptManager::registerRegion);
     }
 
 
@@ -786,8 +804,8 @@ public class Scene {
 
         // Spawn gadgets AFTER triggers are added
         // TODO
-        val entities = new ArrayList<GameEntity>();
-        val entitiesBorn = new ArrayList<GameEntity>();
+        val entities = new ArrayList<GameEntity<?>>();
+        val entitiesBorn = new ArrayList<GameEntity<?>>();
         groups.stream().filter(group -> !this.loadedGroups.contains(group)).filter(group -> group.getInitConfig() != null)
             .map(group -> Optional.ofNullable(this.scriptManager.getCachedGroupInstanceById(group.getGroupInfo().getId()))
                 .stream().peek(cachedInstance -> cachedInstance.setLuaGroup(group))
@@ -809,7 +827,7 @@ public class Scene {
      * */
     private void unloadGroup(SceneBlock block, int groupId) {
         removeEntities(this.entities.values().stream().filter(Objects::nonNull).filter(e ->
-            e.getBlockId() == block.getId() && e.getGroupId() == groupId).toList(), VisionTypeOuterClass.VisionType.VISION_TYPE_REMOVE);
+            e.getBlockId() == block.getId() && e.getGroupId() == groupId).toList(), VisionType.VISION_REMOVE);
 
 
         SceneGroup group = scriptManager.getMeta().getGroups().get(groupId);
@@ -861,7 +879,7 @@ public class Scene {
 
         // Optimization
         if (this.players.stream().anyMatch(p -> p != gadget.getOwner())) { // if there is other players in scene
-            broadcastPacketToOthers(gadget.getOwner(), new PacketSceneEntityDisappearNotify(gadget, VisionTypeOuterClass.VisionType.VISION_TYPE_DIE));
+            broadcastPacketToOthers(gadget.getOwner(), new PacketSceneEntityDisappearNotify(gadget, VisionType.VISION_DIE));
         }
     }
 
@@ -889,10 +907,14 @@ public class Scene {
             val range = (1.5f + (.05f * amount));
             for (int i = 0; i < amount; i++) {
                 val pos = bornForm.getPosition().nearby2d(range).addZ(.9f);  // Why Z?
-                addEntity(new EntityItem(this, null, itemData, pos, 1));
+                val createConfig = new CreateGadgetEntityConfig(itemData, 1)
+                    .setBornPos(pos);
+                addEntity(new EntityItem(this, createConfig));
             }
         } else {
-            addEntity(new EntityItem(this, null, itemData, bornForm.getPosition().clone().addZ(.9f), amount));
+            val createConfig = new CreateGadgetEntityConfig(itemData, amount)
+                .setBornPos(bornForm.getPosition().clone().addZ(.9f));
+            addEntity(new EntityItem(this, createConfig));
         }
     }
 
@@ -941,7 +963,7 @@ public class Scene {
             .map(EntityGadget::getContent)
             .filter(GadgetWorktop.class::isInstance).map(GadgetWorktop.class::cast)
             .filter(worktop -> worktop.onSelectWorktopOption(req))
-            .ifPresent(worktop -> entity.getScene().removeEntity(entity, VisionTypeOuterClass.VisionType.VISION_TYPE_REMOVE));
+            .ifPresent(worktop -> entity.getScene().removeEntity(entity, VisionType.VISION_REMOVE));
     }
 
     public void saveGroups() {

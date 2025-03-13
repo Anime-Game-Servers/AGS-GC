@@ -15,29 +15,28 @@ import emu.grasscutter.utils.JsonUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.val;
-import messages.VERSION;
 
 public class PacketOpcodesUtils {
     private static Int2ObjectMap<String> opcodeMap;
 
-    public static final Set<Integer> BANNED_PACKETS = Set.of(
-        PacketOpcodes.WindSeedClientNotify,
-        PacketOpcodes.PlayerLuaShellNotify
+    public static final Set<String> BANNED_PACKETS = Set.of(
+        "WindSeedClientNotify",
+        "PlayerLuaShellNotify"
     );
 
-    public static final Set<Integer> LOOP_PACKETS = Set.of(
-        PacketOpcodes.PingReq,
-        PacketOpcodes.PingRsp,
-        PacketOpcodes.WorldPlayerRTTNotify,
-        PacketOpcodes.UnionCmdNotify,
-        PacketOpcodes.QueryPathReq,
-        PacketOpcodes.QueryPathRsp,
+    public static final Set<String> LOOP_PACKETS = Set.of(
+        "PingReq",
+        "PingRsp",
+        "WorldPlayerRTTNotify",
+        "UnionCmdNotify",
+        "QueryPathReq",
+        "QueryPathRsp",
 
         // Satiation sends these every tick
-        PacketOpcodes.PlayerTimeNotify,
-        PacketOpcodes.PlayerGameTimeNotify,
-        PacketOpcodes.AvatarPropNotify,
-        PacketOpcodes.AvatarSatiationDataNotify
+        "PlayerTimeNotify",
+        "PlayerGameTimeNotify",
+        "AvatarPropNotify",
+        "AvatarSatiationDataNotify"
     );
 
     static {

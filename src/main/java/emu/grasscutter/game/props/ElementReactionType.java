@@ -38,7 +38,16 @@ public enum ElementReactionType {
     CrystalliseFire(27),
     CrystalliseWater(28),
     CrystalliseElectric(29),
-    CrystalliseIce(30);
+    CrystalliseIce(30),
+    FrozenBroken (31),
+    StickGrass (32),
+    Overdose (33),
+    OverdoseElectric (34),
+    OverdoseGrass (35),
+    OvergrowMushroomFire (36),
+    OvergrowMushroomElectric (37),
+    PhlogistonSolidification (38),
+    PhlogistonSolidificationEnd (39);
 
     private final int value;
     private static final Int2ObjectMap<ElementReactionType> map = new Int2ObjectOpenHashMap<>();

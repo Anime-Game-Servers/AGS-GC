@@ -10,6 +10,8 @@ import emu.grasscutter.data.excels.MonsterCurveData;
 import emu.grasscutter.data.excels.MonsterData;
 import emu.grasscutter.game.ability.AbilityManager;
 import emu.grasscutter.game.dungeons.enums.DungeonPassConditionType;
+import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
+import emu.grasscutter.game.entity.create_config.CreateMonsterEntityConfig;
 import emu.grasscutter.game.entity.interfaces.StringAbilityEntity;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.*;
@@ -24,10 +26,10 @@ import it.unimi.dsi.fastutil.ints.Int2FloatOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import messages.gadget.GadgetInteractReq;
-import messages.general.ability.AbilitySyncStateInfo;
-import messages.general.entity.SceneWeaponInfo;
-import messages.scene.entity.*;
+import org.anime_game_servers.multi_proto.gi.messages.gadget.GadgetInteractReq;
+import org.anime_game_servers.multi_proto.gi.messages.general.ability.AbilitySyncStateInfo;
+import org.anime_game_servers.multi_proto.gi.messages.general.entity.SceneWeaponInfo;
+import org.anime_game_servers.multi_proto.gi.messages.scene.entity.*;
 import org.anime_game_servers.gi_lua.models.ScriptArgs;
 import org.anime_game_servers.gi_lua.models.constants.EventType;
 import org.anime_game_servers.gi_lua.models.scene.group.SceneGroup;
@@ -39,7 +41,8 @@ import java.util.stream.Collectors;
 
 import static org.anime_game_servers.gi_lua.models.constants.EventType.EVENT_SPECIFIC_MONSTER_HP_CHANGE;
 
-public class EntityMonster extends GameEntity implements StringAbilityEntity {
+@Getter
+public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> implements StringAbilityEntity {
     @Getter(onMethod = @__(@Override))
     private final Int2FloatOpenHashMap fightProperties;
 
@@ -47,41 +50,45 @@ public class EntityMonster extends GameEntity implements StringAbilityEntity {
     private final Position position;
     @Getter(onMethod = @__(@Override))
     private final Position rotation;
-    @Getter private final MonsterData monsterData;
-    @Getter private final ConfigEntityMonster configEntityMonster;
-    @Getter private final Position bornPos;
-    @Getter private final int level;
-    @Getter private EntityWeapon weaponEntity;
-    @Getter @Setter private int poseId;
-    @Getter @Setter private int aiId = -1;
+    private final MonsterData monsterData;
+    private final ConfigEntityMonster configEntityMonster;
+    private final Position bornPos;
+    private final Position bornRot;
+    private EntityWeapon weaponEntity;
+    @Setter private int poseId;
+    @Setter private int aiId;
+    private final int titleId;
+    private final int specialNameId;
+    private int weaponId;
 
-    @Getter private List<Player> playerOnBattle;
+    private List<Player> playerOnBattle;
 
-    @Getter @Setter private SceneMonster metaMonster;
-
-    public EntityMonster(Scene scene, MonsterData monsterData, Position pos, int level) {
-        super(scene);
+    public EntityMonster(Scene scene, CreateMonsterEntityConfig config) {
+        super(scene, config);
         this.id = getWorld().getNextEntityId(EntityIdType.MONSTER);
-        this.monsterData = monsterData;
+
+        this.monsterData = config.getMonsterData();
         this.fightProperties = new Int2FloatOpenHashMap();
-        this.position = new Position(pos);
-        this.rotation = new Position();
-        this.bornPos = getPosition().clone();
-        this.level = level;
+        this.position = config.getPos();
+        this.rotation = config.getRot();
+        this.bornPos = config.getBornPos();
+        this.bornRot = config.getBornRot();
         this.playerOnBattle = new ArrayList<>();
 
-        if(GameData.getMonsterMappingMap().containsKey(getMonsterId())) {
-            this.configEntityMonster = GameData.getMonsterConfigData().get(GameData.getMonsterMappingMap().get(getMonsterId()).getMonsterJson());
-        } else {
-            this.configEntityMonster = null;
-        }
+
+        this.configEntityMonster = config.getConfigEntity();
 
         // Monster weapon
-        if (getMonsterWeaponId() > 0) {
-            this.weaponEntity = new EntityWeapon(scene, getMonsterWeaponId());
+        this.weaponId = config.getWeaponId();
+        if (weaponId > 0) {
+            val weaponConfig = new CreateGadgetEntityConfig(weaponId);
+            this.weaponEntity = new EntityWeapon(scene, weaponConfig);
             scene.getWeaponEntities().put(this.weaponEntity.getId(), this.weaponEntity);
-            //this.weaponEntityId = getWorld().getNextEntityId(EntityIdType.WEAPON);
         }
+        this.aiId = config.getAiId();
+        this.poseId = config.getPoseId();
+        this.titleId = config.getTitleId();
+        this.specialNameId = config.getSpecialNameId();
 
         this.recalcStats();
 
@@ -181,12 +188,8 @@ public class EntityMonster extends GameEntity implements StringAbilityEntity {
         return getMonsterId();
     }
 
-    public int getMonsterWeaponId() {
-        return this.getMonsterData().getWeaponId();
-    }
-
     private int getMonsterId() {
-        return this.getMonsterData().getId();
+        return this.getSpawnConfig().getMonsterId();
     }
 
     @Override
@@ -274,8 +277,8 @@ public class EntityMonster extends GameEntity implements StringAbilityEntity {
         }
 
         SceneGroupInstance groupInstance = scene.getScriptManager().getGroupInstanceById(this.getGroupId());
-        if(groupInstance != null && metaMonster != null)
-            groupInstance.getDeadEntities().add(metaMonster.getConfigId());
+        if(groupInstance != null)
+            groupInstance.getDeadEntities().add(getConfigId());
 
         scene.triggerDungeonEvent(DungeonPassConditionType.DUNGEON_COND_KILL_GROUP_MONSTER, this.getGroupId());
         scene.triggerDungeonEvent(DungeonPassConditionType.DUNGEON_COND_KILL_TYPE_MONSTER, this.getMonsterData().getType().getValue());
@@ -339,22 +342,17 @@ public class EntityMonster extends GameEntity implements StringAbilityEntity {
         monsterInfo.setBlockId(getScene().getId());
         monsterInfo.setBornType(MonsterBornType.MONSTER_BORN_DEFAULT);
 
-        if(metaMonster!=null && metaMonster.getSpecialNameId()!=0){
-            monsterInfo.setTitleId(this.metaMonster.getTitleId());
-            monsterInfo.setSpecialNameId(this.metaMonster.getSpecialNameId());
-        } else if (monsterData.getDescribeData() != null) {
-            monsterInfo.setTitleId(monsterData.getDescribeData().getTitleId());
-            monsterInfo.setSpecialNameId(monsterData.getSpecialNameId());
-        }
+        monsterInfo.setTitleId(getTitleId());
+        monsterInfo.setSpecialNameId(getSpecialNameId());
 
-        if (this.getMonsterWeaponId() > 0) {
+        if (this.getWeaponId() > 0) {
             val entityId = this.getWeaponEntity() != null ? this.getWeaponEntity().getId() : 0;
-            val weaponInfo = new SceneWeaponInfo(entityId, this.getMonsterWeaponId());
+            val weaponInfo = new SceneWeaponInfo(entityId, this.getWeaponId());
             weaponInfo.setAbilityInfo(new AbilitySyncStateInfo());
 
             monsterInfo.setWeaponList(List.of(weaponInfo));
         }
-        if (this.aiId != -1) {
+        if (this.aiId > 0) {
             monsterInfo.setAiConfigId(aiId);
         }
 

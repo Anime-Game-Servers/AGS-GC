@@ -12,32 +12,33 @@ import emu.grasscutter.game.entity.EntityClientGadget;
 import emu.grasscutter.game.entity.EntityItem;
 import emu.grasscutter.game.entity.EntityMonster;
 import emu.grasscutter.game.entity.GameEntity;
+import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
+import emu.grasscutter.game.inventory.GameItem;
+import emu.grasscutter.game.inventory.MaterialType;
 import emu.grasscutter.game.player.BasePlayerManager;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.ElementType;
 import emu.grasscutter.game.props.FightProperty;
 import emu.grasscutter.game.props.MonsterType;
 import emu.grasscutter.game.props.WeaponType;
-import emu.grasscutter.net.proto.ChangeEnergyReasonOuterClass.ChangeEnergyReason;
-import emu.grasscutter.net.proto.PropChangeReasonOuterClass.PropChangeReason;
 import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.utils.Position;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import lombok.val;
+import org.anime_game_servers.multi_proto.gi.messages.ability.AbilityInvokeEntry;
+import org.anime_game_servers.multi_proto.gi.messages.ability.action.AbilityActionGenerateElemBall;
+import org.anime_game_servers.multi_proto.gi.messages.battle.event.EvtBeingHitInfo;
+import org.anime_game_servers.multi_proto.gi.messages.general.PropChangeReason;
+import org.anime_game_servers.multi_proto.gi.messages.scene.entity.ChangeEnergyReason;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static emu.grasscutter.config.Configuration.GAME_OPTIONS;
-
-import com.google.protobuf.InvalidProtocolBufferException;
-import lombok.val;
-import messages.ability.AbilityInvokeEntry;
-import messages.ability.action.AbilityActionGenerateElemBall;
-import messages.battle.EvtBeingHitInfo;
 
 public class EnergyManager extends BasePlayerManager {
     private final Object2IntMap<EntityAvatar> avatarNormalProbabilities;
@@ -126,7 +127,7 @@ public class EnergyManager extends BasePlayerManager {
         };
     }
 
-    public void handleGenerateElemBall(AbilityInvokeEntry invoke) throws InvalidProtocolBufferException {
+    public void handleGenerateElemBall(AbilityInvokeEntry invoke) {
         // ToDo:
         // This is also called when a weapon like Favonius Warbow etc. creates energy through its passive.
         // We are not handling this correctly at the moment.
@@ -202,7 +203,7 @@ public class EnergyManager extends BasePlayerManager {
 
         // If the player wins the roll, we increase the avatar's energy and reset the probability.
         if (roll < currentProbability) {
-            avatar.addEnergy(1.0f, PropChangeReason.PROP_CHANGE_REASON_ABILITY, true);
+            avatar.addEnergy(1.0f, PropChangeReason.PROP_CHANGE_ABILITY, true);
             this.avatarNormalProbabilities.put(avatar, weaponType.getEnergyGainInitialProbability());
         }
         // Otherwise, we increase the probability for the next hit.
@@ -263,7 +264,7 @@ public class EnergyManager extends BasePlayerManager {
 
         // If the cast skill was a burst, consume energy.
         if (avatar.getSkillDepot() != null && skillId == avatar.getSkillDepot().getEnergySkill()) {
-            avatar.getAsEntity().clearEnergy(ChangeEnergyReason.CHANGE_ENERGY_REASON_SKILL_START);
+            avatar.getAsEntity().clearEnergy(ChangeEnergyReason.CHANGE_ENERGY_SKILL_START);
         }
     }
 
@@ -341,7 +342,11 @@ public class EnergyManager extends BasePlayerManager {
             return;
         }
 
-        EntityItem energyBall = new EntityItem(this.getPlayer().getScene(), this.getPlayer(), itemData, position, count);
+        val createConfig = new CreateGadgetEntityConfig(itemData, count)
+            .setBornPos(position)
+            .setPlayerOwner(this.getPlayer());
+
+        EntityItem energyBall = new EntityItem(this.getPlayer().getScene(), createConfig);
         this.getPlayer().getScene().addEntity(energyBall);
     }
 
@@ -360,9 +365,9 @@ public class EnergyManager extends BasePlayerManager {
         // particle being generated). If the scene entity is an `EntityClientGadget`, we need to find the
         // ID of the original owner of that gadget.
         int avatarEntityId =
-                (!(entity instanceof EntityClientGadget))
+                (!(entity instanceof EntityClientGadget entityClientGadget))
                         ? invokeEntityId
-                        : ((EntityClientGadget)entity).getOriginalOwnerEntityId();
+                        : entityClientGadget.getOriginalOwnerEntityId();
 
         // Finally, find the avatar entity in the player's team.
         return this.player.getTeamManager().getActiveTeam()
@@ -390,7 +395,7 @@ public class EnergyManager extends BasePlayerManager {
     public void setEnergyUsage(boolean energyUsage) {
         this.energyUsage = energyUsage;
         if (!energyUsage) {  // Refill team energy if usage is disabled
-            refillTeamEnergy(PropChangeReason.PROP_CHANGE_REASON_GM, true);
+            refillTeamEnergy(PropChangeReason.PROP_CHANGE_GM, true);
         }
     }
 }

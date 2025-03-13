@@ -11,8 +11,6 @@ import emu.grasscutter.Grasscutter;
 import emu.grasscutter.Loggers;
 import emu.grasscutter.game.props.ElementReactionType;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.binout.AbilityData;
 import emu.grasscutter.data.binout.AbilityMixinData;
@@ -28,15 +26,15 @@ import emu.grasscutter.game.player.Player;
 import io.netty.util.concurrent.FastThreadLocalThread;
 import lombok.Getter;
 import lombok.val;
-import messages.ability.AbilityInvokeEntry;
-import messages.ability.ModifierAction;
-import messages.ability.meta.AbilityMetaAddAbility;
-import messages.ability.meta.AbilityMetaModifierChange;
-import messages.ability.meta.AbilityMetaReInitOverrideMap;
-import messages.ability.meta.AbilityMetaTriggerElementReaction;
-import messages.general.ability.AbilityScalarType;
-import messages.general.ability.AbilityScalarValueEntry;
-import messages.general.ability.AbilityString;
+import org.anime_game_servers.multi_proto.gi.messages.ability.AbilityInvokeEntry;
+import org.anime_game_servers.multi_proto.gi.messages.ability.ModifierAction;
+import org.anime_game_servers.multi_proto.gi.messages.ability.meta.AbilityMetaAddAbility;
+import org.anime_game_servers.multi_proto.gi.messages.ability.meta.AbilityMetaModifierChange;
+import org.anime_game_servers.multi_proto.gi.messages.ability.meta.AbilityMetaReInitOverrideMap;
+import org.anime_game_servers.multi_proto.gi.messages.ability.meta.AbilityMetaTriggerElementReaction;
+import org.anime_game_servers.multi_proto.gi.messages.general.ability.AbilityScalarType;
+import org.anime_game_servers.multi_proto.gi.messages.general.ability.AbilityScalarValueEntry;
+import org.anime_game_servers.multi_proto.gi.messages.general.ability.AbilityString;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
@@ -372,7 +370,11 @@ public final class AbilityManager extends BasePlayerManager {
                 //Search for the parent ability
 
                 //TODO: Research about hash
-                instancedAbilityData = GameData.getAbilityData(getAbilityName(modChange.getParentAbilityName()));
+
+                val abilityName = modChange.getParentAbilityName();
+                if(abilityName != null) {
+                    instancedAbilityData = GameData.getAbilityData(getAbilityName(abilityName));
+                }
             }
 
             if(instancedAbilityData == null ||  instancedAbilityData.modifiers == null) {
@@ -410,11 +412,11 @@ public final class AbilityManager extends BasePlayerManager {
         }
     }
 
-    private void handleMixinCostStamina(AbilityInvokeEntry invoke) throws InvalidProtocolBufferException {
+    private void handleMixinCostStamina(AbilityInvokeEntry invoke) {
 
     }
 
-    private void handleGenerateElemBall(AbilityInvokeEntry invoke) throws InvalidProtocolBufferException {
+    private void handleGenerateElemBall(AbilityInvokeEntry invoke) {
 
     }
 
@@ -428,7 +430,7 @@ public final class AbilityManager extends BasePlayerManager {
         return null;
     }
 
-    private void handleGlobalFloatValue(AbilityInvokeEntry invoke) throws InvalidProtocolBufferException {
+    private void handleGlobalFloatValue(AbilityInvokeEntry invoke) {
         var entity = this.player.getScene().getEntityById(invoke.getEntityId());
         if(entity == null) return;
 
@@ -461,11 +463,11 @@ public final class AbilityManager extends BasePlayerManager {
 
     }
 
-    private void handleModifierDurabilityChange(AbilityInvokeEntry invoke) throws InvalidProtocolBufferException {
+    private void handleModifierDurabilityChange(AbilityInvokeEntry invoke) {
 
     }
 
-    private void handleAddNewAbility(AbilityInvokeEntry invoke) throws InvalidProtocolBufferException {
+    private void handleAddNewAbility(AbilityInvokeEntry invoke) {
         var entity = this.player.getScene().getEntityById(invoke.getEntityId());
 
         if(entity == null) {
@@ -492,7 +494,7 @@ public final class AbilityManager extends BasePlayerManager {
      * Invoked when an entity triggered an elemental reaction.
      * @param invoke Holds information of elemental reaction, attacker and target.
      */
-    private void handleTriggerElementReaction(AbilityInvokeEntry invoke) throws InvalidProtocolBufferException {
+    private void handleTriggerElementReaction(AbilityInvokeEntry invoke) {
         if (getPlayer().getScene() == null) return;
 
         AbilityMetaTriggerElementReaction data = AbilityMetaTriggerElementReaction.parseBy(invoke.getAbilityData(), player.getSession().getVersion());

@@ -1,18 +1,22 @@
 package emu.grasscutter.server.packet.send;
 
-import emu.grasscutter.net.packet.BasePacket;
-import emu.grasscutter.net.packet.PacketOpcodes;
-import emu.grasscutter.net.proto.DungeonInterruptChallengeReqOuterClass.DungeonInterruptChallengeReq;
-import emu.grasscutter.net.proto.DungeonInterruptChallengeRspOuterClass.DungeonInterruptChallengeRsp;
-import emu.grasscutter.net.proto.RetcodeOuterClass.Retcode;
+import emu.grasscutter.net.packet.BaseTypedPacket;
+import org.anime_game_servers.multi_proto.gi.messages.dungeon.challenge.DungeonInterruptChallengeRsp;
+import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
+import emu.grasscutter.game.dungeons.challenge.WorldChallenge;
 
-public class PacketDungeonInterruptChallengeRsp extends BasePacket {
+import javax.annotation.Nonnull;
+
+public class PacketDungeonInterruptChallengeRsp extends BaseTypedPacket<DungeonInterruptChallengeRsp> {
     public PacketDungeonInterruptChallengeRsp(boolean result, int challengeId, int challengeIndex, int groupId) {
-        super(PacketOpcodes.DungeonInterruptChallengeRsp);
-        this.setData(DungeonInterruptChallengeRsp.newBuilder()
-            .setChallengeId(challengeId)
-            .setChallengeIndex(challengeIndex)
-            .setGroupId(groupId)
-            .setRetcode(result ? Retcode.RET_SUCC_VALUE : Retcode.RET_FAIL_VALUE));
+        super(new DungeonInterruptChallengeRsp());
+        proto.setChallengeId(challengeId);
+        proto.setChallengeIndex(challengeIndex);
+        proto.setGroupId(groupId);
+        proto.setRetcode(result ? Retcode.RET_SUCC : Retcode.RET_FAIL);
+    }
+    public PacketDungeonInterruptChallengeRsp(@Nonnull WorldChallenge challenge) {
+        this(true, challenge.getInfo().getChallengeId(),
+            challenge.getInfo().getChallengeIndex(), challenge.getGroupId());
     }
 }

@@ -6,7 +6,10 @@ import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.binout.config.ConfigLevelEntity;
 import emu.grasscutter.data.binout.config.fields.ConfigAbilityData;
-import emu.grasscutter.data.excels.*;
+import emu.grasscutter.data.excels.AvatarData;
+import emu.grasscutter.data.excels.PlayerLevelData;
+import emu.grasscutter.data.excels.SceneTagData;
+import emu.grasscutter.data.excels.WeatherData;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.Account;
 import emu.grasscutter.game.CoopRequest;
@@ -31,13 +34,13 @@ import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.game.inventory.Inventory;
 import emu.grasscutter.game.mail.Mail;
 import emu.grasscutter.game.mail.MailHandler;
+import emu.grasscutter.game.managers.FurnitureManager;
+import emu.grasscutter.game.managers.ResinManager;
+import emu.grasscutter.game.managers.SotSManager;
 import emu.grasscutter.game.managers.blossom.BlossomManager;
 import emu.grasscutter.game.managers.cooking.ActiveCookCompoundData;
 import emu.grasscutter.game.managers.cooking.CookingCompoundManager;
 import emu.grasscutter.game.managers.cooking.CookingManager;
-import emu.grasscutter.game.managers.FurnitureManager;
-import emu.grasscutter.game.managers.ResinManager;
-import emu.grasscutter.game.managers.SotSManager;
 import emu.grasscutter.game.managers.deforestation.DeforestationManager;
 import emu.grasscutter.game.managers.energy.EnergyManager;
 import emu.grasscutter.game.managers.forging.ActiveForgeData;
@@ -45,7 +48,10 @@ import emu.grasscutter.game.managers.forging.ForgingManager;
 import emu.grasscutter.game.managers.mapmark.MapMark;
 import emu.grasscutter.game.managers.mapmark.MapMarksManager;
 import emu.grasscutter.game.managers.stamina.StaminaManager;
-import emu.grasscutter.game.props.*;
+import emu.grasscutter.game.props.ActionReason;
+import emu.grasscutter.game.props.ClimateType;
+import emu.grasscutter.game.props.PlayerProperty;
+import emu.grasscutter.game.props.WatcherTriggerType;
 import emu.grasscutter.game.quest.QuestManager;
 import emu.grasscutter.game.quest.enums.QuestCond;
 import emu.grasscutter.game.quest.enums.QuestContent;
@@ -55,8 +61,8 @@ import emu.grasscutter.game.tower.TowerManager;
 import emu.grasscutter.game.world.Scene;
 import emu.grasscutter.game.world.World;
 import emu.grasscutter.net.packet.BasePacket;
-import emu.grasscutter.net.proto.PlayerApplyEnterMpResultNotifyOuterClass;
-import emu.grasscutter.net.proto.PropChangeReasonOuterClass.PropChangeReason;
+import org.anime_game_servers.multi_proto.gi.messages.multiplayer.MpEnterResultReason;
+import org.anime_game_servers.multi_proto.gi.messages.general.PropChangeReason;
 import emu.grasscutter.server.event.player.PlayerJoinEvent;
 import emu.grasscutter.server.event.player.PlayerQuitEvent;
 import emu.grasscutter.server.game.GameServer;
@@ -72,20 +78,21 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import messages.ability.AbilityInvokeEntry;
-import messages.battle.AttackResult;
-import messages.battle.CombatInvokeEntry;
-import messages.chat.FriendEnterHomeOption;
-import messages.chat.SocialDetail;
-import messages.chat.SocialShowAvatarInfo;
-import messages.gadget.GadgetInteractReq;
-import messages.general.ProfilePicture;
-import messages.general.avatar.GrantReason;
-import messages.general.avatar.ShowAvatarInfo;
-import messages.scene.PlayerLocationInfo;
-import messages.scene.PlayerWorldLocationInfo;
-import messages.scene.entity.MpSettingType;
-import messages.scene.entity.OnlinePlayerInfo;
+import org.anime_game_servers.multi_proto.gi.messages.ability.AbilityInvokeEntry;
+import org.anime_game_servers.multi_proto.gi.messages.battle.CombatInvokeEntry;
+import org.anime_game_servers.multi_proto.gi.messages.battle.event.AttackResult;
+import org.anime_game_servers.multi_proto.gi.messages.community.SocialShowAvatarInfo;
+import org.anime_game_servers.multi_proto.gi.messages.community.friends.FriendEnterHomeOption;
+import org.anime_game_servers.multi_proto.gi.messages.community.player_presentation.SocialDetail;
+import org.anime_game_servers.multi_proto.gi.messages.gadget.GadgetInteractReq;
+import org.anime_game_servers.multi_proto.gi.messages.general.ProfilePicture;
+import org.anime_game_servers.multi_proto.gi.messages.general.avatar.AvatarExpeditionState;
+import org.anime_game_servers.multi_proto.gi.messages.general.avatar.GrantReason;
+import org.anime_game_servers.multi_proto.gi.messages.general.avatar.ShowAvatarInfo;
+import org.anime_game_servers.multi_proto.gi.messages.scene.PlayerLocationInfo;
+import org.anime_game_servers.multi_proto.gi.messages.scene.PlayerWorldLocationInfo;
+import org.anime_game_servers.multi_proto.gi.messages.scene.entity.MpSettingType;
+import org.anime_game_servers.multi_proto.gi.messages.scene.entity.OnlinePlayerInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.DayOfWeek;
@@ -144,6 +151,8 @@ public class Player {
     @Getter private Map<Integer, Integer> openStates;
     @Getter private Map<Integer, Map<Integer, Boolean>> sceneTags;
     @Getter private CoopHandler coopHandler;
+    @Getter private Map<Integer, Boolean> levelTags;
+    @Getter @Setter private Map<Integer, Boolean> unlockedScenes;
     @Getter @Setter private Map<Integer, Set<Integer>> unlockedSceneAreas;
     @Getter @Setter private Map<Integer, Set<Integer>> unlockedScenePoints;
     @Getter @Setter private List<Integer> chatEmojiIdList;
@@ -189,7 +198,7 @@ public class Player {
     // Manager data (Save-able to the database)
     private PlayerProfile playerProfile;  // Getter has null-check
     @Getter private TeamManager teamManager;
-    @Getter private BlossomManager blossomManager;
+    @Getter private transient BlossomManager blossomManager;
     private TowerData towerData;  // Getter has null-check
     @Getter private PlayerGachaInfo gachaInfo;
     private PlayerCollectionRecords collectionRecordStore;  // Getter has null-check
@@ -270,6 +279,8 @@ public class Player {
         this.questGlobalVariables = new HashMap<>();
         this.openStates = new HashMap<>();
         this.sceneTags = new HashMap<>();
+        this.levelTags = new HashMap<>();
+        this.unlockedScenes = new HashMap<>();
         this.unlockedSceneAreas = new HashMap<>();
         this.unlockedScenePoints = new HashMap<>();
         this.chatEmojiIdList = new ArrayList<>();
@@ -401,13 +412,18 @@ public class Player {
         this.scene = scene;
     }
 
-    public void visitScene(int sceneId) {
-        val sceneTagData = GameData.getSceneTagDataMap().values();
-        val tags = this.sceneTags.computeIfAbsent(sceneId, k -> new HashMap<>());
-        sceneTagData.stream()
-                .filter(tagData -> tagData.getSceneId() == sceneId && tagData.isDefaultValid())
+    public void visitScene(int visitSceneId) {
+        val tags = this.sceneTags.computeIfAbsent(visitSceneId, k -> new HashMap<>());
+        GameData.getSceneTagDataMap().values().stream()
+            .filter(tagData -> tagData.getSceneId() == visitSceneId && tagData.isDefaultValid())
                 .map(SceneTagData::getId)
                 .forEach(k -> tags.putIfAbsent(k, true));
+    }
+
+    public void initializeLevelTags() {
+        GameData.getLevelTagGroupsDataMap().values()
+            .forEach(group -> Arrays.stream(group.getInitialLevelTagIdList()).boxed()
+                .forEach(tagId -> this.levelTags.put(tagId, true)));
     }
 
     synchronized public void setClimate(ClimateType climate) {
@@ -759,7 +775,7 @@ public class Player {
         ExpeditionInfo exp = new ExpeditionInfo();
         exp.setExpId(expId);
         exp.setHourTime(hourTime);
-        exp.setState(1);
+        exp.setState(AvatarExpeditionState.AVATAR_EXPEDITION_DOING);
         exp.setStartTime(startTime);
         expeditionInfo.put(avatarGuid, exp);
     }
@@ -1199,7 +1215,7 @@ public class Player {
         req.getRequester().sendPacket(new PacketPlayerApplyEnterMpResultNotify(
             this,
             false,
-            PlayerApplyEnterMpResultNotifyOuterClass.PlayerApplyEnterMpResultNotify.Reason.REASON_SYSTEM_JUDGE));
+            MpEnterResultReason.SYSTEM_JUDGE));
         return true;
     }
 
@@ -1234,9 +1250,9 @@ public class Player {
         var timeNow = Utils.getCurrentSeconds();
         var needNotify = false;
         for (ExpeditionInfo e : expeditionInfo.values()) {
-            if (e.getState() == 1) {
+            if (e.getState() == AvatarExpeditionState.AVATAR_EXPEDITION_DOING) {
                 if (timeNow - e.getStartTime() >= e.getHourTime() * 60 * 60) {
-                    e.setState(2);
+                    e.setState(AvatarExpeditionState.AVATAR_EXPEDITION_FINISH_WAIT_REWARD);
                     needNotify = true;
                 }
             }
@@ -1353,6 +1369,11 @@ public class Player {
         // Execute daily reset logic if this is a new day.
         this.doDailyReset();
 
+        //set LevelTags if they have not been set before
+        if (this.levelTags.isEmpty()) {
+            this.initializeLevelTags();
+        }
+
         // Activity needed for some quests
         activityManager = new ActivityManager(this);
 
@@ -1365,6 +1386,7 @@ public class Player {
         // Packets
         session.send(new PacketMainCoopUpdateNotify(this.getCoopHandler().getCoopCards().values().stream().map(e -> e.getMainCoop().toProto()).toList()));
         session.send(new PacketPlayerDataNotify(this)); // Player data
+        session.send(new PacketLevelTagDataNotify(this));
         session.send(new PacketStoreWeightLimitNotify());
         session.send(new PacketPlayerStoreNotify(this));
         session.send(new PacketAvatarDataNotify(this));
@@ -1527,9 +1549,9 @@ public class Player {
 
             // Make the Adventure EXP pop-up show on screen.
             if (prop == PlayerProperty.PROP_PLAYER_EXP) {
-                this.sendPacket(new PacketPlayerPropChangeReasonNotify(this, prop, currentValue, value, PropChangeReason.PROP_CHANGE_REASON_PLAYER_ADD_EXP));
+                this.sendPacket(new PacketPlayerPropChangeReasonNotify(this, prop, currentValue, value, PropChangeReason.PROP_CHANGE_PLAYER_ADD_EXP));
             } else if(prop == PlayerProperty.PROP_MAX_STAMINA) {
-                this.sendPacket(new PacketPlayerPropChangeReasonNotify(this, prop, currentValue, value, PropChangeReason.PROP_CHANGE_REASON_CITY_LEVELUP));
+                this.sendPacket(new PacketPlayerPropChangeReasonNotify(this, prop, currentValue, value, PropChangeReason.PROP_CHANGE_CITY_LEVELUP));
             }
         }
         return true;
@@ -1574,4 +1596,57 @@ public class Player {
                 .toList();
     }
 
+    public void setLevelTag(int levelTag) {
+        //set all other levelTags in the levelTag groups to false
+        GameData.getLevelTagGroupsDataMap().values()
+            .forEach(group -> Arrays.stream(group.getLevelTagGroupList())
+                .forEach(subgroup -> {
+                    val tagList = Arrays.stream(subgroup.getLevelTagIdList()).boxed().toList();
+                    if (tagList.contains(levelTag)) {
+                        tagList.forEach(tag -> {
+                            if (tag != levelTag) {
+                                this.levelTags.put(tag, false);
+                            }
+                        });
+                    }
+                })
+            );
+
+        val levelTagData = GameData.getLevelTagDataMap().get(levelTag);
+
+        //add sceneTags
+        Arrays.stream(levelTagData.getAddSceneTagIdList()).forEach(sceneTagId -> {
+            val sceneTag = GameData.getSceneTagDataMap().get(sceneTagId);
+            if (sceneTag == null) {
+                Grasscutter.getLogger().warn("trying to load unknown scene tag {} in level tag {}", sceneTagId, levelTag);
+            }
+            val sceneTagSceneId = sceneTag != null ? sceneTag.getSceneId() : levelTagData.getSceneId();
+            this.sceneTags.computeIfAbsent(sceneTagSceneId, k -> new HashMap<>())
+                .put(sceneTagId, true);
+        });
+
+        //remove sceneTags
+        Arrays.stream(levelTagData.getRemoveSceneTagIdList()).forEach(sceneTagId -> {
+            val sceneTag = GameData.getSceneTagDataMap().get(sceneTagId);
+            if (sceneTag == null) {
+                Grasscutter.getLogger().warn("trying to unload unknown scene tag {} in level tag {}", sceneTagId, levelTag);
+            }
+            val sceneTagSceneId = sceneTag != null ? sceneTag.getSceneId() : levelTagData.getSceneId();
+            this.sceneTags.computeIfAbsent(sceneTagSceneId, k -> new HashMap<>())
+                .put(sceneTagId, false);
+        });
+
+        //load dynamic groups
+        Arrays.stream(levelTagData.getLoadDynamicGroupList()).forEach(groupId -> this.scene.loadDynamicGroup(groupId));
+
+        this.levelTags.put(levelTag, true);
+
+        this.sendPacket(new PacketSceneDataNotify(this));
+        this.sendPacket(new PacketPlayerWorldSceneInfoListNotify(this));
+        this.sendPacket(new PacketLevelTagDataNotify(this));
+
+        //trigger quest content/conditions
+        questManager.queueEvent(QuestContent.QUEST_CONTENT_SCENE_LEVEL_TAG_EQ, levelTag, 0);
+        questManager.queueEvent(QuestCond.QUEST_COND_SCENE_LEVEL_TAG_EQ, levelTag, 0);
+    }
 }

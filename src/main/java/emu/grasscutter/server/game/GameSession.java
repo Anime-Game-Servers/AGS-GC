@@ -9,19 +9,20 @@ import emu.grasscutter.Grasscutter.ServerDebugMode;
 import emu.grasscutter.game.Account;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.net.packet.BasePacket;
-import emu.grasscutter.net.packet.PacketOpcodes;
 import emu.grasscutter.net.packet.PacketOpcodesUtils;
 import emu.grasscutter.server.event.game.SendPacketEvent;
 import emu.grasscutter.utils.Crypto;
 import emu.grasscutter.utils.FileUtils;
 import emu.grasscutter.utils.Utils;
-import interfaces.PacketIdProvider;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 import org.anime_game_servers.core.base.Version;
-import packet_id.PacketIds;
+import org.anime_game_servers.multi_proto.core.interfaces.PacketIdProvider;
+import org.anime_game_servers.multi_proto.gi.packet_id.PacketIds;
+import org.anime_game_servers.multi_proto.gi.utils.VersionIdentify;
 
 import static emu.grasscutter.config.Configuration.*;
 import static emu.grasscutter.utils.Language.translate;
@@ -41,7 +42,8 @@ public class GameSession implements GameSessionManager.KcpChannel {
     @Getter private int clientTime;
     @Getter private long lastPingTime;
     private int lastClientSeq = 10;
-    @Getter private Version version = Version.GI_3_2_0; // TODO actually get the version from the client
+    @Getter private Version version = Version.DEFAULT;
+    @Getter private boolean isTemporaryVersion = true;
     @Getter private PacketIdProvider packageIdProvider = PacketIds.getMapper(version);
 
     public GameSession(GameServer server) {
@@ -124,19 +126,20 @@ public class GameSession implements GameSessionManager.KcpChannel {
         }
 
         // Log
+        val paketName = PacketOpcodesUtils.getOpcodeName(packet.getOpcode(this), this);
         switch (GAME_INFO.logPackets) {
             case ALL -> {
-                if (!PacketOpcodesUtils.LOOP_PACKETS.contains(packet.getOpcode(this)) || GAME_INFO.isShowLoopPackets) {
+                if (!PacketOpcodesUtils.LOOP_PACKETS.contains(paketName) || GAME_INFO.isShowLoopPackets) {
                     logPacket("SEND", packet.getOpcode(this), packet.getData(version));
                 }
             }
             case WHITELIST -> {
-                if (SERVER.debugWhitelist.contains(packet.getOpcode(this))) {
+                if (SERVER.debugWhitelist.contains(paketName)) {
                     logPacket("SEND", packet.getOpcode(this), packet.getData(version));
                 }
             }
             case BLACKLIST -> {
-                if (!SERVER.debugBlacklist.contains(packet.getOpcode(this))) {
+                if (!SERVER.debugBlacklist.contains(paketName)) {
                     logPacket("SEND", packet.getOpcode(this), packet.getData(version));
                 }
             }
@@ -156,6 +159,12 @@ public class GameSession implements GameSessionManager.KcpChannel {
     public void onConnected(GameSessionManager.KcpTunnel tunnel) {
         this.tunnel = tunnel;
         Grasscutter.getLogger().info(translate("messages.game.connect", this.getAddress().toString()));
+    }
+
+    public void updateVersion(Version version, boolean isTemporaryVersion) {
+        this.packageIdProvider = PacketIds.getMapper(version);
+        this.version = version;
+        this.isTemporaryVersion = isTemporaryVersion;
     }
 
     @Override
@@ -200,25 +209,38 @@ public class GameSession implements GameSessionManager.KcpChannel {
                     return; // Bad packet
                 }
 
+                if(version == Version.DEFAULT) {
+                    val versions = VersionIdentify.getClientVersionsFromFirstPacket(opcode, payload);
+                    if(versions == null || versions.isEmpty()) {
+                        Grasscutter.getLogger().error("Failed to identify client version for opcode: {}", opcode);
+                        return;
+                    }
+                    val updateVersion = versions.get(versions.size()-1); // get the latest version for initial parsing
+                    val updateIsTemporaryVersion = versions.size() > 1; // if the result is only one version, it's the final version
+
+                    updateVersion(updateVersion, updateIsTemporaryVersion);
+                }
+
+                val paketName = PacketOpcodesUtils.getOpcodeName(opcode, this);
+
                 // Log packet
                 switch (GAME_INFO.logPackets) {
                     case ALL -> {
-                        if (!PacketOpcodesUtils.LOOP_PACKETS.contains(opcode) || GAME_INFO.isShowLoopPackets) {
+                        if (!PacketOpcodesUtils.LOOP_PACKETS.contains(paketName) || GAME_INFO.isShowLoopPackets) {
                             logPacket("RECV", opcode, payload);
                         }
                     }
                     case WHITELIST -> {
-                        if (SERVER.debugWhitelist.contains(opcode)) {
+                        if (SERVER.debugWhitelist.contains(paketName)) {
                             logPacket("RECV", opcode, payload);
                         }
                     }
                     case BLACKLIST -> {
-                        if (!(SERVER.debugBlacklist.contains(opcode))) {
+                        if (!(SERVER.debugBlacklist.contains(paketName))) {
                             logPacket("RECV", opcode, payload);
                         }
                     }
-                    default -> {
-                    }
+                    default -> { /* nothing to log */}
                 }
 
                 // Handle
@@ -244,7 +266,7 @@ public class GameSession implements GameSessionManager.KcpChannel {
             player.onLogout();
         }
         try {
-            send(new BasePacket(PacketOpcodes.ServerDisconnectClientNotify));
+            send(new BasePacket(getPackageIdProvider().getPacketId("ServerDisconnectClientNotify")));
         } catch (Throwable ignore) {
             Grasscutter.getLogger().warn("closing {} error", getAddress().getAddress().getHostAddress());
         }

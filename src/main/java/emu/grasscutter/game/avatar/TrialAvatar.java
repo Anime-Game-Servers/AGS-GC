@@ -7,16 +7,17 @@ import emu.grasscutter.data.common.BaseTrialAvatarTemplateData;
 import emu.grasscutter.data.excels.AvatarCostumeData;
 import emu.grasscutter.data.excels.TrialReliquaryData;
 import emu.grasscutter.game.entity.EntityWeapon;
+import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
 import emu.grasscutter.game.inventory.EquipType;
 import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.server.packet.send.PacketAvatarEquipChangeNotify;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import messages.general.avatar.AvatarInfo;
-import messages.general.avatar.GrantReason;
-import messages.general.avatar.TrialAvatarGrantRecord;
-import messages.general.avatar.TrialAvatarInfo;
+import org.anime_game_servers.multi_proto.gi.messages.general.avatar.AvatarInfo;
+import org.anime_game_servers.multi_proto.gi.messages.general.avatar.GrantReason;
+import org.anime_game_servers.multi_proto.gi.messages.general.avatar.TrialAvatarGrantRecord;
+import org.anime_game_servers.multi_proto.gi.messages.general.avatar.TrialAvatarInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
@@ -122,7 +123,8 @@ public class TrialAvatar extends Avatar{
             item.setOwner(getPlayer());
             if (item.getItemData().getEquipType() == EquipType.EQUIP_WEAPON && getPlayer().getWorld() != null) {
                 if(!(item.getWeaponEntity() != null && item.getWeaponEntity().getScene() == getPlayer().getScene())) {
-                    item.setWeaponEntity(new EntityWeapon(this.getPlayer().getScene(), item.getItemData().getGadgetId()));
+                    val createConfig = new CreateGadgetEntityConfig(item.getItemData().getGadgetId());
+                    item.setWeaponEntity(new EntityWeapon(this.getPlayer().getScene(), createConfig));
                     getPlayer().getScene().getWeaponEntities().put(item.getWeaponEntity().getId(), item.getWeaponEntity());
                 }
                 getPlayer().sendPacket(new PacketAvatarEquipChangeNotify(this, item));

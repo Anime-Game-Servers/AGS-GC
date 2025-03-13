@@ -1,10 +1,11 @@
 package emu.grasscutter.game.entity.gadget.platform;
 
+import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
 import emu.grasscutter.utils.Position;
 import lombok.val;
-import messages.general.MathQuaternion;
-import messages.scene.entity.MovingPlatformType;
-import messages.scene.entity.PlatformInfo;
+import org.anime_game_servers.multi_proto.gi.messages.general.MathQuaternion;
+import org.anime_game_servers.multi_proto.gi.messages.scene.entity.MovingPlatformType;
+import org.anime_game_servers.multi_proto.gi.messages.scene.entity.PlatformInfo;
 
 /**
  * TODO mostly hardcoded for EntitySolarIsotomaElevatorPlatform, should be more generic
@@ -13,9 +14,9 @@ public class AbilityRoute extends BaseRoute {
 
     private final Position basePosition;
 
-    public AbilityRoute(Position startRot, boolean startRoute, boolean isActive, Position basePosition) {
-        super(startRot, startRoute, isActive);
-        this.basePosition = basePosition;
+    public AbilityRoute(CreateGadgetEntityConfig createConfig, boolean startRoute, boolean isActive) {
+        super(createConfig.getBornRot(), startRoute, isActive);
+        this.basePosition = createConfig.getBornPos();
     }
 
     @Override

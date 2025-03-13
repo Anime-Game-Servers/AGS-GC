@@ -2,8 +2,6 @@ package emu.grasscutter.server.game;
 
 import static emu.grasscutter.config.Configuration.*;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -14,7 +12,6 @@ import emu.grasscutter.server.event.game.ReceivePacketEvent;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.Grasscutter.ServerDebugMode;
 import emu.grasscutter.server.game.GameSession.SessionState;
-import interfaces.ProtoModel;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
@@ -77,34 +74,34 @@ public class GameServerPacketHandler {
     }
 
     @Nullable
-    private PacketHandler getHandler(GameSession session, int opcode) {
-        String name = session.getPackageIdProvider().getPacketName(opcode);
-        PacketHandler handler = this.versionHandlers.get(name);
+    private PacketHandler getHandler(String packageName, int opcode) {
+        PacketHandler handler = this.versionHandlers.get(packageName);
         return handler!= null ? handler : this.handlers.get(opcode);
     }
 
     public void handle(GameSession session, int opcode, byte[] header, byte[] payload) {
-        PacketHandler handler = getHandler(session, opcode);
+        String packageName = session.getPackageIdProvider().getPacketName(opcode);
+        PacketHandler handler = getHandler(packageName, opcode);
 
         if (handler != null) {
             try {
                 // Make sure session is ready for packets
                 SessionState state = session.getState();
 
-                if (opcode == PacketOpcodes.PingReq) {
+                if ("PingReq".equals(packageName)) {
                     // Always continue if packet is ping request
-                } else if (opcode == PacketOpcodes.GetPlayerTokenReq) {
+                } else if ("GetPlayerTokenReq".equals(packageName)) {
                     if (state != SessionState.WAITING_FOR_TOKEN) {
                         return;
                     }
                 } else if (state == SessionState.ACCOUNT_BANNED) {
                     session.close();
                     return;
-                } else if (opcode == PacketOpcodes.PlayerLoginReq) {
+                } else if ("PlayerLoginReq".equals(packageName)) {
                     if (state != SessionState.WAITING_FOR_LOGIN) {
                         return;
                     }
-                } else if (opcode == PacketOpcodes.SetPlayerBornDataReq) {
+                } else if ("SetPlayerBornDataReq".equals(packageName)) {
                     if (state != SessionState.PICKING_CHARACTER) {
                         return;
                     }

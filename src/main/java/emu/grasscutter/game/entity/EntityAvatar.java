@@ -5,6 +5,7 @@ import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.excels.AvatarData;
 import emu.grasscutter.data.excels.AvatarSkillDepotData;
 import emu.grasscutter.game.avatar.Avatar;
+import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
 import emu.grasscutter.game.inventory.EquipType;
 import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.game.player.Player;
@@ -12,10 +13,10 @@ import emu.grasscutter.game.props.EntityIdType;
 import emu.grasscutter.game.props.FightProperty;
 import emu.grasscutter.game.props.PlayerProperty;
 import emu.grasscutter.game.world.Scene;
-import emu.grasscutter.net.proto.ChangeEnergyReasonOuterClass.ChangeEnergyReason;
-import emu.grasscutter.net.proto.ChangeHpReasonOuterClass.ChangeHpReason;
-import emu.grasscutter.net.proto.PlayerDieTypeOuterClass.PlayerDieType;
-import emu.grasscutter.net.proto.PropChangeReasonOuterClass.PropChangeReason;
+import org.anime_game_servers.multi_proto.gi.messages.scene.entity.ChangeEnergyReason;
+import org.anime_game_servers.multi_proto.gi.messages.scene.entity.ChangeHpReason;
+import org.anime_game_servers.multi_proto.gi.messages.general.PlayerDieType;
+import org.anime_game_servers.multi_proto.gi.messages.general.PropChangeReason;
 import emu.grasscutter.server.event.player.PlayerMoveEvent;
 import emu.grasscutter.server.packet.send.PacketEntityFightPropChangeReasonNotify;
 import emu.grasscutter.server.packet.send.PacketEntityFightPropUpdateNotify;
@@ -25,11 +26,11 @@ import emu.grasscutter.utils.Utils;
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
 import lombok.Getter;
 import lombok.val;
-import messages.general.ability.AbilityControlBlock;
-import messages.general.ability.AbilityEmbryo;
-import messages.general.ability.AbilitySyncStateInfo;
-import messages.general.entity.SceneReliquaryInfo;
-import messages.scene.entity.*;
+import org.anime_game_servers.multi_proto.gi.messages.general.ability.AbilityControlBlock;
+import org.anime_game_servers.multi_proto.gi.messages.general.ability.AbilityEmbryo;
+import org.anime_game_servers.multi_proto.gi.messages.general.ability.AbilitySyncStateInfo;
+import org.anime_game_servers.multi_proto.gi.messages.general.entity.SceneReliquaryInfo;
+import org.anime_game_servers.multi_proto.gi.messages.scene.entity.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,7 +57,8 @@ public class EntityAvatar extends GameEntity {
             GameItem weapon = this.getAvatar().getWeapon();
             if (weapon != null) {
                 if (!(weapon.getWeaponEntity() != null && weapon.getWeaponEntity().getScene() == scene)) {
-                    weapon.setWeaponEntity(new EntityWeapon(getPlayer().getScene(), weapon.getItemData().getGadgetId()));
+                    val weaponCreateConfig = new CreateGadgetEntityConfig(weapon.getItemData().getGadgetId());
+                    weapon.setWeaponEntity(new EntityWeapon(getPlayer().getScene(), weaponCreateConfig));
                     scene.getWeaponEntities().put(weapon.getWeaponEntity().getId(), weapon.getWeaponEntity());
                 }
                 //weapon.setWeaponEntityId(getScene().getWorld().getNextEntityId(EntityIdType.WEAPON));
@@ -104,9 +106,9 @@ public class EntityAvatar extends GameEntity {
     public void onDeath(int killerId) {
         super.onDeath(killerId); // Invoke super class's onDeath() method.
 
-        this.killedType = PlayerDieType.PLAYER_DIE_TYPE_KILL_BY_MONSTER;
+        this.killedType = PlayerDieType.PLAYER_DIE_KILL_BY_MONSTER;
         this.killedBy = killerId;
-        clearEnergy(ChangeEnergyReason.CHANGE_ENERGY_REASON_NONE);
+        clearEnergy(ChangeEnergyReason.CHANGE_ENERGY_NONE);
     }
 
     public void onDeath(PlayerDieType dieType, int killerId) {
@@ -114,7 +116,7 @@ public class EntityAvatar extends GameEntity {
 
         this.killedType = dieType;
         this.killedBy = killerId;
-        clearEnergy(ChangeEnergyReason.CHANGE_ENERGY_REASON_NONE);
+        clearEnergy(ChangeEnergyReason.CHANGE_ENERGY_NONE);
     }
 
     @Override
@@ -128,7 +130,7 @@ public class EntityAvatar extends GameEntity {
 
         if (healed > 0f) {
             getScene().broadcastPacket(
-                new PacketEntityFightPropChangeReasonNotify(this, FightProperty.FIGHT_PROP_CUR_HP, healed, mute ? PropChangeReason.PROP_CHANGE_REASON_NONE : PropChangeReason.PROP_CHANGE_REASON_ABILITY, ChangeHpReason.CHANGE_HP_REASON_ADD_ABILITY)
+                new PacketEntityFightPropChangeReasonNotify(this, FightProperty.FIGHT_PROP_CUR_HP, healed, mute ? PropChangeReason.PROP_CHANGE_NONE : PropChangeReason.PROP_CHANGE_ABILITY, ChangeHpReason.CHANGE_HP_ADD_ABILITY)
             );
         }
 
@@ -151,7 +153,7 @@ public class EntityAvatar extends GameEntity {
         // Send packets.
         this.getScene().broadcastPacket(new PacketEntityFightPropUpdateNotify(this, curEnergyProp));
 
-        if (reason == ChangeEnergyReason.CHANGE_ENERGY_REASON_SKILL_START) {
+        if (reason == ChangeEnergyReason.CHANGE_ENERGY_SKILL_START) {
             this.getScene().broadcastPacket(new PacketEntityFightPropChangeReasonNotify(this, curEnergyProp, -curEnergy, reason));
         }
     }
@@ -234,11 +236,11 @@ public class EntityAvatar extends GameEntity {
 
     @Override
     public SceneEntityInfo toProto() {
-        val bornPosProto = new messages.general.Vector();
+        val bornPosProto = new org.anime_game_servers.multi_proto.gi.messages.general.Vector();
         val aiInfo = new SceneEntityAiInfo(true, bornPosProto);
         val authority = new EntityAuthorityInfo(new AbilitySyncStateInfo(), new EntityRendererChangedInfo(), aiInfo, bornPosProto);
 
-        val entityInfo = new SceneEntityInfo(messages.scene.entity.ProtEntityType.PROT_ENTITY_AVATAR, getId());
+        val entityInfo = new SceneEntityInfo(org.anime_game_servers.multi_proto.gi.messages.scene.entity.ProtEntityType.PROT_ENTITY_AVATAR, getId());
         entityInfo.setAnimatorParaList(List.of(new AnimatorParameterValueInfoPair()));
         entityInfo.setEntityClientData(new EntityClientData());
         entityInfo.setEntityAuthorityInfo(authority);
@@ -252,7 +254,7 @@ public class EntityAvatar extends GameEntity {
 
         this.addAllFightPropsToEntityInfo(entityInfo);
 
-        val pair = new messages.scene.entity.PropPair(PlayerProperty.PROP_LEVEL.getId(), ProtoHelper.newPropValue(PlayerProperty.PROP_LEVEL, getAvatar().getLevel()));
+        val pair = new org.anime_game_servers.multi_proto.gi.messages.scene.entity.PropPair(PlayerProperty.PROP_LEVEL.getId(), ProtoHelper.newPropValue(PlayerProperty.PROP_LEVEL, getAvatar().getLevel()));
         entityInfo.setPropList(List.of(pair));
 
         entityInfo.setEntity(new SceneEntityInfo.Entity.Avatar(this.getSceneAvatarInfo()));

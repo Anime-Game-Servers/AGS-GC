@@ -67,21 +67,23 @@ public enum GrowCurve {
 	GROW_CURVE_CRITICAL_302(2302),
 	GROW_CURVE_CRITICAL_303(2303),
 	GROW_CURVE_CRITICAL_304(2304),
-	GROW_CURVE_CRITICAL_305(2305);
-	
+	GROW_CURVE_CRITICAL_305(2305),
+    GROW_CURVE_ACTIVITY_ATTACK_1(5201),
+    GROW_CURVE_ACTIVITY_HP_1(5202);
+
 	private final int id;
 	private static final Int2ObjectMap<GrowCurve> map = new Int2ObjectOpenHashMap<>();
 	private static final Map<String, GrowCurve> stringMap = new HashMap<>();
-	
+
 	public static final int[] fightProps = new int[] {1, 4, 7, 20, 21, 22, 23, 26, 27, 28, 29, 30, 40, 41, 42, 43, 44, 45, 46, 50, 51, 52, 53, 54, 55, 56, 2000, 2001, 2002, 2003, 1010};
-	
+
 	static {
 		Stream.of(values()).forEach(e -> {
 			map.put(e.getId(), e);
 			stringMap.put(e.name(), e);
 		});
 	}
-	
+
 	private GrowCurve(int id) {
 		this.id = id;
 	}
@@ -89,11 +91,11 @@ public enum GrowCurve {
 	public int getId() {
 		return id;
 	}
-	
+
 	public static GrowCurve getPropById(int value) {
 		return map.getOrDefault(value, GROW_CURVE_NONE);
 	}
-	
+
 	public static GrowCurve getPropByName(String name) {
 		return stringMap.getOrDefault(name, GROW_CURVE_NONE);
 	}
