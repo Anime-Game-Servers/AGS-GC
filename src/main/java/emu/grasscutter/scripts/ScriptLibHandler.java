@@ -11,7 +11,8 @@ import emu.grasscutter.game.entity.EntityAvatar;
 import emu.grasscutter.game.entity.EntityGadget;
 import emu.grasscutter.game.entity.EntityMonster;
 import emu.grasscutter.game.entity.GameEntity;
-import emu.grasscutter.game.entity.gadget.GadgetWorktop;
+import emu.grasscutter.game.entity.*;
+import emu.grasscutter.game.entity.gadget.content.GadgetWorktop;
 import emu.grasscutter.game.entity.gadget.platform.ConfigRoute;
 import emu.grasscutter.game.entity.gadget.platform.PointArrayRoute;
 import emu.grasscutter.game.managers.blossom.BlossomSchedule;
@@ -67,7 +68,7 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
             return null;
         }
 
-        val entity = sceneScriptManager.createGadget(groupId, groupBlockId, gadget);
+        val entity = sceneScriptManager.createGadget(gadget);
         if(entity==null){
             logger.warn("[LUA] Create gadget null with cid: {} gid: {} bid: {}", configId, groupId, groupBlockId);
             return null;
@@ -1002,7 +1003,7 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
         if (currentGroup == null) return 1;
 
         val gadget = currentGroup.getGadgets().get(chestConfigId);
-        val chestGadget = context.getSceneScriptManager().createGadget(actualGroupId, currentGroup.getGroupInfo().getBlockId(), gadget);
+        val chestGadget = context.getSceneScriptManager().createGadget(gadget);
         if (chestGadget == null) return 1;
 
         val blossomManager = context.getSceneScriptManager().getScene().getWorld().getHost().getBlossomManager();
@@ -1470,17 +1471,16 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
         }
 
         var routeConfig = entityGadget.getRouteConfig();
-        if(!(routeConfig instanceof PointArrayRoute)){
-            routeConfig = new PointArrayRoute((entityGadget).getMetaGadget());
+        if(routeConfig instanceof PointArrayRoute pointArrayRoute) {
+            if(pointArrayRoute.getPointArrayId() == pointArrayId){
+                return -1;
+            }
+            pointArrayRoute.setPointArrayId(pointArrayId);
+        } else {
+            routeConfig = new PointArrayRoute(entityGadget.getRotation(), pointArrayId);
             entityGadget.setRouteConfig(routeConfig);
         }
 
-        val configRoute = (PointArrayRoute) routeConfig;
-        if(configRoute.getPointArrayId() == pointArrayId){
-            return -1;
-        }
-
-        configRoute.setPointArrayId(pointArrayId);
         val pointIndexList = Arrays.stream(var3.getAsIntArray()).boxed().toList();
         if (!entityGadget.scheduleArrayPoints(pointArrayId, pointIndexList)) {
             return -1;
@@ -1504,19 +1504,18 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
         }
 
         var routeConfig = entityGadget.getRouteConfig();
-        if(!(routeConfig instanceof ConfigRoute)){
-            routeConfig = new ConfigRoute((entityGadget).getMetaGadget());
+        if(routeConfig instanceof ConfigRoute configRoute){
+            if(configRoute.getRouteId() == routeId){
+                return 0;
+            }
+            configRoute.setRouteId(routeId);
+        } else {
+            routeConfig = new ConfigRoute(entityGadget.getRotation().clone(), routeId);
             entityGadget.setRouteConfig(routeConfig);
         }
 
-        val configRoute = (ConfigRoute) routeConfig;
-        if(configRoute.getRouteId() == routeId){
-            return 0;
-        }
-
-        configRoute.setRouteId(routeId);
-        configRoute.setStartSceneTime(scene.getSceneTime());
-        configRoute.setStartIndex(0);
+        routeConfig.setStartSceneTime(scene.getSceneTime());
+        routeConfig.setStartIndex(0);
         entityGadget.schedulePlatform();
         scene.broadcastPacket(new PacketPlatformChangeRouteNotify(entityGadget));
         return 0;

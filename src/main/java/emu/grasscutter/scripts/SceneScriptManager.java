@@ -3,12 +3,14 @@ package emu.grasscutter.scripts;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.Loggers;
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.excels.MonsterData;
 import emu.grasscutter.data.excels.WorldLevelData;
 import emu.grasscutter.data.server.Grid;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.entity.*;
-import emu.grasscutter.game.entity.gadget.platform.BaseRoute;
+import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
+import emu.grasscutter.game.entity.create_config.CreateMonsterEntityConfig;
+import emu.grasscutter.game.entity.create_config.CreateNpcEntityConfig;
+import emu.grasscutter.game.entity.create_config.CreateRegionEntityConfig;
 import emu.grasscutter.game.quest.GameQuest;
 import emu.grasscutter.game.quest.QuestGroupSuite;
 import emu.grasscutter.game.quest.enums.QuestContent;
@@ -208,10 +210,11 @@ public class SceneScriptManager {
     public int refreshGroup(SceneGroupInstance groupInstance, int suiteIndex, boolean excludePrevSuite, boolean dontLoad) {
         return refreshGroup(groupInstance, suiteIndex, excludePrevSuite, null, dontLoad);
     }
-    public int refreshGroup(SceneGroupInstance groupInstance, int suiteIndex, boolean excludePrevSuite, List<GameEntity> entitiesAdded) {
+    public int refreshGroup(SceneGroupInstance groupInstance, int suiteIndex, boolean excludePrevSuite, List<GameEntity<?>> entitiesAdded) {
         return refreshGroup(groupInstance, suiteIndex, excludePrevSuite, entitiesAdded, false);
     }
-    public int refreshGroup(SceneGroupInstance groupInstance, int suiteIndex, boolean excludePrevSuite, List<GameEntity> entitiesAdded, boolean dontLoad) {
+
+    public int refreshGroup(SceneGroupInstance groupInstance, int suiteIndex, boolean excludePrevSuite, List<GameEntity<?>> entitiesAdded, boolean dontLoad) {
         val groupId = groupInstance.getGroupId();
         SceneGroup group = meta.getGroups().get(groupId);
         if(suiteIndex == 0) {
@@ -314,7 +317,7 @@ public class SceneScriptManager {
                 var entity = scene.getEntityByConfigId(m.getConfigId(), groupId);
                 return (entity == null || entity.getGroupId()!=group.getGroupInfo().getId());/*&& !groupInstance.getDeadEntities().contains(entity); */ //TODO: Investigate the usage of deadEntities
             })
-            .map(mob -> createMonster(group.getGroupInfo().getId(), group.getGroupInfo().getBlockId(), mob))
+            .map(mob -> createMonster(mob))
             .toList();//TODO check if it interferes with bigworld or anything else
         this.addEntities(monstersToSpawn);
 
@@ -326,10 +329,10 @@ public class SceneScriptManager {
 
     public void registerRegion(EntityRegion region) {
         regions.put(region.getId(), region);
-        logger.debug("Registered region {} from group {}", region.getMetaRegion().getConfigId(), region.getGroupId());
+        logger.debug("Registered region {} from group {}", region.getConfigId(), region.getGroupId());
     }
     public void registerRegionInGroupSuite(SceneGroup group, SceneSuite suite) {
-        suite.getSceneRegions().stream().map(region -> new EntityRegion(this.getScene(), region))
+        suite.getSceneRegions().stream().map(region -> new EntityRegion(this.getScene(), new CreateRegionEntityConfig(region)))
             .forEach(this::registerRegion);
     }
     public synchronized void deregisterRegion(SceneRegion region) {
@@ -568,14 +571,12 @@ public class SceneScriptManager {
         }
 
         for (var region : this.regions.values()) {
-            val metaRegion = region.getMetaRegion();
-
             getScene().getEntities().values().stream()
-                .filter(e -> metaRegion.contains(e.getPosition()) && !region.getEntities().contains(e))
+                .filter(e -> region.isPosInRegion(e.getPosition()) && !region.getEntities().contains(e))
                 .forEach(region::addEntity);
 
             region.getEntities().stream()
-                .filter(e -> !metaRegion.contains(e.getPosition()))
+                .filter(e -> !region.isPosInRegion(e.getPosition()))
                 .forEach(region::removeEntity);
 
             // call enter region events for new entities
@@ -604,9 +605,9 @@ public class SceneScriptManager {
                 val entity = scene.getEntityByConfigId(m.getConfigId(), groupId);
                 return (entity == null || entity.getGroupId()!=groupId) && (!m.isOneOff() || !m.isPersistent() || !groupInstance.getDeadEntities().contains(m.getConfigId()));
             })
-            .map(g -> createGadget(groupId, group.getGroupInfo().getBlockId(), g, groupInstance.getCachedGadgetState(g)))
+            .map(g -> createGadget(g, groupInstance.getCachedGadgetState(g)))
             .filter(Objects::nonNull)
-            .peek(g -> groupInstance.cacheGadgetState(g.getMetaGadget(), g.getState()))
+            .peek(groupInstance::cacheGadgetState)
             .toList();
     }
     public List<EntityMonster> getMonstersInGroupSuite(SceneGroupInstance groupInstance, SceneSuite suite) {
@@ -617,7 +618,7 @@ public class SceneScriptManager {
                 var entity = scene.getEntityByConfigId(m.getConfigId(), groupId);
                 return (entity == null || entity.getGroupId()!=groupId);/*&& !groupInstance.getDeadEntities().contains(entity); */ //TODO: Investigate the usage of deadEntities
             }) //TODO: Add persistent monster cached data
-            .map(mob -> createMonster(groupId, group.getGroupInfo().getBlockId(), mob))
+            .map(mob -> createMonster(mob))
             .filter(Objects::nonNull)
             .toList();
     }
@@ -625,16 +626,16 @@ public class SceneScriptManager {
     public void addGroupSuite(SceneGroupInstance groupInstance, SceneSuite suite) {
         addGroupSuite(groupInstance, suite, null);
     }
-    public void addGroupSuite(SceneGroupInstance groupInstance, SceneSuite suite, List<GameEntity> entities) {
+    public void addGroupSuite(SceneGroupInstance groupInstance, SceneSuite suite, List<GameEntity<?>> entities) {
         // we added trigger first
         registerTrigger(suite.getSceneTriggers());
 
         var group = groupInstance.getLuaGroup();
-        var toCreate = new ArrayList<GameEntity>();
+        var toCreate = new ArrayList<GameEntity<?>>();
         toCreate.addAll(getGadgetsInGroupSuite(groupInstance, suite));
         toCreate.addAll(getMonstersInGroupSuite(groupInstance, suite));
         if(entities != null)
-            toCreate.forEach(entities::add);
+            entities.addAll(toCreate);
         else
             addEntities(toCreate);
 
@@ -645,7 +646,7 @@ public class SceneScriptManager {
         registerTrigger(suite.getSceneTriggers());
 
         var group = groupInstance.getLuaGroup();
-        var toCreate = new ArrayList<GameEntity>();
+        var toCreate = new ArrayList<GameEntity<?>>();
         toCreate.addAll(getGadgetsInGroupSuite(groupInstance, suite));
         toCreate.addAll(getMonstersInGroupSuite(groupInstance, suite));
         addEntities(toCreate);
@@ -697,7 +698,7 @@ public class SceneScriptManager {
             logger.warn("configId {} not found in group {}", configId, groupId);
             return;
         }
-        entity = createMonster(groupId, group.getGroupInfo().getBlockId(), monster);
+        entity = createMonster(monster);
         if(entity!=null){
             getScene().addEntity(entity);
         } else {
@@ -839,11 +840,11 @@ public class SceneScriptManager {
         return scriptMonsterSpawnService;
     }
 
-    public EntityGadget createGadget(int groupId, int blockId, SceneGadget g) {
-        return createGadget(groupId, blockId, g, g.getState());
+    public EntityGadget createGadget(SceneGadget g) {
+        return createGadget(g, g.getState());
     }
 
-    public EntityGadget createGadget(int groupId, int blockId, SceneGadget g, int state) {
+    public EntityGadget createGadget(SceneGadget g, int state) {
         if (g.isOneOff()) {
             var hasEntity = getScene().getEntities().values().stream()
                 .filter(e -> e instanceof EntityGadget)
@@ -854,34 +855,26 @@ public class SceneScriptManager {
                 return null;
             }
         }
-        EntityGadget entity = new EntityGadget(getScene(), g.getGadgetId(), new emu.grasscutter.utils.Position(g.getPos()));
+        val createConfig = new CreateGadgetEntityConfig(g)
+            .setGadgetState(state);
+        EntityGadget entity = new EntityGadget(getScene(), createConfig);
 
         if (entity.getGadgetData() == null) {
             return null;
         }
 
-        entity.setBlockId(blockId);
-        entity.setConfigId(g.getConfigId());
-        entity.setGroupId(groupId);
-        entity.getRotation().set(g.getRot());
-        entity.setState(state);
-
-        entity.setPointType(g.getPointType());
-        entity.setRouteConfig(BaseRoute.fromSceneGadget(g));
-        entity.setMetaGadget(g);
-        entity.buildContent();
-
         return entity;
     }
-    public EntityNPC createNPC(SceneNPC npc, int blockId, int suiteId) {
-        return new EntityNPC(getScene(), npc, blockId, suiteId);
+    public EntityNPC createNPC(SceneNPC npc) {
+        return new EntityNPC(getScene(), new CreateNpcEntityConfig(npc));
     }
-    public EntityMonster createMonster(int groupId, int blockId, SceneMonster monster) {
+    public EntityMonster createMonster(SceneMonster monster) {
         if (monster == null) {
             return null;
         }
 
-        MonsterData data = GameData.getMonsterDataMap().get(monster.getMonsterId());
+        val config = new CreateMonsterEntityConfig(monster);
+        val data = config.getMonsterData();
 
         if (data == null) {
             return null;
@@ -890,6 +883,7 @@ public class SceneScriptManager {
         // Calculate level
         int level = monster.getLevel();
 
+        // should monster.level take priority?
         if (getScene().getDungeonManager() != null) {
             level = getScene().getDungeonManager().getLevelForMonster(monster.getConfigId());
         } else if (getScene().getWorld().getWorldLevel() > 0) {
@@ -900,14 +894,9 @@ public class SceneScriptManager {
             }
         }
 
+        config.setLevel(level);
         // Spawn mob
-        EntityMonster entity = new EntityMonster(getScene(), data, new emu.grasscutter.utils.Position(monster.getPos()), level);
-        entity.getRotation().set(monster.getRot());
-        entity.setGroupId(groupId);
-        entity.setBlockId(blockId);
-        entity.setConfigId(monster.getConfigId());
-        entity.setPoseId(monster.getPoseId());
-        entity.setMetaMonster(monster);
+        EntityMonster entity = new EntityMonster(getScene(), config);
 
         this.getScriptMonsterSpawnService()
                 .onMonsterCreatedListener.forEach(action -> action.onNotify(entity));

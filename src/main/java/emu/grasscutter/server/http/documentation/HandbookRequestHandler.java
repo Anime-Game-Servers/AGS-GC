@@ -1,6 +1,7 @@
 package emu.grasscutter.server.http.documentation;
 
 import static emu.grasscutter.config.Configuration.*;
+import static emu.grasscutter.utils.Language.TextStrings.NUM_LANGUAGES;
 
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.command.CommandMap;
@@ -14,10 +15,13 @@ import emu.grasscutter.utils.Language;
 import io.javalin.http.ContentType;
 import io.javalin.http.Context;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import lombok.val;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 final class HandbookRequestHandler implements DocumentationHandler {
     private List<String> handbookHtmls;
@@ -42,6 +46,36 @@ final class HandbookRequestHandler implements DocumentationHandler {
         }
     }
 
+    private void addTableRowString(StringBuilder builder, int id, String value){
+        builder.append("<tr><td><code>").append(id).append("</code></td>")
+            .append("<td>").append(value).append("</td></tr>\n");
+    }
+    private void addTableRowString(StringBuilder builder, String key, String value){
+        builder.append("<tr><td><code>").append(key).append("</code></td>")
+            .append("<td>").append(value).append("</td></tr>\n");
+    }
+    private void addTableRowString(StringBuilder builder, int id, long textMapHash, int langIdx){
+        Language.TextStrings name = Language.getTextMapKey(textMapHash);
+
+        builder.append("<tr><td><code>").append(id).append("</code></td><td>");
+        if (name !=null){
+            builder.append(name.get(langIdx));
+        } else {
+            builder.append(textMapHash);
+        }
+        builder.append("</td></tr>\n");
+    }
+
+    private <T> void addAllEntries(final List<StringBuilder> sbs, Int2ObjectMap<T> map, Function<T, Integer> idGetter, Function<T, Long> nameTextMapHashGetter){
+        sbs.forEach(sb -> sb.setLength(0));
+        map.keySet().intStream().sorted().mapToObj(map::get).forEach(data -> {
+            int id = idGetter.apply(data);
+            for (int langIdx = 0; langIdx < NUM_LANGUAGES; langIdx++)
+                addTableRowString(sbs.get(langIdx), id, nameTextMapHashGetter.apply(data), langIdx);
+        });
+        sbs.forEach(sb -> sb.setLength(sb.length()-1));  // Remove trailing \n
+    }
+
     private List<String> generateHandbookHtmls(String template) {
         final int NUM_LANGUAGES = Language.TextStrings.NUM_LANGUAGES;
         final List<String> output = new ArrayList<>(NUM_LANGUAGES);
@@ -55,33 +89,19 @@ final class HandbookRequestHandler implements DocumentationHandler {
             String label = cmd.getLabel();
             String descKey = cmd.getDescriptionKey();
             for (int langIdx = 0; langIdx < NUM_LANGUAGES; langIdx++)
-                sbs.get(langIdx).append("<tr><td><code>" + label + "</code></td><td>" + languages.get(langIdx).get(descKey) + "</td></tr>\n");
+                addTableRowString(sbs.get(langIdx),label, languages.get(langIdx).get(descKey));
         });
         sbs.forEach(sb -> sb.setLength(sb.length()-1));  // Remove trailing \n
         final List<String> cmdsTable = sbs.stream().map(StringBuilder::toString).toList();
 
         // Avatars table
         final Int2ObjectMap<AvatarData> avatarMap = GameData.getAvatarDataMap();
-        sbs.forEach(sb -> sb.setLength(0));
-        avatarMap.keySet().intStream().sorted().mapToObj(avatarMap::get).forEach(data -> {
-            int id = data.getId();
-            Language.TextStrings name = Language.getTextMapKey(data.getNameTextMapHash());
-            for (int langIdx = 0; langIdx < NUM_LANGUAGES; langIdx++)
-                sbs.get(langIdx).append("<tr><td><code>" + id + "</code></td><td>" + name.get(langIdx) + "</td></tr>\n");
-        });
-        sbs.forEach(sb -> sb.setLength(sb.length()-1));  // Remove trailing \n
+        addAllEntries(sbs, avatarMap, AvatarData::getId, AvatarData::getNameTextMapHash);
         final List<String> avatarsTable = sbs.stream().map(StringBuilder::toString).toList();
 
         // Items table
         final Int2ObjectMap<ItemData> itemMap = GameData.getItemDataMap();
-        sbs.forEach(sb -> sb.setLength(0));
-        itemMap.keySet().intStream().sorted().mapToObj(itemMap::get).forEach(data -> {
-            int id = data.getId();
-            Language.TextStrings name = Language.getTextMapKey(data.getNameTextMapHash());
-            for (int langIdx = 0; langIdx < NUM_LANGUAGES; langIdx++)
-                sbs.get(langIdx).append("<tr><td><code>" + id + "</code></td><td>" + name.get(langIdx) + "</td></tr>\n");
-        });
-        sbs.forEach(sb -> sb.setLength(sb.length()-1));  // Remove trailing \n
+        addAllEntries(sbs, itemMap, ItemData::getId, ItemData::getNameTextMapHash);
         final List<String> itemsTable = sbs.stream().map(StringBuilder::toString).toList();
 
         // Scenes table
@@ -89,20 +109,14 @@ final class HandbookRequestHandler implements DocumentationHandler {
         sceneMap.keySet().intStream().sorted().mapToObj(sceneMap::get).forEach(data -> {
             int id = data.getId();
             for (int langIdx = 0; langIdx < NUM_LANGUAGES; langIdx++)
-                sbs.get(langIdx).append("<tr><td><code>" + id + "</code></td><td>" + data.getScriptData() + "</td></tr>\n");
+                addTableRowString(sbs.get(langIdx), id, data.getScriptData());
         });
         sbs.forEach(sb -> sb.setLength(sb.length()-1));  // Remove trailing \n
         final List<String> scenesTable = sbs.stream().map(StringBuilder::toString).toList();
 
         // Monsters table
         final Int2ObjectMap<MonsterData> monsterMap = GameData.getMonsterDataMap();
-        monsterMap.keySet().intStream().sorted().mapToObj(monsterMap::get).forEach(data -> {
-            int id = data.getId();
-            Language.TextStrings name = Language.getTextMapKey(data.getNameTextMapHash());
-            for (int langIdx = 0; langIdx < NUM_LANGUAGES; langIdx++)
-                sbs.get(langIdx).append("<tr><td><code>" + id + "</code></td><td>" + name.get(langIdx) + "</td></tr>\n");
-        });
-        sbs.forEach(sb -> sb.setLength(sb.length()-1));  // Remove trailing \n
+        addAllEntries(sbs, monsterMap, MonsterData::getId, MonsterData::getNameTextMapHash);
         final List<String> monstersTable = sbs.stream().map(StringBuilder::toString).toList();
 
         // Add translated title etc. to the page.
