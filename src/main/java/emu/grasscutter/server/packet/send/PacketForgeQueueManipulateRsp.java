@@ -13,8 +13,8 @@ public class PacketForgeQueueManipulateRsp extends BaseTypedPacket<ForgeQueueMan
         super(new ForgeQueueManipulateRsp());
         proto.setRetCode(retcode);
         proto.setManipulateType(type);
-        proto.setOutputItemList(output.stream().map(GameItem::toItemParam).toList());
-        proto.setReturnItemList(refund.stream().map(GameItem::toItemParam).toList());
+        proto.setOutputItemList(output.stream().map(GameItem::toItemHintProto).toList());
+        proto.setReturnItemList(refund.stream().map(GameItem::toItemHintProto).toList());
         // ToDo: Add extra items when once we have handling for it.
     }
 }
