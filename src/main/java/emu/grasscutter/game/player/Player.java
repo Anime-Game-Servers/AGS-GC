@@ -150,7 +150,6 @@ public class Player {
     @Getter private Map<Integer, Integer> questGlobalVariables;
     @Getter private Map<Integer, Integer> openStates;
     @Getter private Map<Integer, Map<Integer, Boolean>> sceneTags;
-    @Getter private CoopHandler coopHandler;
     @Getter private Map<Integer, Boolean> levelTags;
     @Getter @Setter private Map<Integer, Boolean> unlockedScenes;
     @Getter @Setter private Map<Integer, Set<Integer>> unlockedSceneAreas;
@@ -199,6 +198,7 @@ public class Player {
     private PlayerProfile playerProfile;  // Getter has null-check
     @Getter private TeamManager teamManager;
     @Getter private transient BlossomManager blossomManager;
+    @Getter private CoopHandler coopHandler;
     private TowerData towerData;  // Getter has null-check
     @Getter private PlayerGachaInfo gachaInfo;
     private PlayerCollectionRecords collectionRecordStore;  // Getter has null-check

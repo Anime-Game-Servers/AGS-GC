@@ -21,19 +21,21 @@ import java.util.List;
 import java.util.Map;
 
 @Entity
-public class CoopHandler {
-    @Transient private Player player;
+public class CoopHandler extends BasePlayerDataManager {
     @Getter private Map<Integer, CoopCardEntry> coopCards;
     @Getter @Setter private int curCoopPoint;
 
-    public CoopHandler(Player player) {
-        this.player = player;
+    @Deprecated // Morphia
+    public CoopHandler() {
+        super();
         this.coopCards = new Int2ObjectOpenHashMap<>();
         this.curCoopPoint = 0;
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    public CoopHandler(Player player) {
+        super(player);
+        this.coopCards = new Int2ObjectOpenHashMap<>();
+        this.curCoopPoint = 0;
     }
 
     public void unlockChapterUpdateNotify(int chapterId) {
@@ -246,6 +248,10 @@ public class CoopHandler {
         @Getter private Map<Integer, CoopRewardEntry> rewards;
         @Getter @Setter private MainCoopData mainCoop;
         @Getter @Setter private int curCoopPoint;
+
+        @Deprecated // Morphia
+        public CoopCardEntry() {
+        }
 
         public CoopCardEntry(int chapterId) {
             this.accepted = false;
