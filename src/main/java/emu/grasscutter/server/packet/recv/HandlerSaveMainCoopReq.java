@@ -7,7 +7,7 @@ import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.server.packet.send.PacketMainCoopUpdateNotify;
 import emu.grasscutter.server.packet.send.PacketSaveMainCoopRsp;
 import lombok.val;
-import messages.coop.*;
+import org.anime_game_servers.multi_proto.gi.messages.coop.*;
 import java.util.HashSet;
 import java.util.List;
 

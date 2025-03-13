@@ -3,7 +3,7 @@ package emu.grasscutter.server.packet.recv;
 import emu.grasscutter.net.packet.TypedPacketHandler;
 import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.server.packet.send.PacketSetCoopChapterViewedRsp;
-import messages.coop.SetCoopChapterViewedReq;
+import org.anime_game_servers.multi_proto.gi.messages.coop.SetCoopChapterViewedReq;
 
 public class HandlerSetCoopChapterViewedReq extends TypedPacketHandler<SetCoopChapterViewedReq> {
 

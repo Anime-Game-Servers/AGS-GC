@@ -7,9 +7,9 @@ import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.server.packet.send.PacketMainCoopUpdateNotify;
 import emu.grasscutter.server.packet.send.PacketStartCoopPointRsp;
 import lombok.val;
-import messages.coop.MainCoop;
-import messages.coop.StartCoopPointReq;
-import messages.coop.Status;
+import org.anime_game_servers.multi_proto.gi.messages.coop.MainCoop;
+import org.anime_game_servers.multi_proto.gi.messages.coop.StartCoopPointReq;
+import org.anime_game_servers.multi_proto.gi.messages.coop.Status;
 import java.util.HashMap;
 import java.util.List;
 

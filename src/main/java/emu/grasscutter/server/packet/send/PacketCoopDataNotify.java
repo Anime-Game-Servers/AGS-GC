@@ -2,7 +2,7 @@ package emu.grasscutter.server.packet.send;
 
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.net.packet.BaseTypedPacket;
-import messages.coop.CoopDataNotify;
+import org.anime_game_servers.multi_proto.gi.messages.coop.CoopDataNotify;
 import java.util.Map;
 
 public class PacketCoopDataNotify extends BaseTypedPacket<CoopDataNotify> {

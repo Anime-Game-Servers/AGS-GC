@@ -5,7 +5,7 @@ import emu.grasscutter.net.packet.TypedPacketHandler;
 import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.server.packet.send.*;
 import lombok.val;
-import messages.coop.CancelCoopTaskReq;
+import org.anime_game_servers.multi_proto.gi.messages.coop.CancelCoopTaskReq;
 import java.util.List;
 
 public class HandlerCancelCoopTaskReq extends TypedPacketHandler<CancelCoopTaskReq> {

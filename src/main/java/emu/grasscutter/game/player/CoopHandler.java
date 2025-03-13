@@ -12,8 +12,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import messages.coop.*;
 import org.anime_game_servers.core.gi.enums.QuestState;
+import org.anime_game_servers.multi_proto.gi.messages.coop.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
