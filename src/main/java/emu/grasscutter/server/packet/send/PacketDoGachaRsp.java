@@ -4,7 +4,7 @@ import emu.grasscutter.data.common.ItemParamData;
 import emu.grasscutter.game.gacha.GachaBanner;
 import emu.grasscutter.game.gacha.PlayerGachaBannerInfo;
 import emu.grasscutter.net.packet.BaseTypedPacket;
-import emu.grasscutter.net.proto.RetcodeOuterClass.Retcode;
+import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
 import org.anime_game_servers.multi_proto.gi.messages.wishing.DoGachaRsp;
 import org.anime_game_servers.multi_proto.gi.messages.wishing.GachaItem;
 
@@ -41,11 +41,11 @@ public class PacketDoGachaRsp extends BaseTypedPacket<DoGachaRsp> {
 
 	public PacketDoGachaRsp() {
         super(new DoGachaRsp());
-        proto.setRetcode(Retcode.RET_SVR_ERROR_VALUE);
+        proto.setRetcode(Retcode.RET_SVR_ERROR);
 	}
 
 	public PacketDoGachaRsp(Retcode retcode) {
         super(new DoGachaRsp());
-        proto.setRetcode(retcode.getNumber());
+        proto.setRetcode(retcode);
 	}
 }

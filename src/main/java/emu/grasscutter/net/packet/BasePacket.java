@@ -3,12 +3,11 @@ package emu.grasscutter.net.packet;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import com.google.protobuf.GeneratedMessageV3;
-import emu.grasscutter.net.proto.PacketHeadOuterClass.PacketHead;
 import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.utils.Crypto;
 import lombok.val;
 import org.anime_game_servers.core.base.Version;
+import org.anime_game_servers.multi_proto.gi.messages.packet_head.PacketHead;
 
 public class BasePacket {
     private static final int const1 = 17767; // 0x4567
@@ -17,7 +16,7 @@ public class BasePacket {
     private int opcode;
     private boolean shouldBuildHeader = false;
 
-    private byte[] header;
+    private PacketHead header;
     private byte[] data;
 
     // Encryption
@@ -56,11 +55,11 @@ public class BasePacket {
         this.useDispatchKey = useDispatchKey;
     }
 
-    public byte[] getHeader() {
+    public PacketHead getHeader() {
         return header;
     }
 
-    public void setHeader(byte[] header) {
+    public void setHeader(PacketHead header) {
         this.header = header;
     }
 
@@ -76,26 +75,24 @@ public class BasePacket {
         this.data = data;
     }
 
-    public void setData(GeneratedMessageV3 proto) {
-        this.data = proto.toByteArray();
-    }
-
-    @SuppressWarnings("rawtypes")
-    public void setData(GeneratedMessageV3.Builder proto) {
-        this.data = proto.build().toByteArray();
-    }
-
     public BasePacket buildHeader(int clientSequence) {
         if (this.getHeader() != null && clientSequence == 0) {
             return this;
         }
-        setHeader(PacketHead.newBuilder().setClientSequenceId(clientSequence).setSentMs(System.currentTimeMillis()).build().toByteArray());
+        val packetHead = new PacketHead();
+        packetHead.setClientSequenceId(clientSequence);
+        packetHead.setSentMs(System.currentTimeMillis());
+        setHeader(packetHead);
         return this;
     }
 
     public byte[] build(GameSession session) {
-        if (getHeader() == null) {
-            this.header = new byte[0];
+        byte[] headerBytes;
+        val header = getHeader();
+        if (header == null) {
+            headerBytes = new byte[0];
+        } else {
+            headerBytes = header.encodeToByteArray(session.getVersion());
         }
 
         var data = getData(session.getVersion());
@@ -105,13 +102,13 @@ public class BasePacket {
             data = new byte[0];
         }
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(2 + 2 + 2 + 4 + getHeader().length + data.length + 2);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(2 + 2 + 2 + 4 + headerBytes.length + data.length + 2);
 
         this.writeUint16(baos, const1);
         this.writeUint16(baos, opcode);
-        this.writeUint16(baos, header.length);
+        this.writeUint16(baos, headerBytes.length);
         this.writeUint32(baos, data.length);
-        this.writeBytes(baos, header);
+        this.writeBytes(baos, headerBytes);
         this.writeBytes(baos, data);
         this.writeUint16(baos, const2);
 

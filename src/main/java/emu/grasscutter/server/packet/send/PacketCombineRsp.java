@@ -1,7 +1,7 @@
 package emu.grasscutter.server.packet.send;
 
 import emu.grasscutter.net.packet.BaseTypedPacket;
-import emu.grasscutter.net.proto.RetcodeOuterClass;
+import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
 import org.anime_game_servers.multi_proto.gi.messages.general.item.ItemParam;
 import org.anime_game_servers.multi_proto.gi.messages.item.combine.CombineReq;
 import org.anime_game_servers.multi_proto.gi.messages.item.combine.CombineRsp;
@@ -11,10 +11,10 @@ import java.util.List;
 public class PacketCombineRsp extends BaseTypedPacket<CombineRsp> {
 
     public PacketCombineRsp() {
-        this(RetcodeOuterClass.Retcode.RET_SVR_ERROR_VALUE);
+        this(Retcode.RET_SVR_ERROR);
     }
 
-    public PacketCombineRsp(int retcode) {
+    public PacketCombineRsp(Retcode retcode) {
         super(new CombineRsp());
         proto.setRetCode(retcode);
     }
@@ -27,7 +27,7 @@ public class PacketCombineRsp extends BaseTypedPacket<CombineRsp> {
                             List<ItemParam> totalExtraItemList) {
 
         super(new CombineRsp());
-        proto.setRetCode(RetcodeOuterClass.Retcode.RET_SUCC_VALUE);
+        proto.setRetCode(Retcode.RET_SUCC);
         proto.setCombineId(combineReq.getCombineId());
         proto.setCombineCount(combineReq.getCombineCount());
         proto.setAvatarGuid(combineReq.getAvatarGuid());

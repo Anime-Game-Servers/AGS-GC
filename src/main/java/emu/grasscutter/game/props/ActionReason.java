@@ -180,19 +180,119 @@ public enum ActionReason {
 	ChannellerSlabLoopDungeonFirstPassReward(1090),
 	ChannellerSlabLoopDungeonScoreReward(1091),
 	HomeLimitedShopBuy(1092),
-	HomeCoinCollect(1093);
-	
+	HomeCoinCollect(1093),
+    ActionReasonSummerTimeSentryTowerReward (1094),
+    SummerTimeSprintBoatReward (1095),
+    SummerTimeBossReward (1096),
+    SummerTimeBombReward (1097),
+    HomeFetterCollect (1098),
+    EchoShellReward (1099),
+    HomeEventReward (1100),
+    BlitzRushDungeonReward (1101),
+    FurnitureMakeReturn (1102),
+    HomePlantBoxGather (1103),
+    HomePlantSeed (1104),
+    HomePlantGather (1105),
+    ChessDungeonReward (1106),
+    GroupLinkBundleFinish (1107),
+    LunaRiteSacrifice (1108),
+    LunaRiteTakeSacrificeReward (1109),
+    FishBite (1110),
+    FishSucc (1111),
+    PlantFlowerReward (1112),
+    PlantFlowerDeliverItem (1113),
+    PlantFlowerGiveFlower (1114),
+    PlantFlowerRecvFlower (1115),
+    RogueChallengeSettle (1116),
+    RogueTakeFirstPassReward (1117),
+    RogueUpgradeShikigami (1118),
+    RogueRefreshCard (1119),
+    UseWidgetCaptureAnimal (1120),
+    CaptureAnimalSucc (1121),
+    SnowDrifts (1122),
+    WinterCampGiveItem (1123),
+    WinterCampRecvItem (1124),
+    WinterCampExploreReward (1125),
+    WinterCampBattleReward (1126),
+    LanternRiteSkinReward (1127),
+    LanternRiteDungeonReward (1128),
+    MichiaeMatsuriDarkChallengeReward (1129),
+    MichiaeMatsuriUnlockCrystalSkill (1130),
+    LanternRiteGroupReward (1131),
+    CostumeDefaultUnlock (1132),
+    SpiceActivityMakeSpice (1133),
+    SpiceActivityProcessFood (1134),
+    SpiceAddAvatarFetter (1135),
+    GachaActivityRobotReward (1136),
+    GivingTakeBack (1137),
+    SummerTimeV2DungeonReward (1138),
+    GravenInnocenceCampReward (1139),
+    TreasureSeelieChestReward (1140),
+    GcgTavernChallengeUnlockCharacter (1141),
+    GcgLevelReward (1143),
+    GcgChallengeFinish (1144),
+    VintageMarketDeal (1145),
+    VintageMarketBargain (1146),
+    VintageMarketStore (1147),
+    VintagePresent (1148),
+    VintageOpenStore (1149),
+    VintageStoreUnlockSlot (1150),
+    VintageStoreNpcEvent (1151),
+    RockBoardExploreReward (1152),
+    VintageStoreDividend (1153),
+    AvatarRename (1154),
+    GcgFinishLevelQuest (1155),
+    GcgProficiencyReward (1156),
+    TeamChainCostumeReward (1157),
+    OfferingPariFinishReward (1158),
+    PenumbraChestReward (1159),
+    RaffleTicketTakeBonus (1160),
+    WispCageReward (1161),
+    AlchemySimCropRipen (1162),
+    AlchemySimUnlockTechTree (1163),
+    AlchemySimUpgradePotion (1164),
+    AlchemySimSell (1165),
+    AlchemySimOrder (1166),
+    AlchemySimExam (1167),
+    AlchemySimDealer (1168),
+    AlchemySimLetter (1169),
+    AlchemySimStage (1170),
+    AlchemySimUpgradeCrop (1171),
+    AlchemySimFinishAlchemy (1172),
+    CatcafeFeed (1173),
+    AlchemySimAlchemyLevelUpgrade (1174),
+    AlchemySimCropHarvest (1175),
+    GreatFestivalV2Upgrade (1176),
+    FairyTalesCapsuleToyLotter (1177),
+    FairyTalesCapsuleToyGiveGift (1178),
+    FairyTalesCapsuleToyRecvGift (1179),
+    FairyTalesTicketBonusReward (1180),
+    FairyTalesTicketBonusDelNormalRadar (1181),
+    CityReputationDonation (1182),
+    CityReputationTotalReward (1183),
+    MiscRename (1184),
+    MiscRenameAuditFailed (1185),
+    MiscRenameReset (1186),
+    MiscRenameCompensate (1187),
+    ReunionVideoReward (1188),
+    HuntingV2OfferReward (1189),
+    TribalReputationLevel (1190),
+    BattlePassMissionReward (1191),
+    ReunionReminderMailReward (1192),
+    ReunionWpReward (1193),
+    CooperateChallengeReward (1194);
+
 	private final int value;
 	private static final Int2ObjectMap<ActionReason> map = new Int2ObjectOpenHashMap<>();
 	private static final Map<String, ActionReason> stringMap = new HashMap<>();
-	
+
 	static {
 		Stream.of(values()).forEach(e -> {
 			map.put(e.getValue(), e);
 			stringMap.put(e.name(), e);
 		});
 	}
-	
+
 	private ActionReason(int value) {
 		this.value = value;
 	}
@@ -200,11 +300,11 @@ public enum ActionReason {
 	public int getValue() {
 		return value;
 	}
-	
+
 	public static ActionReason getTypeByValue(int value) {
 		return map.getOrDefault(value, None);
 	}
-	
+
 	public static ActionReason getTypeByName(String name) {
 		return stringMap.getOrDefault(name, None);
 	}

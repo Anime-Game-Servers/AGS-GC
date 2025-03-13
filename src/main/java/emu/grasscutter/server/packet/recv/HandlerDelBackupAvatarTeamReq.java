@@ -1,10 +1,10 @@
 package emu.grasscutter.server.packet.recv;
 
 import emu.grasscutter.net.packet.TypedPacketHandler;
-import emu.grasscutter.net.proto.RetcodeOuterClass.Retcode;
 import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.server.packet.send.PacketAvatarTeamAllDataNotify;
 import emu.grasscutter.server.packet.send.PacketDelBackupAvatarTeamRsp;
+import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
 import org.anime_game_servers.multi_proto.gi.messages.team.DelBackupAvatarTeamReq;
 import org.jetbrains.annotations.NotNull;
 

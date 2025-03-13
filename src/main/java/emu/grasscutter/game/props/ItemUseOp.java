@@ -53,7 +53,12 @@ public enum ItemUseOp {
     ITEM_USE_GAIN_GCG_CARD_FACE (49),
     ITEM_USE_GAIN_GCG_CARD_BACK (50),
     ITEM_USE_GAIN_GCG_CARD_FIELD (51),
-    ITEM_USE_OPEN_RENAME_DIALOG (52);
+    ITEM_USE_OPEN_RENAME_DIALOG (52),
+    ITEM_USE_UNLOCK_PROFILE_PICTURE (53),
+    ITEM_USE_ADD_ALCHEMY_SIM_ITEM (54),
+    ITEM_USE_UNLOCK_PHOTOGRAPH_POSE (55),
+    ITEM_USE_UNLOCK_AVATAR_TRACE (56),
+    ITEM_USE_ADD_PHLOGISTON(60);
 
     private final int value;
     private static final Int2ObjectMap<ItemUseOp> map = new Int2ObjectOpenHashMap<>();

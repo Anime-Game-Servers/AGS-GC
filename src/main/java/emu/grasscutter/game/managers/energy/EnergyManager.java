@@ -1,6 +1,5 @@
 package emu.grasscutter.game.managers.energy;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.DataLoader;
 import emu.grasscutter.data.GameData;
@@ -8,7 +7,14 @@ import emu.grasscutter.data.excels.AvatarSkillDepotData;
 import emu.grasscutter.data.excels.ItemData;
 import emu.grasscutter.data.excels.MonsterData.HpDrops;
 import emu.grasscutter.game.avatar.Avatar;
-import emu.grasscutter.game.entity.*;
+import emu.grasscutter.game.entity.EntityAvatar;
+import emu.grasscutter.game.entity.EntityClientGadget;
+import emu.grasscutter.game.entity.EntityItem;
+import emu.grasscutter.game.entity.EntityMonster;
+import emu.grasscutter.game.entity.GameEntity;
+import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
+import emu.grasscutter.game.inventory.GameItem;
+import emu.grasscutter.game.inventory.MaterialType;
 import emu.grasscutter.game.player.BasePlayerManager;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.ElementType;
@@ -121,7 +127,7 @@ public class EnergyManager extends BasePlayerManager {
         };
     }
 
-    public void handleGenerateElemBall(AbilityInvokeEntry invoke) throws InvalidProtocolBufferException {
+    public void handleGenerateElemBall(AbilityInvokeEntry invoke) {
         // ToDo:
         // This is also called when a weapon like Favonius Warbow etc. creates energy through its passive.
         // We are not handling this correctly at the moment.
@@ -336,7 +342,11 @@ public class EnergyManager extends BasePlayerManager {
             return;
         }
 
-        EntityItem energyBall = new EntityItem(this.getPlayer().getScene(), this.getPlayer(), itemData, position, count);
+        val createConfig = new CreateGadgetEntityConfig(itemData, count)
+            .setBornPos(position)
+            .setPlayerOwner(this.getPlayer());
+
+        EntityItem energyBall = new EntityItem(this.getPlayer().getScene(), createConfig);
         this.getPlayer().getScene().addEntity(energyBall);
     }
 
@@ -355,9 +365,9 @@ public class EnergyManager extends BasePlayerManager {
         // particle being generated). If the scene entity is an `EntityClientGadget`, we need to find the
         // ID of the original owner of that gadget.
         int avatarEntityId =
-                (!(entity instanceof EntityClientGadget))
+                (!(entity instanceof EntityClientGadget entityClientGadget))
                         ? invokeEntityId
-                        : ((EntityClientGadget)entity).getOriginalOwnerEntityId();
+                        : entityClientGadget.getOriginalOwnerEntityId();
 
         // Finally, find the avatar entity in the player's team.
         return this.player.getTeamManager().getActiveTeam()

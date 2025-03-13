@@ -57,7 +57,15 @@ public enum PlayerProperty {
     PROP_IS_AUTO_UNLOCK_SPECIFIC_EQUIP      (10044),
     PROP_PLAYER_GCG_COIN                    (10045),
     PROP_PLAYER_WAIT_SUB_GCG_COIN           (10046),
-    PROP_PLAYER_ONLINE_TIME                 (10047);
+    PROP_PLAYER_ONLINE_TIME                 (10047),
+    PROP_IS_DIVEABLE                        (10048),
+    PROP_MAX_DIVE_STAMINA                   (10049),
+    PROP_CUR_PERSIST_DIVE_STAMINA           (10050),
+    PROP_IS_CAN_PUT_FIVE_STAR_RELIQUARY     (10051),
+    PROP_IS_AUTO_LOCK_FIVE_STAR_RELIQUARY   (10052),
+    PROP_PLAYER_ROLE_COMBAT_COIN            (10053),
+    PROP_CUR_PHLOGISTON                     (10054),
+    PROP_RELIQUARY_TEMPORARY_EXP            (10055);
 
     private static final int inf = Integer.MAX_VALUE;  // Maybe this should be something else?
     @Getter private final int id, min, max;

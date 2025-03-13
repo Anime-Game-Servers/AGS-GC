@@ -2,10 +2,10 @@ package emu.grasscutter.server.packet.recv;
 
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.net.packet.TypedPacketHandler;
-import emu.grasscutter.net.proto.RetcodeOuterClass.Retcode;
 import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.server.packet.send.PacketQuestUpdateQuestVarRsp;
 import lombok.val;
+import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
 import org.anime_game_servers.multi_proto.gi.messages.quest.variable.QuestUpdateQuestVarReq;
 import org.anime_game_servers.multi_proto.gi.messages.quest.variable.QuestVarOp;
 

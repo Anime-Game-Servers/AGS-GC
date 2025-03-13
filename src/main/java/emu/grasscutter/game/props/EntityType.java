@@ -84,6 +84,7 @@ public enum EntityType implements IntValueEnum {
     Partner (70),
     DeshretObeliskGadget (71),
     CoinCollectLevelGadget (72),
+    TrifleGadget (73),
     PlaceHolder (99);
 
     @Getter

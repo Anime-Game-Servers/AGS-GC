@@ -1,10 +1,13 @@
 package emu.grasscutter.game.entity;
 
+import emu.grasscutter.game.entity.create_config.CreateRegionEntityConfig;
 import emu.grasscutter.game.props.EntityIdType;
 import emu.grasscutter.game.world.Scene;
 import emu.grasscutter.utils.Position;
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
 import lombok.Getter;
+import lombok.val;
+import org.anime_game_servers.core.gi.models.Vector;
 import org.anime_game_servers.multi_proto.gi.messages.scene.entity.SceneEntityInfo;
 import org.anime_game_servers.gi_lua.models.scene.group.SceneRegion;
 
@@ -12,29 +15,24 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
-public class EntityRegion extends GameEntity{
+public class EntityRegion extends GameEntity<CreateRegionEntityConfig> {
     private final Position position;
     private boolean hasNewEntities;
     private boolean entityLeave;
     private final Set<GameEntity> entities; // Ids of entities inside this region
     private final Set<GameEntity> newEntities; // Ids that entered this region since the last check
     private final Set<GameEntity> leftEntities; // Ids that left this region since the last check
-    private final SceneRegion metaRegion;
 
-    public EntityRegion(Scene scene, SceneRegion region) {
-        super(scene);
+    public EntityRegion(Scene scene, CreateRegionEntityConfig createConfig) {
+        super(scene, createConfig);
         this.id = getScene().getWorld().getNextEntityId(EntityIdType.REGION);
-        setGroupId(region.getGroupId());
-        setBlockId(region.getBlockId());
-        setConfigId(region.getConfigId());
-        this.position = new Position(region.getPos());
+        this.position = createConfig.getPos();
         this.entities = ConcurrentHashMap.newKeySet();
         this.newEntities = ConcurrentHashMap.newKeySet();
         this.leftEntities = ConcurrentHashMap.newKeySet();
-        this.metaRegion = region;
     }
 
-    public void addEntity(GameEntity entity) {
+    public void addEntity(GameEntity<?> entity) {
         if (this.getEntities().contains(entity)) {
             return;
         }
@@ -45,7 +43,7 @@ public class EntityRegion extends GameEntity{
 
     @Override
     public int getEntityTypeId() {
-        return metaRegion.getConfigId();
+        return getConfigId();
     }
 
     public boolean hasNewEntities() {
@@ -72,6 +70,15 @@ public class EntityRegion extends GameEntity{
         this.entityLeave = false;
         leftEntities.clear();
     }
+
+    public boolean isPosInRegion(Vector position) {
+        val initialDataSource = getSpawnConfig().getInitDataSource();
+        if(initialDataSource instanceof SceneRegion region){
+            return region.contains(position);
+        }
+        return false;
+    }
+
     @Override public Int2FloatMap getFightProperties() {return null;}
 
     @Override public Position getPosition() {return position;}

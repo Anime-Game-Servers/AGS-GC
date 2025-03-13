@@ -12,13 +12,13 @@ public class ConfigRoute extends BaseRoute {
 
     @Getter @Setter private int routeId;
 
-    public ConfigRoute(SceneGadget gadget) {
-        super(gadget);
-        this.routeId = gadget.getRouteId();
-    }
-
     public ConfigRoute(Position startRot, boolean startRoute, boolean isActive, int routeId) {
         super(startRot, startRoute, isActive);
+        this.routeId = routeId;
+    }
+
+    public ConfigRoute(Position startRot, int routeId) {
+        super(startRot);
         this.routeId = routeId;
     }
 

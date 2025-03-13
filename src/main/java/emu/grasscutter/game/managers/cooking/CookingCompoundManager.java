@@ -7,12 +7,12 @@ import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.game.player.BasePlayerManager;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.ActionReason;
-import emu.grasscutter.net.proto.RetcodeOuterClass.Retcode;
 import emu.grasscutter.server.packet.send.PacketCompoundDataNotify;
 import emu.grasscutter.server.packet.send.PacketGetCompoundDataRsp;
 import emu.grasscutter.server.packet.send.PacketPlayerCompoundMaterialRsp;
 import emu.grasscutter.server.packet.send.PacketTakeCompoundOutputRsp;
 import emu.grasscutter.utils.Utils;
+import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
 import org.anime_game_servers.multi_proto.gi.messages.item.cooking.CompoundQueueData;
 import org.anime_game_servers.multi_proto.gi.messages.item.cooking.GetCompoundDataReq;
 import org.anime_game_servers.multi_proto.gi.messages.item.cooking.PlayerCompoundMaterialReq;
@@ -71,18 +71,18 @@ public class CookingCompoundManager extends BasePlayerManager {
         //check whether the compound is available
         //TODO:add other compounds,see my pr for detail
         if (!unlocked.contains(id)) {
-            player.sendPacket(new PacketPlayerCompoundMaterialRsp(Retcode.RET_FAIL_VALUE));
+            player.sendPacket(new PacketPlayerCompoundMaterialRsp(Retcode.RET_FAIL));
             return;
         }
         //check whether the queue is full
         if (activeCompounds.containsKey(id) && activeCompounds.get(id).getTotalCount() + count > compound.getQueueSize()) {
-            player.sendPacket(new PacketPlayerCompoundMaterialRsp(Retcode.RET_COMPOUND_QUEUE_FULL_VALUE));
+            player.sendPacket(new PacketPlayerCompoundMaterialRsp(Retcode.RET_COMPOUND_QUEUE_FULL));
             return;
         }
         //try to consume raw materials
         if (!player.getInventory().payItems(compound.getInputVec(), count)) {
             //TODO:I'm not sure whether retcode is correct.
-            player.sendPacket(new PacketPlayerCompoundMaterialRsp(Retcode.RET_ITEM_COUNT_NOT_ENOUGH_VALUE));
+            player.sendPacket(new PacketPlayerCompoundMaterialRsp(Retcode.RET_ITEM_COUNT_NOT_ENOUGH));
             return;
         }
         ActiveCookCompoundData c;
@@ -130,9 +130,9 @@ public class CookingCompoundManager extends BasePlayerManager {
         //give player the rewards
         if (success) {
             player.getInventory().addItems(allRewards.values(), ActionReason.Compound);
-            player.sendPacket(new PacketTakeCompoundOutputRsp(allRewards.values().stream().toList(), Retcode.RET_SUCC_VALUE));
+            player.sendPacket(new PacketTakeCompoundOutputRsp(allRewards.values().stream().toList(), Retcode.RET_SUCC));
         } else {
-            player.sendPacket(new PacketTakeCompoundOutputRsp(new ArrayList<GameItem>(), Retcode.RET_COMPOUND_NOT_FINISH_VALUE));
+            player.sendPacket(new PacketTakeCompoundOutputRsp(new ArrayList<GameItem>(), Retcode.RET_COMPOUND_NOT_FINISH));
         }
     }
 

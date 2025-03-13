@@ -9,6 +9,7 @@ import emu.grasscutter.game.player.Player;
 import emu.grasscutter.net.packet.TypedPacketHandler;
 import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.server.packet.send.PacketQuickUseWidgetRsp;
+import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
 import org.anime_game_servers.multi_proto.gi.messages.item.widget.use.QuickUseWidgetReq;
 
 public class HandlerQuickUseWidgetReq extends TypedPacketHandler<QuickUseWidgetReq> {
@@ -32,7 +33,7 @@ public class HandlerQuickUseWidgetReq extends TypedPacketHandler<QuickUseWidgetR
             if (remain > 0) {
                 remain--;
                 inventory.removeItem(item,1);// decrease count
-                session.send(new PacketQuickUseWidgetRsp(materialId, remain <= 0 ? 1 : 0));
+                session.send(new PacketQuickUseWidgetRsp(materialId, remain <= 0 ? Retcode.RET_FAIL : Retcode.RET_SUCC));
                 Grasscutter.getLogger().warn("class has no effects in the game, feel free to implement it");
                 // but no effects in the game, feel free to implement it!
             }

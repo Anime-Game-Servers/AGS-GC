@@ -1,7 +1,7 @@
 package emu.grasscutter.server.packet.send;
 
 import emu.grasscutter.net.packet.BaseTypedPacket;
-import emu.grasscutter.net.proto.RetcodeOuterClass.Retcode;
+import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
 import org.anime_game_servers.multi_proto.gi.messages.item.cooking.CompoundQueueData;
 import org.anime_game_servers.multi_proto.gi.messages.item.cooking.GetCompoundDataRsp;
 
@@ -13,6 +13,6 @@ public class PacketGetCompoundDataRsp extends BaseTypedPacket<GetCompoundDataRsp
         super(new GetCompoundDataRsp());
         proto.setUnlockCompoundList(unlockedCompounds.stream().toList());
         proto.setCompoundQueDataList(compoundQueueData);
-        proto.setRetcode(Retcode.RET_SUCC_VALUE);
+        proto.setRetcode(Retcode.RET_SUCC);
     }
 }

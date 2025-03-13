@@ -64,9 +64,19 @@ public class GameQuest {
         this.triggers = new HashMap<>();
     }
 
-    public void start() {
+    public void acceptQuest(boolean begin){
         clearProgress(false);
         this.acceptTime = Utils.getCurrentSeconds();
+        if(begin){
+            start();
+        } else {
+            this.state = QuestState.QUEST_STATE_UNSTARTED;
+            getOwner().sendPacket(new PacketQuestListUpdateNotify(this));
+            triggerStateEvents();
+        }
+    }
+
+    public void start() {
         this.startTime = this.acceptTime;
         this.startGameDay = getOwner().getWorld().getTotalGameTimeDays();
         this.state = QuestState.QUEST_STATE_UNFINISHED;
@@ -83,7 +93,7 @@ public class GameQuest {
                     triggers.put(newTrigger.getTriggerName(), false);
                     val scene = getOwner().getWorld().getSceneById(newTrigger.getSceneId());
                     val group = scene.getScriptManager().getGroupById(newTrigger.getGroupId());
-                    getOwner().getWorld().getSceneById(newTrigger.getSceneId()).loadTriggerFromGroup(group, newTrigger.getTriggerName());
+                    //getOwner().getWorld().getSceneById(newTrigger.getSceneId()).loadTriggerFromGroup(group, newTrigger.getTriggerName());
                 }
             }
         }
@@ -101,7 +111,7 @@ public class GameQuest {
         triggerStateEvents();
 
         getQuestData().getBeginExec().forEach(e -> getOwner().getServer().getQuestSystem().triggerExec(this, e, e.getParam()));
-        getOwner().getQuestManager().checkQuestAlreadyFullfilled(this);
+        getOwner().getQuestManager().checkQuestAlreadyFulfilled(this, true);
         getOwner().getDungeonEntryManager().checkQuestForDungeonEntryUpdate(this);
 
         Grasscutter.getLogger().debug("Quest {} is started", subQuestId);

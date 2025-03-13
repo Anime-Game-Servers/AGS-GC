@@ -224,6 +224,7 @@ public class TowerManager extends BasePlayerManager {
                         .filter(gt -> gt.getGoal().get() == c.getConfigId())
                         .filter(gt -> ((GuardTrigger) gt).getLastSendPercent() >= c.getTargetHpPercentage())
                         .isPresent();
+                default -> false;
             }).count();
 
         tryRemoveBuffs();

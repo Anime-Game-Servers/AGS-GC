@@ -11,6 +11,7 @@ import emu.grasscutter.game.props.ActionReason;
 import emu.grasscutter.game.props.FightProperty;
 import emu.grasscutter.game.props.PlayerProperty;
 import emu.grasscutter.game.quest.enums.QuestContent;
+import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
 import org.anime_game_servers.multi_proto.gi.messages.scene.entity.ChangeHpReason;
 import org.anime_game_servers.multi_proto.gi.messages.general.PropChangeReason;
 import emu.grasscutter.server.packet.send.PacketEntityFightPropChangeReasonNotify;
@@ -283,6 +284,6 @@ public class SotSManager extends BasePlayerManager {
         // Packets
         player.sendPacket(
                 new PacketLevelupCityRsp(
-                        sceneId, cityInfo.getLevel(), cityId, cityInfo.getNumCrystal(), areaId, 0));
+                        sceneId, cityInfo.getLevel(), cityId, cityInfo.getNumCrystal(), areaId, Retcode.RET_SUCC));
     }
 }

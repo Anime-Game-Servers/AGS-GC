@@ -1,9 +1,7 @@
 package emu.grasscutter.server.http.dispatch;
 
-import com.google.protobuf.ByteString;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.Grasscutter.ServerRunMode;
-import emu.grasscutter.net.proto.RegionSimpleInfoOuterClass.RegionSimpleInfo;
 import emu.grasscutter.server.event.dispatch.QueryAllRegionsEvent;
 import emu.grasscutter.server.event.dispatch.QueryCurrentRegionEvent;
 import emu.grasscutter.server.http.Router;
@@ -15,18 +13,18 @@ import io.javalin.http.Context;
 import lombok.val;
 import org.anime_game_servers.multi_proto.gi.messages.general.server.RegionInfo;
 import org.anime_game_servers.multi_proto.gi.messages.login.QueryCurrRegionHttpRsp;
-import org.anime_game_servers.core.base.Game;
 import org.anime_game_servers.core.base.Version;
+import org.anime_game_servers.multi_proto.gi.messages.login.QueryRegionListHttpRsp;
+import org.anime_game_servers.multi_proto.gi.messages.login.RegionSimpleInfo;
+import org.anime_game_servers.multi_proto.gi.utils.VersionIdentify;
 
 import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.security.Signature;
-import java.util.regex.Pattern;
 
 import static emu.grasscutter.config.Configuration.*;
-import static emu.grasscutter.net.proto.QueryRegionListHttpRspOuterClass.QueryRegionListHttpRsp;
 
 /**
  * Handles requests related to region queries.
@@ -76,10 +74,11 @@ public final class RegionHandler implements Router {
             }
 
             // Create a region identifier.
-            var identifier = RegionSimpleInfo.newBuilder()
-                    .setName(region.Name).setTitle(region.Title).setType("DEV_PUBLIC")
-                    .setDispatchUrl(dispatchDomain + "/query_cur_region/" + region.Name)
-                    .build();
+            val identifier = new RegionSimpleInfo();
+            identifier.setName(region.Name);
+            identifier.setTitle(region.Title);
+            identifier.setType("DEV_PUBLIC");
+            identifier.setDispatchUrl(dispatchDomain + "/query_cur_region/" + region.Name);
             usedNames.add(region.Name); servers.add(identifier);
 
             // Create a region info object.
@@ -91,6 +90,7 @@ public final class RegionHandler implements Router {
             // Create an updated region query.
             val updatedQuery = new QueryCurrRegionHttpRsp();
             updatedQuery.setRegionInfo(regionInfo);
+            updatedQuery.setClientSecretKey(Crypto.DISPATCH_SEED);
             regions.put(region.Name, new RegionData(updatedQuery));
         });
 
@@ -102,17 +102,31 @@ public final class RegionHandler implements Router {
         Crypto.xor(customConfigCn, Crypto.DISPATCH_KEY); // XOR the config with the key.
 
         // Create an updated region list.
-        val updatedRegionList = QueryRegionListHttpRsp.newBuilder()
-                .addAllRegionList(servers)
-                .setClientSecretKey(ByteString.copyFrom(Crypto.DISPATCH_SEED))
-                .setClientCustomConfigEncrypted(ByteString.copyFrom(customConfig))
-                .setEnableLoginPc(true);
+        val updatedRegionList = new QueryRegionListHttpRsp();
+        updatedRegionList.setRegionList(servers);
+        updatedRegionList.setClientSecretKey(Crypto.DISPATCH_SEED);
+        updatedRegionList.setEnableLoginPc(true);
 
         // Set the region list response.
-        regionListResponses.put(RegionType.OS, Utils.base64Encode(updatedRegionList.build().toByteString().toByteArray()));
+        setRegionListResponses(RegionType.OS, customConfig, updatedRegionList);
+        setRegionListResponses(RegionType.CN, customConfigCn, updatedRegionList);
+    }
 
-        updatedRegionList.setClientCustomConfigEncrypted(ByteString.copyFrom(customConfigCn));
-        regionListResponses.put(RegionType.CN, Utils.base64Encode(updatedRegionList.build().toByteString().toByteArray()));
+    /**
+     * Pre generates the region list responses for each version
+     * @param regionType The region type
+     * @param customConfig The  custom configuration, XOR'd with the dispatch key
+     * @param baseRegionList The filled out region list response model
+     */
+    private void setRegionListResponses(RegionType regionType, byte[] customConfig, QueryRegionListHttpRsp baseRegionList) {
+        baseRegionList.setClientCustomConfigEncrypted(customConfig);
+        Arrays.stream(Version.values()).forEach(version -> {
+            val encoded = baseRegionList.encodeToByteArray(version);
+            if (encoded != null) {
+                // todo actually save region specific responses, and not just the newest success
+                regionListResponses.put(regionType, Utils.base64Encode(encoded));
+            }
+        });
     }
 
     @Override public void applyRoutes(Javalin javalin) {
@@ -167,15 +181,22 @@ public final class RegionHandler implements Router {
         String versionName = ctx.queryParam("version");
         var region = regions.get(regionName);
 
-        String[] versionCode = versionName.replaceAll(Pattern.compile("[a-zA-Z]").pattern(), "").split("\\.");
-        int versionMajor = Integer.parseInt(versionCode[0]);
-        int versionMinor = Integer.parseInt(versionCode[1]);
-        int versionFix   = Integer.parseInt(versionCode[2]);
-        val versionId = Version.idFromVersion(Game.GI, versionMajor, versionMinor, versionFix);
-        val version = Version.fromId(Game.GI, versionId);
+
+        if (versionName == null){
+            Grasscutter.getLogger().error("Client {} request: query_cur_region/{} with missing version", ctx.ip(), regionName);
+            return;
+        }
+
+        Version version;
+        try {
+            version = VersionIdentify.getClientVersionFromQueryRegion(versionName);
+        } catch (Exception e) {
+            Grasscutter.getLogger().error("Client {} request: query_cur_region/{} with invalid version {} and exception", ctx.ip(), regionName, versionName, e);
+            return;
+        }
 
         if (version == null){
-            Grasscutter.getLogger().error("Client {} request: query_cur_region/{} with invalid version {}", ctx.ip(), regionName, versionName);
+            Grasscutter.getLogger().error("Client {} request: query_cur_region/{} with unknown version {}", ctx.ip(), regionName, versionName);
             return;
         }
 
@@ -187,7 +208,7 @@ public final class RegionHandler implements Router {
         }
 
 
-        if (versionId > Version.GI_2_7_0.getId()) {
+        if (version.getId() > Version.GI_2_7_0.getId()) {
             try {
                 QueryCurrentRegionEvent event = new QueryCurrentRegionEvent(regionData); event.call();
 

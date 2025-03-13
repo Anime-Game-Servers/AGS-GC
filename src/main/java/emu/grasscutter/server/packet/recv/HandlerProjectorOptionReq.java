@@ -8,6 +8,7 @@ import emu.grasscutter.server.packet.send.PacketProjectorOptionRsp;
 import org.anime_game_servers.multi_proto.gi.messages.gadget.ProjectorOpType;
 import org.anime_game_servers.multi_proto.gi.messages.gadget.ProjectorOptionReq;
 import org.anime_game_servers.gi_lua.models.constants.ScriptGadgetState;
+import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
 
 public class HandlerProjectorOptionReq extends TypedPacketHandler<ProjectorOptionReq> {
 
@@ -26,9 +27,9 @@ public class HandlerProjectorOptionReq extends TypedPacketHandler<ProjectorOptio
                     gadget.setState(ScriptGadgetState.GearStop);
             }
 
-            session.send(new PacketProjectorOptionRsp(req.getEntityId(), req.getOpType(), 0));
+            session.send(new PacketProjectorOptionRsp(req.getEntityId(), req.getOpType(), Retcode.RET_SUCC));
         } else {
-            session.send(new PacketProjectorOptionRsp(req.getEntityId(), req.getOpType(), 1));
+            session.send(new PacketProjectorOptionRsp(req.getEntityId(), req.getOpType(), Retcode.RET_FAIL));
         }
     }
 

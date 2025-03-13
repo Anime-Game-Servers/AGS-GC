@@ -68,6 +68,11 @@ public class ItemUseAction {
             case ITEM_USE_GAIN_GCG_CARD_BACK -> null;
             case ITEM_USE_GAIN_GCG_CARD_FIELD -> null;
             case ITEM_USE_OPEN_RENAME_DIALOG -> null;
+            case ITEM_USE_UNLOCK_PROFILE_PICTURE -> null;
+            case ITEM_USE_ADD_ALCHEMY_SIM_ITEM -> null;
+            case ITEM_USE_UNLOCK_PHOTOGRAPH_POSE -> null;
+            case ITEM_USE_UNLOCK_AVATAR_TRACE -> null;
+            case ITEM_USE_ADD_PHLOGISTON -> null;
         };
     }
 

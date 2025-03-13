@@ -1,7 +1,7 @@
 package emu.grasscutter.server.packet.send;
 
 import emu.grasscutter.net.packet.BaseTypedPacket;
-import emu.grasscutter.net.proto.RetcodeOuterClass;
+import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
 import org.anime_game_servers.multi_proto.gi.messages.general.item.ItemParam;
 import org.anime_game_servers.multi_proto.gi.messages.item.upgrade.CalcWeaponUpgradeReturnItemsRsp;
 
@@ -16,6 +16,6 @@ public class PacketCalcWeaponUpgradeReturnItemsRsp extends BaseTypedPacket<CalcW
 
     public PacketCalcWeaponUpgradeReturnItemsRsp() {
         super(new CalcWeaponUpgradeReturnItemsRsp());
-        proto.setRetCode(RetcodeOuterClass.Retcode.RET_SVR_ERROR_VALUE);
+        proto.setRetCode(Retcode.RET_SVR_ERROR);
 	}
 }

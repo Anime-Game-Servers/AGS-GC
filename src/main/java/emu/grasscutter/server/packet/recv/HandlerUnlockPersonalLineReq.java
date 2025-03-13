@@ -2,9 +2,9 @@ package emu.grasscutter.server.packet.recv;
 
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.net.packet.TypedPacketHandler;
-import emu.grasscutter.net.proto.RetcodeOuterClass;
 import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.server.packet.send.PacketUnlockPersonalLineRsp;
+import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
 import org.anime_game_servers.multi_proto.gi.messages.quest.personal.UnlockPersonalLineReq;
 
 public class HandlerUnlockPersonalLineReq extends TypedPacketHandler<UnlockPersonalLineReq> {
@@ -12,7 +12,7 @@ public class HandlerUnlockPersonalLineReq extends TypedPacketHandler<UnlockPerso
     public void handle(GameSession session, byte[] header, UnlockPersonalLineReq req) throws Exception {
         var data = GameData.getPersonalLineDataMap().get(req.getPersonalLineId());
         if(data == null){
-            session.send(new PacketUnlockPersonalLineRsp(req.getPersonalLineId(), RetcodeOuterClass.Retcode.RET_FAIL));
+            session.send(new PacketUnlockPersonalLineRsp(req.getPersonalLineId(), Retcode.RET_FAIL));
             return;
         }
 

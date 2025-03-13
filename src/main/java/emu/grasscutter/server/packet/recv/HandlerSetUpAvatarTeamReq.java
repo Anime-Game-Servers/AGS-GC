@@ -1,9 +1,9 @@
 package emu.grasscutter.server.packet.recv;
 
 import emu.grasscutter.net.packet.TypedPacketHandler;
-import emu.grasscutter.net.proto.RetcodeOuterClass.Retcode;
 import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.server.packet.send.PacketSetUpAvatarTeamRsp;
+import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
 import org.anime_game_servers.multi_proto.gi.messages.team.avatar.SetUpAvatarTeamReq;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,6 +15,6 @@ public class HandlerSetUpAvatarTeamReq extends TypedPacketHandler<SetUpAvatarTea
 
         session.getPlayer().sendPacket(new PacketSetUpAvatarTeamRsp(
             req.getTeamId(), req.getCurAvatarGuid(), req.getAvatarTeamGuidList(),
-            result ? Retcode.RET_SUCC_VALUE : Retcode.RET_FAIL_VALUE));
+            result ? Retcode.RET_SUCC : Retcode.RET_FAIL));
 	}
 }
