@@ -16,7 +16,7 @@ public class StaticScriptLibHandler implements ScriptLibStaticHandler {
     }
 
     @Override
-    public int GetEntityType(int entityId) {
+    public int GetEntityType(LuaContext luaContext, int entityId) {
         return EntityIdType.fromEntityId(entityId).getType().getValue();
     }
 
