@@ -198,6 +198,7 @@ public class Player {
     private PlayerProfile playerProfile;  // Getter has null-check
     @Getter private TeamManager teamManager;
     @Getter private transient BlossomManager blossomManager;
+    @Getter private CoopHandler coopHandler;
     private TowerData towerData;  // Getter has null-check
     @Getter private PlayerGachaInfo gachaInfo;
     private PlayerCollectionRecords collectionRecordStore;  // Getter has null-check
@@ -314,6 +315,7 @@ public class Player {
         this.cookingCompoundManager=new CookingCompoundManager(this);
         this.blossomManager = new BlossomManager(this);
         this.dungeonEntryManager = new DungeonEntryManager(this);
+        this.coopHandler = new CoopHandler(this);
     }
 
     // On player creation
@@ -508,6 +510,7 @@ public class Player {
             this.getProgressManager().tryUnlockOpenStates();
             this.getQuestManager().queueEvent(QuestContent.QUEST_CONTENT_PLAYER_LEVEL_UP, level);
             this.getQuestManager().queueEvent(QuestCond.QUEST_COND_PLAYER_LEVEL_EQUAL_GREATER, level);
+            this.getCoopHandler().conditionMetChapterUpdateNotify(level, "COOP_COND_PLAYER_LEVEL");
 
             return true;
         }
@@ -1315,6 +1318,7 @@ public class Player {
         this.getProgressManager().setPlayer(this);
         this.getTeamManager().setPlayer(this);
         this.getBlossomManager().setPlayer(this);
+        this.getCoopHandler().setPlayer(this);
     }
 
     public void save() {
@@ -1380,6 +1384,7 @@ public class Player {
         getDungeonEntryManager().onLogin();
 
         // Packets
+        session.send(new PacketMainCoopUpdateNotify(this.getCoopHandler().getCoopCards().values().stream().map(e -> e.getMainCoop().toProto()).toList()));
         session.send(new PacketPlayerDataNotify(this)); // Player data
         session.send(new PacketLevelTagDataNotify(this));
         session.send(new PacketStoreWeightLimitNotify());
@@ -1396,6 +1401,8 @@ public class Player {
         session.send(new PacketCodexDataFullNotify(this));
         session.send(new PacketAllWidgetDataNotify(this));
         session.send(new PacketWidgetGadgetAllDataNotify());
+        session.send(new PacketCoopDataNotify(this));
+        session.send(new PacketMainCoopUpdateNotify(this.getCoopHandler().getCoopCards().values().stream().map(e -> e.getMainCoop().toProto()).toList())); //send it a second time
         session.send(new PacketCombineDataNotify(this.unlockedCombines));
         session.send(new PacketGetChatEmojiCollectionRsp(this.getChatEmojiIdList()));
 
