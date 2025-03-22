@@ -1,16 +1,7 @@
 package emu.grasscutter.game.ability;
 
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.Loggers;
-import emu.grasscutter.game.props.ElementReactionType;
-
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.binout.AbilityData;
 import emu.grasscutter.data.binout.AbilityMixinData;
@@ -23,6 +14,7 @@ import emu.grasscutter.game.ability.mixins.AbilityMixinHandler;
 import emu.grasscutter.game.entity.GameEntity;
 import emu.grasscutter.game.player.BasePlayerManager;
 import emu.grasscutter.game.player.Player;
+import emu.grasscutter.game.props.ElementReactionType;
 import io.netty.util.concurrent.FastThreadLocalThread;
 import lombok.Getter;
 import lombok.val;
@@ -38,6 +30,13 @@ import org.anime_game_servers.multi_proto.gi.messages.general.ability.AbilityStr
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 
 public final class AbilityManager extends BasePlayerManager {
     @Getter
@@ -73,7 +72,7 @@ public final class AbilityManager extends BasePlayerManager {
                     return;
                 }
             } catch (Exception e) {
-                logger.error("Unable to register handler.", e);
+                logger.error("Unable to register handlerClassesAction.", e);
             }
         }
 
@@ -88,7 +87,7 @@ public final class AbilityManager extends BasePlayerManager {
                     return;
                 }
             } catch (Exception e) {
-                logger.error("Unable to register handler.", e);
+                logger.error("Unable to register handlerClassesMixin.", e);
             }
         }
     }
@@ -97,13 +96,13 @@ public final class AbilityManager extends BasePlayerManager {
         AbilityActionHandler handler = actionHandlers.get(action.type);
 
         if (handler == null || ability == null) {
-            logger.error("Could not execute ability action {} at {}", action.type, ability);
+            logger.error("executeAction could not execute ability action {} at {}", action.type, ability);
             return;
         }
 
         eventExecutor.submit(() -> {
             if (!handler.execute(ability, action, abilityData, target)) {
-                logger.error("exec ability action failed {} at {}", action.type, ability);
+                logger.error("executeAction exec ability action failed {} at {}", action.type, ability);
             }
         });
     }
@@ -112,25 +111,25 @@ public final class AbilityManager extends BasePlayerManager {
         AbilityMixinHandler handler = mixinHandlers.get(mixinData.type);
 
         if (handler == null || ability == null || mixinData == null) {
-            logger.error("Could not execute ability mixin {} at {}", mixinData.type, ability);
+            logger.error("executeMixin could not execute ability mixin {} at {}", mixinData.type, ability);
             return;
         }
 
         eventExecutor.submit(() -> {
             if (!handler.execute(ability, mixinData, abilityData)) {
-                logger.error("exec ability action failed {} at {}", mixinData.type, ability);
+                logger.error("executeMixin exec ability action failed {} at {}", mixinData.type, ability);
             }
         });
     }
 
     public void onAbilityInvoke(AbilityInvokeEntry invoke) throws Exception {
-        logger.debug("Ability invoke: " + invoke + " " + invoke.getArgumentType() + " (" + invoke.getArgumentType() + "): " + this.player.getScene().getEntityById(invoke.getEntityId()));
+        logger.debug("Ability invoke: {} {} ({}): {}", invoke, invoke.getArgumentType(), invoke.getArgumentType(), this.player.getScene().getEntityById(invoke.getEntityId()));
         var entity = this.player.getScene().getEntityById(invoke.getEntityId());
         if(entity != null) {
             logger.debug("Entity group id {} config id {}", entity.getGroupId(), entity.getConfigId());
         }
         if(invoke.getHead() != null && invoke.getHead().getTargetId() != 0) {
-            logger.debug("Target: " + this.player.getScene().getEntityById(invoke.getHead().getTargetId()));
+            logger.debug("Target: {}", this.player.getScene().getEntityById(invoke.getHead().getTargetId()));
         }
 
         if(invoke.getHead() != null && invoke.getHead().getLocalId() != 0) {
@@ -157,7 +156,7 @@ public final class AbilityManager extends BasePlayerManager {
 
         var entity = this.player.getScene().getEntityById(invoke.getEntityId());
         if(entity == null) {
-            logger.info("Entity not found: {}", invoke.getEntityId());
+            logger.info("handleServerInvoke entity not found: {}", invoke.getEntityId());
             return;
         }
 
@@ -178,7 +177,7 @@ public final class AbilityManager extends BasePlayerManager {
         }
 
         if(ability == null) {
-            logger.warn("Ability not found: ability {} modifier {}", head.getInstancedAbilityId(), head.getInstancedModifierId());
+            logger.warn("handleServerInvoke ability not found: ability {} modifier {}", head.getInstancedAbilityId(), head.getInstancedModifierId());
             return;
         }
 
@@ -255,13 +254,13 @@ public final class AbilityManager extends BasePlayerManager {
 
     private void setAbilityOverrideValue(Ability ability, AbilityScalarValueEntry valueChange) {
         if(valueChange.getValueType() != AbilityScalarType.ABILITY_SCALAR_TYPE_FLOAT) {
-            logger.info("Scalar type not supported: {}", valueChange.getValueType());
+            logger.info("setAbilityOverrideValue scalar type not supported: {}", valueChange.getValueType());
 
             return;
         }
 
         if(valueChange.getKey() == null){
-            logger.warn("Key is null");
+            logger.warn("setAbilityOverrideValue key is null");
             return;
         }
 
@@ -283,13 +282,13 @@ public final class AbilityManager extends BasePlayerManager {
         var head = invoke.getHead();
 
         if(entity == null) {
-            logger.info("Entity not found: {}", invoke.getEntityId());
+            logger.info("handleOverrideParam entity not found: {}", invoke.getEntityId());
             return;
         }
 
         var instancedAbilityIndex = head.getInstancedAbilityId() - 1;
         if(instancedAbilityIndex >= entity.getInstancedAbilities().size()) {
-            logger.error("Ability not found {}", head.getInstancedAbilityId());
+            logger.error("handleOverrideParam ability not found {}", head.getInstancedAbilityId());
             return;
         }
 
@@ -304,13 +303,13 @@ public final class AbilityManager extends BasePlayerManager {
         var head = invoke.getHead();
 
         if(entity == null) {
-            logger.info("Entity not found: {}", invoke.getEntityId());
+            logger.info("handleReinitOverrideMap entity not found: {}", invoke.getEntityId());
             return;
         }
 
         var instancedAbilityIndex = head.getInstancedAbilityId() - 1;
         if(instancedAbilityIndex >= entity.getInstancedAbilities().size()) {
-            logger.error("Ability not found {}", head.getInstancedAbilityId());
+            logger.error("handleReinitOverrideMap ability not found {}", head.getInstancedAbilityId());
             return;
         }
 
@@ -337,7 +336,7 @@ public final class AbilityManager extends BasePlayerManager {
 
         var entity = this.player.getScene().getEntityById(invoke.getEntityId());
         if(entity == null){
-            logger.warn("Entity not found: {}", invoke.getEntityId());
+            logger.warn("handleModifierChange entity not found: {}", invoke.getEntityId());
             return;
         }
 
@@ -378,14 +377,14 @@ public final class AbilityManager extends BasePlayerManager {
             }
 
             if(instancedAbilityData == null ||  instancedAbilityData.modifiers == null) {
-                logger.info("No ability found");
+                logger.info("handleModifierChange No ability found. modChange: {}", modChange);
                 return; //TODO: Display error message
             }
 
             var modifierArray = instancedAbilityData.modifiers.values().toArray();
             if(modChange.getModifierLocalId() >= modifierArray.length)
             {
-                logger.info("Modifier local id {} not found", modChange.getModifierLocalId());
+                logger.info("handleModifierChange modifier local id {} not found", modChange.getModifierLocalId());
                 return;
             }
             var modifierData = (AbilityModifier)modifierArray[modChange.getModifierLocalId()];
@@ -408,7 +407,7 @@ public final class AbilityManager extends BasePlayerManager {
             entity.getInstancedModifiers().remove(head.getInstancedModifierId());
         } else {
             //TODO: Display error message
-            logger.debug("Unknown action");
+            logger.debug("handleModifierChange unknown action");
         }
     }
 
@@ -422,6 +421,10 @@ public final class AbilityManager extends BasePlayerManager {
 
     @Nullable
     private String getAbilityName(AbilityString protoString) {
+        if (protoString == null) {
+            Grasscutter.getLogger().error("null protoString!");
+            return null;
+        }
         if(protoString.getType() instanceof AbilityString.Type.Str str){
             return str.getValue();
         } else if (protoString.getType() instanceof AbilityString.Type.Hash hash){
@@ -471,7 +474,7 @@ public final class AbilityManager extends BasePlayerManager {
         var entity = this.player.getScene().getEntityById(invoke.getEntityId());
 
         if(entity == null) {
-            logger.info("Entity not found: {}", invoke.getEntityId());
+            logger.info("handleAddNewAbility entity not found: {}", invoke.getEntityId());
             return;
         }
 
@@ -481,7 +484,7 @@ public final class AbilityManager extends BasePlayerManager {
 
         var ability = GameData.getAbilityData(abilityName);
         if(ability == null) {
-            logger.info("Ability not found: {}", abilityName);
+            logger.info("handleAddNewAbility ability not found: {}", abilityName);
             return;
         }
 
