@@ -41,7 +41,7 @@ public class QuestManager extends BasePlayerManager {
             r -> {
                 Thread thread = new FastThreadLocalThread(r);
                 thread.setUncaughtExceptionHandler((t, e) ->
-                    QuestSystem.getLogger().error("Uncaught exception in quest handling {}", t.getName(), e)
+                    QuestSystem.getLogger().error("Uncaught exception in quest handling", e)
                 );
                 return thread;
             },

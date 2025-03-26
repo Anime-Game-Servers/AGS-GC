@@ -84,8 +84,14 @@ public class SceneScriptManager {
     public static final ExecutorService eventExecutor;
     static {
         eventExecutor = new ThreadPoolExecutor(4, 4,
-                60, TimeUnit.SECONDS, new LinkedBlockingDeque<>(10000),
-                FastThreadLocalThread::new, new ThreadPoolExecutor.AbortPolicy());
+            60, TimeUnit.SECONDS, new LinkedBlockingDeque<>(10000),
+            r -> {
+                Thread thread = new FastThreadLocalThread(r);
+                thread.setUncaughtExceptionHandler((t, e) ->
+                    Loggers.getScriptSystem().error("Uncaught exception in script handling", e)
+                );
+                return thread;
+            }, new ThreadPoolExecutor.AbortPolicy());
     }
     public SceneScriptManager(Scene scene) {
         this.scene = scene;
@@ -716,7 +722,7 @@ public class SceneScriptManager {
          * e.g. CallEvent -> set -> ScriptLib.xxx -> CallEvent -> set -> remove -> NPE -> (remove)
          * So we use thread pool to clean the stack to avoid this new issue.
          */
-        eventExecutor.submit(() -> this.realCallEvent(params));
+        eventExecutor.execute(() -> this.realCallEvent(params));
     }
 
     private void realCallEvent(@Nonnull ScriptArgs params) {
