@@ -1,8 +1,10 @@
 package emu.grasscutter.game.entity;
 
+import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.binout.config.ConfigEntityGadget;
 import emu.grasscutter.data.binout.config.fields.ConfigAbilityData;
 import emu.grasscutter.data.excels.GadgetData;
+import emu.grasscutter.data.excels.GatherData;
 import emu.grasscutter.game.ability.AbilityManager;
 import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
 import emu.grasscutter.game.entity.gadget.content.GadgetContent;
@@ -70,6 +72,11 @@ public abstract class EntityBaseGadget extends GameEntity<CreateGadgetEntityConf
         this.interactId = gadgetCreateConfig.getInteractId();
         this.arguments = gadgetCreateConfig.getArguments();
         this.owner = gadgetCreateConfig.getPlayerOwner();
+
+        GatherData gatherData = GameData.getGatherDataMap().get(gadgetCreateConfig.getPointType());
+        if(gatherData != null) {
+            this.interactEnabled = !gatherData.initDisableInteract();
+        }
 
         if(gadgetCreateConfig.getContent() == null) {
             this.content = buildContent(gadgetCreateConfig);
