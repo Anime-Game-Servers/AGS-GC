@@ -109,8 +109,9 @@ public class GameQuest {
 
         //Some subQuests and talks become active when some other subQuests are unfinished (even from different MainQuests)
         triggerStateEvents();
-
-        getQuestData().getBeginExec().forEach(e -> getOwner().getServer().getQuestSystem().triggerExec(this, e, e.getParam()));
+        if (getQuestData().getBeginExec() != null) {
+            getQuestData().getBeginExec().forEach(e -> getOwner().getServer().getQuestSystem().triggerExec(this, e, e.getParam()));
+        }
         getOwner().getQuestManager().checkQuestAlreadyFulfilled(this, true);
         getOwner().getDungeonEntryManager().checkQuestForDungeonEntryUpdate(this);
         getOwner().getCoopHandler().checkNextCoopPointAccept(this.getSubQuestId());
@@ -164,6 +165,10 @@ public class GameQuest {
         if (questData.getFailCond() != null && questData.getFailCond().size() != 0) {
             this.failProgressList = new int[questData.getFailCond().size()];
         }
+
+        this.getMainQuest().getTalks().values()
+            .removeIf(talk -> talk.getId() >= this.getSubQuestId());
+
         setState(QuestState.QUEST_STATE_UNSTARTED);
         finishTime = 0;
         acceptTime = 0;
@@ -193,8 +198,8 @@ public class GameQuest {
             // This quest finishes the questline - the main quest will also save the quest to db, so we don't have to call save() here
             getMainQuest().finish(isManualFinish);
         }
-
-        getQuestData().getFinishExec().forEach(e -> getOwner().getServer().getQuestSystem().triggerExec(this, e, e.getParam()));
+        if (getQuestData().getFinishExec() != null)
+            getQuestData().getFinishExec().forEach(e -> getOwner().getServer().getQuestSystem().triggerExec(this, e, e.getParam()));
         //Some subQuests have conditions that subQuests are finished (even from different MainQuests)
         triggerStateEvents();
         getOwner().getScene().triggerDungeonEvent(DungeonPassConditionType.DUNGEON_COND_FINISH_QUEST, getSubQuestId());

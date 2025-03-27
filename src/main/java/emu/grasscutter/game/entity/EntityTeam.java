@@ -15,6 +15,7 @@ public class EntityTeam extends MetaGameEntity implements StringAbilityEntity {
 
     public EntityTeam(Player player) {
         super(player.getScene());
+        this.player = player;
         initAbilities();
         this.id = player.getWorld().getNextEntityId(EntityIdType.TEAM);
     }

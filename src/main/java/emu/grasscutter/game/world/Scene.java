@@ -816,7 +816,7 @@ public class Scene {
         this.scriptManager.meetEntities(entities);
         this.scriptManager.addEntities(entitiesBorn);
         groups.forEach(g -> this.scriptManager.callEvent(new ScriptArgs(g.getGroupInfo().getId(), EventType.EVENT_GROUP_LOAD, g.getGroupInfo().getId())));
-        Grasscutter.getLogger().info("Scene {} loaded {} group(s)", getId(), groups.size());
+        Grasscutter.getLogger().info("Scene {} loaded {} group(s): {}", getId(), groups.size(), groups.stream().map(x -> x.getGroupInfo().getId()).toList());
     }
 
     /**

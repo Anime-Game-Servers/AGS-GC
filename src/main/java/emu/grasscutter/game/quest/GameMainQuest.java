@@ -372,7 +372,7 @@ public class GameMainQuest {
     public void tryFailSubQuests(QuestContent condType, String paramStr, int... params) {
         try {
             List<GameQuest> subQuestsWithCond = getChildQuests().values().stream()
-                .filter(p -> p.getState() == QuestState.QUEST_STATE_UNFINISHED)
+                .filter(p -> p.getState() == QuestState.QUEST_STATE_UNFINISHED && p.getQuestData().getFailCond() != null)
                 .filter(p -> p.getQuestData().getFailCond().stream().anyMatch(q -> q.getType() == condType))
                 .toList();
             val questSystem = this.getOwner().getServer().getQuestSystem();
@@ -399,7 +399,7 @@ public class GameMainQuest {
         try {
             List<GameQuest> subQuestsWithCond = getChildQuests().values().stream()
                 //There are subQuests with no acceptCond, but can be finished (example: 35104)
-                .filter(p -> p.getState() == QuestState.QUEST_STATE_UNFINISHED && p.getQuestData().getAcceptCond() != null)
+                .filter(p -> p.getState() == QuestState.QUEST_STATE_UNFINISHED && p.getQuestData().getFinishCond() != null)
                 .filter(p -> p.getQuestData().getFinishCond().stream().anyMatch(q -> q.getType() == condType))
                 .toList();
             val questSystem = this.getOwner().getServer().getQuestSystem();
