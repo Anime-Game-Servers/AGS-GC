@@ -165,10 +165,6 @@ public class GameQuest {
         if (questData.getFailCond() != null && questData.getFailCond().size() != 0) {
             this.failProgressList = new int[questData.getFailCond().size()];
         }
-
-        this.getMainQuest().getTalks().values()
-            .removeIf(talk -> talk.getId() >= this.getSubQuestId());
-
         setState(QuestState.QUEST_STATE_UNSTARTED);
         finishTime = 0;
         acceptTime = 0;
