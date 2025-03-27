@@ -6,7 +6,6 @@ import emu.grasscutter.game.entity.EntityAvatar;
 import emu.grasscutter.game.entity.EntityGadget;
 import emu.grasscutter.game.entity.EntityMonster;
 import emu.grasscutter.game.entity.GameEntity;
-import emu.grasscutter.game.entity.*;
 import emu.grasscutter.game.entity.gadget.platform.ConfigRoute;
 import emu.grasscutter.game.entity.gadget.platform.PointArrayRoute;
 import emu.grasscutter.game.managers.blossom.BlossomSchedule;
@@ -944,6 +943,445 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
         return handleUnimplemented(groupId, val2);
     }
 
+    @Override
+    public int autoPoolMonsterTide(GroupEventLuaContext context, int index, int groupId, int[] monsterPool, int routeId, int[] routePoints, int[] monsterAffix, LuaTable monsterPoolParam) {
+        return handleUnimplemented(index, groupId, monsterPool, routeId, routePoints, monsterAffix, printTable(monsterPoolParam));
+        //TODO implement monsterPoolParam contains int totalCount, int minCount, int tag, int fillTime, int fillCount, bool isOrdered
+    }
 
+    @Override
+    public int beginCameraSceneLookWithTemplate(GroupEventLuaContext context, int var1, LuaTable camParam) {
+        return handleUnimplemented(var1, printTable(camParam));
+        //TODO implement camParam contains int lookConfigId, Vector lookPos, int followType, Vector followPos, boolean isBrodcast, int delay
+    }
+
+    @Override
+    public boolean checkIsInGroup(GroupEventLuaContext context, int groupId, int configId) {
+        return handleUnimplemented(groupId, configId) == 0;
+    }
+
+    @Override
+    public int clearExhibitionReplaceableData(GroupEventLuaContext context, int uid, String key) {
+        return handleUnimplemented(uid, key);
+    }
+
+    @Override
+    public int clearPoolMonsterTide(GroupEventLuaContext context, int groupId, int tideNum) {
+        return handleUnimplemented(groupId, tideNum);
+    }
+
+    @Override
+    public int continueAutoMonster(GroupEventLuaContext context, int groupId, int tideNum) {
+        return handleUnimplemented(groupId, tideNum);
+    }
+
+    @Override
+    public int continueTimeAxis(GroupEventLuaContext context, String key) {
+        return handleUnimplemented(key);
+    }
+
+    @Override
+    public int createFoundation(GroupEventLuaContext context, int[] uidList, int configId, int groupId, int index) {
+        return handleUnimplemented(uidList, configId, groupId, index);
+    }
+
+    @Override
+    public int createFoundations(GroupEventLuaContext context, LuaTable fundationTable, int groupId, int index) {
+        return handleUnimplemented(printTable(fundationTable), groupId, index);
+    }
+
+    @Override
+    public int createGadgetWave(GroupEventLuaContext context, int areaId, int suitId, int offset, Vector boxSize, Vector gadgetSize) {
+        return handleUnimplemented(areaId, suitId, offset, boxSize, gadgetSize);
+    }
+
+    @Override
+    public int createGadgetWithGlobalValue(GroupEventLuaContext context, int configId, LuaTable sgv) {
+        return handleUnimplemented(configId, printTable(sgv));
+        //TODO implement Sgv contains ["SGV_BDShootType"] or sometimes nothing.
+    }
+
+    @Override
+    public int createScenePlayGeneralRewardGadget(GroupEventLuaContext context, int groupId, int configId) {
+        return handleUnimplemented(groupId, configId);
+    }
+
+    @Override
+    public int endAllTimeAxis(GroupEventLuaContext context) {
+        return handleUnimplemented();
+    }
+
+    @Override
+    public int endMonsterTide(GroupEventLuaContext context, int groupId, int tideIndex, int endType) {
+        return handleUnimplemented(groupId, tideIndex, endType);
+    }
+
+    @Override
+    public int endPoolMonsterTide(GroupEventLuaContext context, int groupId, int index) {
+        return handleUnimplemented(groupId, index);
+    }
+
+    @Override
+    public int endSceneMultiStagePlay(GroupEventLuaContext context, int playIndex, boolean isSucc) {
+        return handleUnimplemented(playIndex, isSucc);
+    }
+
+    @Override
+    public int endSceneMultiStagePlayStage(GroupEventLuaContext context, int playIndex, String stageName, boolean isSucc) {
+        return handleUnimplemented(playIndex, stageName, isSucc);
+    }
+
+    @Override
+    public int enterCurve(GroupEventLuaContext context, int uid, int curveId, int pointId, LuaTable oceanCurrent) {
+        return handleUnimplemented(uid, curveId, pointId, printTable(oceanCurrent));
+        //TODO implement oceanCurrent unknown what it is.
+    }
+
+    @Override
+    public int failScenePlayBattle(GroupEventLuaContext context, int groupId) {
+        return handleUnimplemented(groupId);
+    }
+
+    @Override
+    public int finishRandTask(GroupEventLuaContext context, int optionId, boolean isSucc) {
+        return handleUnimplemented(optionId, isSucc);
+    }
+
+    @Override
+    public int forbidPlayerRegionVision(GroupEventLuaContext context, int uid) {
+        return handleUnimplemented(uid);
+    }
+
+    @Override
+    public int getAranaraCollectableCountByTypeAndState(GroupEventLuaContext context, int type, int state) {
+        return handleUnimplemented(type, state);
+    }
+
+    @Override
+    public int getChainLevel(GroupEventLuaContext context, int chainId) {
+        return handleUnimplemented(chainId);
+    }
+
+    @Override
+    public int getExhibitionAccumulableData(GroupEventLuaContext context, int uid, int exhibitionId) {
+        return handleUnimplemented(uid, exhibitionId);
+    }
+
+    @Override
+    public int getExhibitionReplaceableData(GroupEventLuaContext context, int uid, int exhibitionId) {
+        return handleUnimplemented(uid, exhibitionId);
+    }
+
+    @Override
+    public int getGadgetPlayProgress(GroupEventLuaContext context, int groupId, int configId) {
+        return handleUnimplemented(groupId, configId);
+    }
+
+    @Override
+    public int getGadgetPlayStageBeginProgress(GroupEventLuaContext context, int groupId, int configId) {
+        return handleUnimplemented(groupId, configId);
+    }
+
+    @Override
+    public int getGadgetPlayUidValue(GroupEventLuaContext context, int groupId, int configId, int uid, String name) {
+        return handleUnimplemented(groupId, configId, uid, name);
+    }
+
+    @Override
+    public int getGameTimePassed(GroupEventLuaContext context) {
+        return handleUnimplemented();
+    }
+
+    @Override
+    public int getGivingItemList(GroupEventLuaContext context, int givingId) {
+        return handleUnimplemented(givingId);
+    }
+
+    @Override
+    public int getGroupAliveMonsterList(GroupEventLuaContext context, int groupId) {
+        return handleUnimplemented(groupId);
+    }
+
+    @Override
+    public int getGroupLogicStateValue(GroupEventLuaContext context, String sgvName) {
+        return handleUnimplemented(sgvName);
+    }
+
+    @Override
+    public int getOfferingLevel(GroupEventLuaContext context, int offeringId) {
+        return handleUnimplemented(offeringId);
+    }
+
+    @Override
+    public int getPlatformArrayInfoByPointId(GroupEventLuaContext context, int arrayId, int pointId) {
+        return handleUnimplemented(arrayId, pointId);
+    }
+
+    @Override
+    public int getPlatformPointArray(GroupEventLuaContext context, int configId) {
+        return handleUnimplemented(configId);
+    }
+
+    @Override
+    public int getPlayerVehicleType(GroupEventLuaContext context, int uid) {
+        return handleUnimplemented(uid);
+    }
+
+    @Override
+    public int getRegionalPlayVarValue(GroupEventLuaContext context, int uid, int type) {
+        return handleUnimplemented(uid, type);
+    }
+
+    @Override
+    public int getSceneMultiStagePlayUidValue(GroupEventLuaContext context, int groupId, int index, String name, int uid) {
+        return handleUnimplemented(groupId, index, name, uid);
+    }
+
+    @Override
+    public int getScenePlayBattleHostUid(GroupEventLuaContext context, int groupId) {
+        return handleUnimplemented(groupId);
+    }
+
+    @Override
+    public int getScenePlayBattleType(GroupEventLuaContext context, int groupId) {
+        return handleUnimplemented(groupId);
+    }
+
+    @Override
+    public int getScenePlayBattleUidValue(GroupEventLuaContext context, int groupId, int uid, String key) {
+        return handleUnimplemented(groupId, uid, key);
+    }
+
+    @Override
+    public int getSceneTimeSeconds(GroupEventLuaContext context) {
+        return handleUnimplemented();
+    }
+
+    @Override
+    public int getSurroundUidList(GroupEventLuaContext context, int configId, int radius) {
+        return handleUnimplemented(configId, radius);
+    }
+
+    @Override
+    public int initSceneMultistagePlay(GroupEventLuaContext context, int index, MultistagePlayType playType, LuaTable paramTable, int[] uidList) {
+        return handleUnimplemented(index, playType, paramTable, uidList);
+        //TODO implement paramTable contains int[] banList, int rounds, int initBuildingPoints
+    }
+
+    @Override
+    public int invalidGravenPhotoBundleMark(GroupEventLuaContext context, int groupBundleId) {
+        return handleUnimplemented(groupBundleId);
+    }
+
+    @Override
+    public boolean isPlayerTransmittable(GroupEventLuaContext context, int uid) {
+        return handleUnimplemented(uid) == 0;
+    }
+
+    @Override
+    public boolean isWidgetEquipped(GroupEventLuaContext context, int hostUid, int widgetId) {
+        return handleUnimplemented(hostUid, widgetId) == 0;
+    }
+
+    @Override
+    public int markGroupLuaAction(GroupEventLuaContext context, String action, String transaction, LuaTable log) {
+        return handleUnimplemented(action, transaction, printTable(log));
+        //TODO implement log contains many sting/int key/value pairs
+    }
+
+    @Override
+    public int modifyClimatePolygonParamTable(GroupEventLuaContext context, int one, LuaTable climateTable) {
+        return handleUnimplemented(one, printTable(climateTable));
+        //TODO implement climateTable contains int climateType, int meterInheritRatio
+    }
+
+    @Override
+    public int moveAvatarByPointArrayWithTemplate(GroupEventLuaContext context, int uid, int pointArrayId, int[] routeList, int gadgetState, LuaTable speed) {
+        return handleUnimplemented(uid, pointArrayId, routeList, gadgetState, speed);
+        //TODO implement speed is sometimes int speed=10 and sometimes {4,60}
+    }
+
+    @Override
+    public int notifyAllPlayerPerformOperation(GroupEventLuaContext context, int teamEntityId, int type, int effectIndex, Vector hunterPos, Vector hunterRot) {
+        return handleUnimplemented(teamEntityId, type, effectIndex, hunterPos, hunterRot);
+    }
+
+    @Override
+    public int pauseAutoMonsterTide(GroupEventLuaContext context, int groupId, int monsterTideIndex) {
+        return handleUnimplemented(groupId, monsterTideIndex);
+    }
+
+    @Override
+    public int pauseAutoPoolMonsterTide(GroupEventLuaContext context, int groupId, int tideStage) {
+        return handleUnimplemented(groupId, tideStage);
+    }
+
+    @Override
+    public int pauseTimeAxis(GroupEventLuaContext context, String key) {
+        return handleUnimplemented(key);
+    }
+
+    @Override
+    public int prestartScenePlayBattle(GroupEventLuaContext context, LuaTable sceneParam) {
+        return handleUnimplemented(printTable(sceneParam));
+        //TODO implement sceneParam contains int duration, int startCd, int[] progressStage, int groupId, int mode
+    }
+
+    @Override
+    public int recieveAllAranaraCollectionByType(GroupEventLuaContext context, int groupId, int type) {
+        return handleUnimplemented(groupId, type);
+    }
+
+    @Override
+    public int resumeAutoPoolMonsterTide(GroupEventLuaContext context, int groupId, int tideStage) {
+        return handleUnimplemented(groupId, tideStage);
+    }
+
+    @Override
+    public int revertPlayerRegionVision(GroupEventLuaContext context, int uid) {
+        return handleUnimplemented(uid);
+    }
+
+    @Override
+    public int scenePlayBattleUidOp(GroupEventLuaContext context, int groupId, int configId, int[] uidList, int buffType, String paramString, int[] paramList, int[] paramTargetList, int index, int duration) {
+        return handleUnimplemented(groupId, configId, uidList, buffType, paramString, paramList, paramTargetList, index, duration);
+    }
+
+    @Override
+    public int setChainLevel(GroupEventLuaContext context, int chainId, int level, boolean isNotify) {
+        return handleUnimplemented(chainId, level, isNotify);
+    }
+
+    @Override
+    public int setDarkPressureLevel(GroupEventLuaContext context, int darkLevel) {
+        return handleUnimplemented(darkLevel);
+    }
+
+    @Override
+    public int setEnvironmentEffectState(GroupEventLuaContext context, int index, String key, float[] floatParam, int[] intParam) {
+        return handleUnimplemented(index, key, floatParam, intParam);
+    }
+
+    @Override
+    public int setGadgetPlayUidValue(GroupEventLuaContext context, int groupId, int configId, int uid, String key, int value) {
+        return handleUnimplemented(groupId, configId, uid, key, value);
+    }
+
+    @Override
+    public int setLimitOptimization(GroupEventLuaContext context, int uid, boolean isLimitOptimization) {
+        return handleUnimplemented(uid, isLimitOptimization);
+    }
+
+    @Override
+    public int setPlatformRouteIndexToNext(GroupEventLuaContext context, int configId) {
+        return handleUnimplemented(configId);
+    }
+
+    @Override
+    public int setPlayerEyePoint(GroupEventLuaContext context, int configId, int configId2) {
+        return handleUnimplemented(configId, configId2);
+    }
+
+    @Override
+    public int setPlayerEyePointLOD(GroupEventLuaContext context, int configId, int configId2, int lodLevel) {
+        return handleUnimplemented(configId, configId2, lodLevel);
+    }
+
+    @Override
+    public int setPlayerInteractOption(GroupEventLuaContext context, String key) {
+        return handleUnimplemented(key);
+    }
+
+    @Override
+    public int setSceneMultiStagePlayUidValue(GroupEventLuaContext context, int groupId, int index, String tag, int value) {
+        return handleUnimplemented(groupId, index, tag, value);
+    }
+
+    @Override
+    public int setSceneMultiStagePlayValue(GroupEventLuaContext context, int index, String tag, int value, boolean isNotify) {
+        return handleUnimplemented(index, tag, value, isNotify);
+    }
+
+    @Override
+    public int setSceneMultiStagePlayValues(GroupEventLuaContext context, int index, LuaTable paramTable, boolean isNotify) {
+        return handleUnimplemented(index, printTable(paramTable), isNotify);
+        //TODO implement paramTable contains a lot
+    }
+
+    @Override
+    public int setScenePlayBattlePlayTeamEntityGadgetId(GroupEventLuaContext context, int groupId, int gadgetId) {
+        return handleUnimplemented(groupId, gadgetId);
+    }
+
+    @Override
+    public int setScenePlayBattleUidValue(GroupEventLuaContext context, int groupId, int uid, String key, int value) {
+        return handleUnimplemented(groupId, uid, key, value);
+    }
+
+    @Override
+    public int setWidgetClientDetectorCoolDown(GroupEventLuaContext context, int configId, boolean isSucc) {
+        return handleUnimplemented(configId, isSucc);
+    }
+
+    @Override
+    public int showClientTutorial(GroupEventLuaContext context, int tutorialId, int[] uidList) {
+        return handleUnimplemented(tutorialId, uidList);
+    }
+
+    @Override
+    public int showCommonPlayerTips(GroupEventLuaContext context, int type, String[] keys) {
+        return handleUnimplemented(type, keys);
+    }
+
+    @Override
+    public int showReminderByUid(GroupEventLuaContext context, int[] uidList, int reminderId) {
+        return handleUnimplemented(uidList, reminderId);
+    }
+
+    @Override
+    public int showTemplateReminder(GroupEventLuaContext context, int reminderId, int[] timerInfo) {
+        return handleUnimplemented(reminderId, timerInfo);
+    }
+
+    @Override
+    public int skipTeyvatTime(GroupEventLuaContext context, int time, int rate) {
+        return handleUnimplemented(time, rate);
+    }
+
+    @Override
+    public int startGadgetPlay(GroupEventLuaContext context, int groupId, int configId) {
+        return handleUnimplemented(groupId, configId);
+    }
+
+    @Override
+    public int startSceneMultiStagePlayStage(GroupEventLuaContext context, int index, int time, String key, LuaTable paramTable) {
+        return handleUnimplemented(index, time, key, printTable(paramTable));
+        //TODO implement paramTable contains int previewStageIndex, int previewDisplayDuration
+    }
+
+    @Override
+    public int stopFishing(GroupEventLuaContext context, int uid) {
+        return handleUnimplemented(uid);
+    }
+
+    @Override
+    public int stopReminder(GroupEventLuaContext context, int reminderId) {
+        return handleUnimplemented(reminderId);
+    }
+
+    @Override
+    public int switchSceneEnvAnimal(GroupEventLuaContext context, int animalId) {
+        return handleUnimplemented(animalId);
+    }
+
+    @Override
+    public int tryRecordActivityPushTips(GroupEventLuaContext context, int pushTipId) {
+        return handleUnimplemented(pushTipId);
+    }
+
+    @Override
+    public int updateStakeHomePlayRecord(GroupEventLuaContext context, int[] uidList) {
+        return handleUnimplemented(uidList);
+    }
 
 }
