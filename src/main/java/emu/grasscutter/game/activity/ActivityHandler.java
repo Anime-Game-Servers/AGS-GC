@@ -109,6 +109,7 @@ public abstract class ActivityHandler {
         proto.setFirstDayStartTime(DateHelper.getUnixTime(activityConfigItem.getBeginTime()));
         proto.setEndTime(DateHelper.getUnixTime(activityConfigItem.getEndTime()));
         proto.setMeetCondList(getMeetConditions(conditionExecutor));
+        proto.setQuickOpen(true);
 
         if (playerActivityData != null){
             proto.setWatcherInfoList(playerActivityData.getAllWatcherInfoList());
