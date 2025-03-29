@@ -1,6 +1,5 @@
 package emu.grasscutter.game.quest.content;
 
-import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.common.quest.SubQuestData.QuestContentCondition;
 import emu.grasscutter.game.quest.GameQuest;
 import emu.grasscutter.game.quest.QuestSystem;
@@ -18,7 +17,8 @@ public class ContentUnknown extends BaseContent {
 
     @Override
     public boolean checkProgress(GameQuest quest, QuestContentCondition condition, int currentProgress) {
-        QuestSystem.getLogger().error("Unknown condition {} at {}", condition.getType().name(), quest.getSubQuestId());
+        if (condition.getType() != null)
+            QuestSystem.getLogger().error("Unknown condition {} at {}", condition.getType().name(), quest.getSubQuestId());
         return false;
     }
 }

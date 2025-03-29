@@ -59,7 +59,7 @@ public class BlossomSchedule implements BaseBlossomROSData {
             .orElse(3);
         val scriptSystem = world.getHost().getServer().getScriptSystem();
         val scene = scriptSystem.getSceneMeta(sceneId);
-
+        if (scene == null) return null;
         val group = scene.getGroup(groupsData.getNewGroupId());
         if(group == null) {
             Grasscutter.getLogger().warn("[BlossomSchedule] Unable to find group {} in scene {}", groupsData.getNewGroupId(), sceneId);

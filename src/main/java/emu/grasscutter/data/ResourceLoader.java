@@ -337,7 +337,9 @@ public class ResourceLoader {
             });
 
         GameData.getQuestDataMap().values().forEach(data -> Optional.ofNullable(data.getGuide())
-            .map(SubQuestData.Guide::getGuideScene).ifPresent(sceneId -> data.getFinishCond().stream()
+            .map(SubQuestData.Guide::getGuideScene).ifPresent(sceneId -> {
+                if (data.getFinishCond() == null) return;
+                data.getFinishCond().stream()
                 .filter(c -> c.getType() == QuestContent.QUEST_CONTENT_ENTER_DUNGEON)
                 .filter(c -> !tempEntriesMap.containsKey(c.getParam()[0])).forEach(cond -> {
                     val scenePointEntry = GameData.getScenePointEntryById(sceneId == 0 ? 3 : sceneId, cond.getParam()[1]);
@@ -349,7 +351,8 @@ public class ResourceLoader {
 
                     tempEntriesMap.putIfAbsent(cond.getParam()[0],
                         DungeonEntries.create(cond.getParam()[0], scenePointEntry.getPointData(), tempExitHolderMap));
-                })));
+                    });
+            }));
     }
 
     private static void cacheTalentLevelSets() {
@@ -579,8 +582,10 @@ public class ResourceLoader {
                     if(mainQuest.getTalks() != null) {
                         mainQuest.getTalks().forEach(talkData -> GameData.getQuestTalkMap().put(talkData.getId(), mainQuest.getId()));
                     }
-                    for(SubQuestData quest : mainQuest.getSubQuests()){
-                        addToCache(quest);
+                    if (mainQuest.getSubQuests() != null) {
+                        for (SubQuestData quest : mainQuest.getSubQuests()) {
+                            addToCache(quest);
+                        }
                     }
                 } catch (IOException e) {
 
@@ -702,7 +707,7 @@ public class ResourceLoader {
                 }
             });
 
-            logger.debug("Loaded {} {} entries.", GameData.getMonsterConfigData().size(), className);
+            logger.debug("Loaded {} {} entries.", targetMap.size(), className);
         } catch (IOException e) {
             logger.error("Failed to load {} folder.", className);
         }
@@ -719,7 +724,7 @@ public class ResourceLoader {
                 }
             });
 
-            logger.debug("Loaded {} {} entries.", GameData.getMonsterConfigData().size(), className);
+            logger.debug("Loaded {} {} entries.", targetMap.size(), className);
         } catch (IOException e) {
             logger.error("Failed to load {} folder.", className);
         }

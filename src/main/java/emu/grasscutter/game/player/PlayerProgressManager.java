@@ -215,6 +215,7 @@ public class PlayerProgressManager extends BasePlayerDataManager {
     private void addStatueQuestsOnLogin() {
         // Get all currently existing subquests for the "unlock all statues" main quest.
         var statueMainQuest = GameData.getMainQuestDataMap().get(303);
+        if (statueMainQuest == null) return;
         var statueSubQuests = statueMainQuest.getSubQuests();
 
         // Add the main statue quest if it isn't active yet.

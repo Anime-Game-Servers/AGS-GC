@@ -92,6 +92,7 @@ public class QuestSystem extends BaseGameSystem {
     }
 
     private BaseContent getContentHandler(QuestContent type, SubQuestData questData){
+        if (type == null) return contHandlers.get(QuestContent.QUEST_CONTENT_UNKNOWN.getValue());
         val handler = contHandlers.get(type.getValue());
         if(handler == null){
             getLogger().debug("Could not get handler for content {} in quest {}", type.getValue(), questData);

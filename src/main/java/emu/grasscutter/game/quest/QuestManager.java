@@ -121,6 +121,7 @@ public class QuestManager extends BasePlayerManager {
             //execute all the beginExec before the rewind target on UNFINISHED quests on login only
             quest.getChildQuests().values().stream().filter(p -> p.getQuestData().getOrder() < finalRewindTarget.getQuestData().getOrder()
                     && p.getState().getValue() == QuestState.QUEST_STATE_UNFINISHED.getValue()).forEach(q -> {
+                if (q.getQuestData().getBeginExec() == null) return;
                 q.getQuestData().getBeginExec().forEach(e -> getPlayer().getServer().getQuestSystem().triggerExec(q, e, e.getParam()));
             });
             quest.checkProgress(false);
@@ -426,7 +427,7 @@ public class QuestManager extends BasePlayerManager {
                 quest.finish(false);
                 return;
             }
-            if(!questData.getFailCond().isEmpty()) {
+            if (questData.getFailCond() != null && !questData.getFailCond().isEmpty()) {
                 val shouldFail = questSystem.initialCheckContent(quest, quest.getFailProgressList(), questData.getFailCond(), questData.getFailCondComb(), shouldReset);
                 if (shouldFail) {
                     quest.fail();
