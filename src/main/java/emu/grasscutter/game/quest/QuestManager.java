@@ -23,10 +23,7 @@ import org.anime_game_servers.core.gi.enums.QuestState;
 
 import javax.annotation.Nonnull;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 public class QuestManager extends BasePlayerManager {
@@ -41,7 +38,15 @@ public class QuestManager extends BasePlayerManager {
     static {
         eventExecutor = new ThreadPoolExecutor(4, 4,
             60, TimeUnit.SECONDS, new LinkedBlockingDeque<>(1000),
-            FastThreadLocalThread::new, new ThreadPoolExecutor.AbortPolicy());
+            r -> {
+                Thread thread = new FastThreadLocalThread(r);
+                thread.setUncaughtExceptionHandler((t, e) ->
+                    QuestSystem.getLogger().error("Uncaught exception in quest handling", e)
+                );
+                return thread;
+            },
+            new ThreadPoolExecutor.AbortPolicy()
+        );
     }
     /*
         On SetPlayerBornDataReq, the server sends FinishedParentQuestNotify, with this exact
@@ -351,10 +356,10 @@ public class QuestManager extends BasePlayerManager {
     }
 
     public void queueEvent(QuestContent condType, String paramStr, int... params) {
-        eventExecutor.submit(() -> triggerEvent(condType, paramStr, params));
+        eventExecutor.execute(() -> triggerEvent(condType, paramStr, params));
     }
     public void queueEvent(QuestCond condType, String paramStr, int... params) {
-        eventExecutor.submit(() -> triggerEvent(condType, paramStr, params));
+        eventExecutor.execute(() -> triggerEvent(condType, paramStr, params));
     }
 
     //QUEST_EXEC are handled directly by each subQuest

@@ -165,7 +165,7 @@ public class QuestSystem extends BaseGameSystem {
             return;
         }
 
-        QuestManager.eventExecutor.submit(() -> {
+        QuestManager.eventExecutor.execute(() -> {
             if (!handler.execute(quest, execParam, params)) {
                 getLogger().debug("exec trigger failed {} at {}", execParam.getType().getValue(), quest.getQuestData());
             }

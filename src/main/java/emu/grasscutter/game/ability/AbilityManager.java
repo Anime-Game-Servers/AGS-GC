@@ -49,7 +49,13 @@ public final class AbilityManager extends BasePlayerManager {
     static {
         eventExecutor = new ThreadPoolExecutor(4, 4,
             60, TimeUnit.SECONDS, new LinkedBlockingDeque<>(1000),
-            FastThreadLocalThread::new, new ThreadPoolExecutor.AbortPolicy());
+            r -> {
+                Thread thread = new FastThreadLocalThread(r);
+                thread.setUncaughtExceptionHandler((t, e) ->
+                    Loggers.getAbilitySystem().error("Uncaught exception in ability handling", e)
+                );
+                return thread;
+            }, new ThreadPoolExecutor.AbortPolicy());
 
         registerHandlers();
     }
@@ -100,7 +106,7 @@ public final class AbilityManager extends BasePlayerManager {
             return;
         }
 
-        eventExecutor.submit(() -> {
+        eventExecutor.execute(() -> {
             if (!handler.execute(ability, action, abilityData, target)) {
                 logger.error("executeAction exec ability action failed {} at {}", action.type, ability);
             }
@@ -115,7 +121,7 @@ public final class AbilityManager extends BasePlayerManager {
             return;
         }
 
-        eventExecutor.submit(() -> {
+        eventExecutor.execute(() -> {
             if (!handler.execute(ability, mixinData, abilityData)) {
                 logger.error("executeMixin exec ability action failed {} at {}", mixinData.type, ability);
             }
