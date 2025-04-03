@@ -986,8 +986,8 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
     }
 
     @Override
-    public int createFoundations(GroupEventLuaContext context, LuaTable fundationTable, int groupId, int index) {
-        return handleUnimplemented(printTable(fundationTable), groupId, index);
+    public int createFoundations(GroupEventLuaContext context, LuaTable foundationTable, int groupId, int index) {
+        return handleUnimplemented(printTable(foundationTable), groupId, index);
     }
 
     @Override
