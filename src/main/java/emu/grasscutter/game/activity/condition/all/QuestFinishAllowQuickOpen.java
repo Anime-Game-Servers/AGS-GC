@@ -18,7 +18,8 @@ public class QuestFinishAllowQuickOpen extends ActivityConditionBaseHandler {
             .getQuestManager()
             .getQuestById(params[0]);
 
-        //todo: verify this is how it works
+        //todo: QuestFinishAllowQuickOpen will probably need to be changed later.
+        // I doubt it's an exact copy of the regular QuestFinished condition
         return quest != null && quest.getState() == QuestState.QUEST_STATE_FINISHED;
     }
 }
