@@ -1258,8 +1258,9 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
     }
 
     @Override
-    public int setEnvironmentEffectState(GroupEventLuaContext context, int index, String key, float[] floatParam, int[] intParam) {
-        return handleUnimplemented(index, key, floatParam, intParam);
+    public int setEnvironmentEffectState(GroupEventLuaContext context, int index, String key, LuaTable floatParamTable, int[] intParam) {
+        return handleUnimplemented(index, key, printTable(floatParamTable), intParam);
+        //TODO implement floatParamTable is an array of floats
     }
 
     @Override
@@ -1329,8 +1330,9 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
     }
 
     @Override
-    public int showCommonPlayerTips(GroupEventLuaContext context, int type, String[] keys) {
-        return handleUnimplemented(type, keys);
+    public int showCommonPlayerTips(GroupEventLuaContext context, int type, LuaTable keys) {
+        return handleUnimplemented(type, printTable(keys));
+        //TODO implement keys is a String Array
     }
 
     @Override
