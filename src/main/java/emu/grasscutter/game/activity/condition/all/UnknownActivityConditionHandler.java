@@ -12,7 +12,7 @@ public class UnknownActivityConditionHandler extends ActivityConditionBaseHandle
 
     @Override
     public boolean execute(PlayerActivityData activityData, ActivityConfigItem activityConfig, int... params) {
-        Grasscutter.getLogger().error("Called unknown condition handler");
+        Grasscutter.getLogger().error("Called unknown condition handler {} {}", activityData.getActivityId(), params);
         return false;
     }
 }
