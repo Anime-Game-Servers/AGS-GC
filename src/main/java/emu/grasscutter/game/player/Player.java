@@ -45,6 +45,7 @@ import emu.grasscutter.game.managers.deforestation.DeforestationManager;
 import emu.grasscutter.game.managers.energy.EnergyManager;
 import emu.grasscutter.game.managers.forging.ActiveForgeData;
 import emu.grasscutter.game.managers.forging.ForgingManager;
+import emu.grasscutter.game.managers.giving.GivingManager;
 import emu.grasscutter.game.managers.mapmark.MapMark;
 import emu.grasscutter.game.managers.mapmark.MapMarksManager;
 import emu.grasscutter.game.managers.stamina.StaminaManager;
@@ -61,8 +62,6 @@ import emu.grasscutter.game.tower.TowerManager;
 import emu.grasscutter.game.world.Scene;
 import emu.grasscutter.game.world.World;
 import emu.grasscutter.net.packet.BasePacket;
-import org.anime_game_servers.multi_proto.gi.messages.multiplayer.MpEnterResultReason;
-import org.anime_game_servers.multi_proto.gi.messages.general.PropChangeReason;
 import emu.grasscutter.server.event.player.PlayerJoinEvent;
 import emu.grasscutter.server.event.player.PlayerQuitEvent;
 import emu.grasscutter.server.game.GameServer;
@@ -86,9 +85,11 @@ import org.anime_game_servers.multi_proto.gi.messages.community.friends.FriendEn
 import org.anime_game_servers.multi_proto.gi.messages.community.player_presentation.SocialDetail;
 import org.anime_game_servers.multi_proto.gi.messages.gadget.GadgetInteractReq;
 import org.anime_game_servers.multi_proto.gi.messages.general.ProfilePicture;
+import org.anime_game_servers.multi_proto.gi.messages.general.PropChangeReason;
 import org.anime_game_servers.multi_proto.gi.messages.general.avatar.AvatarExpeditionState;
 import org.anime_game_servers.multi_proto.gi.messages.general.avatar.GrantReason;
 import org.anime_game_servers.multi_proto.gi.messages.general.avatar.ShowAvatarInfo;
+import org.anime_game_servers.multi_proto.gi.messages.multiplayer.MpEnterResultReason;
 import org.anime_game_servers.multi_proto.gi.messages.scene.PlayerLocationInfo;
 import org.anime_game_servers.multi_proto.gi.messages.scene.PlayerWorldLocationInfo;
 import org.anime_game_servers.multi_proto.gi.messages.scene.entity.MpSettingType;
@@ -187,6 +188,7 @@ public class Player {
     @Getter private transient PlayerBuffManager buffManager;
     @Getter private transient PlayerProgressManager progressManager;
     @Getter private transient DungeonEntryManager dungeonEntryManager;
+    @Getter private transient GivingManager givingManager;
 
     @Getter private transient int lastWeatherAreaId = 0;
     @Getter @Setter private transient int weatherAreaId = 0;
@@ -316,6 +318,7 @@ public class Player {
         this.blossomManager = new BlossomManager(this);
         this.dungeonEntryManager = new DungeonEntryManager(this);
         this.coopHandler = new CoopHandler(this);
+        this.givingManager = new GivingManager(this);
     }
 
     // On player creation
@@ -1398,6 +1401,7 @@ public class Player {
 
         session.send(new PacketBattlePassAllDataNotify(this));
         session.send(new PacketQuestListNotify(this));
+        this.givingManager.sendGivingRecordNotify();
         session.send(new PacketCodexDataFullNotify(this));
         session.send(new PacketAllWidgetDataNotify(this));
         session.send(new PacketWidgetGadgetAllDataNotify());
