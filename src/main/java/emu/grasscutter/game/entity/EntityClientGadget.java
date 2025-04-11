@@ -64,6 +64,7 @@ public class EntityClientGadget extends EntityBaseGadget implements ConfigAbilit
         entityInfo.setEntityClientData(new EntityClientData());
         entityInfo.setEntityAuthorityInfo(authority);
         entityInfo.setLifeState(1);
+        entityInfo.setTagList(getEntityTags().stream().toList());
 
         val pair = new PropPair(PlayerProperty.PROP_LEVEL.getId(), ProtoHelper.newPropValue(PlayerProperty.PROP_LEVEL, getLevel()));
         entityInfo.setPropList(List.of(pair));

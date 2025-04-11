@@ -327,6 +327,7 @@ public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> impleme
         entityInfo.setEntityClientData(new EntityClientData());
         entityInfo.setEntityAuthorityInfo(authority);
         entityInfo.setLifeState(this.getLifeState().getValue());
+        entityInfo.setTagList(getEntityTags().stream().toList());
 
 
         this.addAllFightPropsToEntityInfo(entityInfo);

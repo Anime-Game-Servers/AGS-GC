@@ -14,6 +14,7 @@ import emu.grasscutter.scripts.data.controller.EntityController;
 import emu.grasscutter.server.event.entity.EntityDamageEvent;
 import emu.grasscutter.server.event.entity.EntityDeathEvent;
 import emu.grasscutter.server.packet.send.PacketEntityFightPropUpdateNotify;
+import emu.grasscutter.server.packet.send.PacketEntityTagChangeNotify;
 import emu.grasscutter.utils.Position;
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -54,6 +55,7 @@ public abstract class GameEntity<T extends CreateEntityConfig<?>> {
     @Getter private List<Ability> instancedAbilities = new ArrayList<>();
     @Getter private Int2ObjectMap<AbilityModifierController> instancedModifiers = new Int2ObjectOpenHashMap<>();
     @Getter private Map<String, Float> globalAbilityValues = new HashMap<>();
+    @Getter private Set<String> entityTags = new HashSet<>();
 
     protected GameEntity(Scene scene) {
         this.scene = scene;
@@ -216,6 +218,18 @@ public abstract class GameEntity<T extends CreateEntityConfig<?>> {
 
     public void callAbilityBeHurt(EntityDamageEvent event) {
         //instancedAbilities.forEach(ability -> ability.onBeingHit(event));
+    }
+
+    public void changeTag(String tag, boolean isAdd) {
+        var wasChanges = false;
+        if (isAdd) {
+            wasChanges = this.entityTags.add(tag);
+        } else {
+            wasChanges = this.entityTags.remove(tag);
+        }
+        if(wasChanges){
+            scene.broadcastPacket(new PacketEntityTagChangeNotify(getId(), isAdd, tag));
+        }
     }
 
     /**

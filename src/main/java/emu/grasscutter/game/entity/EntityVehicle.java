@@ -85,6 +85,7 @@ public class EntityVehicle extends EntityBaseGadget {
         entityInfo.setEntity(new SceneEntityInfo.Entity.Gadget(gadgetInfo));
         entityInfo.setEntityAuthorityInfo(authority);
         entityInfo.setLifeState(1);
+        entityInfo.setTagList(getEntityTags().stream().toList());
 
 
         this.addAllFightPropsToEntityInfo(entityInfo);

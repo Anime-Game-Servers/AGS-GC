@@ -118,6 +118,7 @@ public class AbilityModifier implements Serializable {
         public boolean lethal = true;
 
         public boolean muteHealEffect = false;
+        public boolean isAdd = false;
 
         public boolean byServer;
         public boolean lifeByOwnerIsAlive;

@@ -7,9 +7,10 @@ import emu.grasscutter.server.packet.send.PacketEntityTagChangeNotify;
 
 @AbilityAction(AbilityModifierAction.Type.ChangeTag)
 public class ActionChangeTag extends AbilityActionHandler {
+
     @Override
     public boolean execute(Ability ability, AbilityModifierAction action, byte[] abilityData, GameEntity target) {
-        ability.getPlayerOwner().sendPacket(new PacketEntityTagChangeNotify(target.getId(), true, action.tag));
+        target.changeTag(action.tag, action.isAdd);
         return true;
     }
 }
