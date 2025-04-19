@@ -61,6 +61,7 @@ public class EntityNPC extends GameEntity<CreateNpcEntityConfig> {
         entityInfo.setEntityClientData(new EntityClientData());
         entityInfo.setEntityAuthorityInfo(authority);
         entityInfo.setLifeState(1);
+        entityInfo.setTagList(getEntityTags().stream().toList());
 
 
         val npc = new SceneNpcInfo(npcId);

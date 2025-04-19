@@ -118,6 +118,7 @@ public class AbilityModifier implements Serializable {
         public boolean lethal = true;
 
         public boolean muteHealEffect = false;
+        public boolean isAdd = false;
 
         public boolean byServer;
         public boolean lifeByOwnerIsAlive;
@@ -144,6 +145,7 @@ public class AbilityModifier implements Serializable {
         public DynamicFloat valueRangeMin;
         public DynamicFloat valueRangeMax;
         public String overrideMapKey;
+        public String tag;
 
         public int paramNum;
         public DynamicFloat param1 = DynamicFloat.ZERO;

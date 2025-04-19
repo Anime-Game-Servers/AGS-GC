@@ -247,6 +247,7 @@ public class EntityAvatar extends GameEntity {
         entityInfo.setLastMoveSceneTimeMs(this.getLastMoveSceneTimeMs());
         entityInfo.setLastMoveReliableSeq(this.getLastMoveReliableSeq());
         entityInfo.setLifeState(this.getLifeState().getValue());
+        entityInfo.setTagList(getEntityTags().stream().toList());
 
         if (this.getScene() != null) {
             entityInfo.setMotionInfo(this.getMotionInfo());
