@@ -1401,7 +1401,7 @@ public class Player {
 
         session.send(new PacketBattlePassAllDataNotify(this));
         session.send(new PacketQuestListNotify(this));
-        this.givingManager.sendGivingRecordNotify();
+        getGivingManager().onLogin();
         session.send(new PacketCodexDataFullNotify(this));
         session.send(new PacketAllWidgetDataNotify(this));
         session.send(new PacketWidgetGadgetAllDataNotify());

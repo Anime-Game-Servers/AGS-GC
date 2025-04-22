@@ -23,8 +23,14 @@ public class GivingData extends GameResource {
     private int exactFinishTalkId;
     private List<Integer> givingGroupIds;
     private int givingGroupCount;
+    private boolean highlight;
     private boolean isRemoveItem;
-    private GiveType giveType;
+    private boolean isRepeatable;
+    private boolean isTakeBack;
+    private boolean isReset;
+    private boolean isMpEnable;
+    @SerializedName(value = "givingType", alternate = "giveType")
+    private GiveType givingType;
 
     public enum GiveMethod {
         GIVING_METHOD_NONE,
@@ -50,7 +56,7 @@ public class GivingData extends GameResource {
     public enum GiveType {
         @SerializedName("GIVING_TYPE_QUEST")
         QUEST,
-        @SerializedName("GIVING_TYPE_GROUP")
-        GROUP
+        @SerializedName("GIVING_TYPE_GADGET")
+        GADGET
     }
 }
