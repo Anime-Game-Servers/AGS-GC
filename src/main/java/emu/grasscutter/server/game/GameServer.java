@@ -107,7 +107,7 @@ public final class GameServer extends KcpServer {
 
         // Extra
         this.scheduler = new ServerTaskScheduler();
-        this.taskMap = new TaskMap(true);
+        this.taskMap = new TaskMap(false);
 
         // Create game systems
         this.scriptSystem = new ScriptSystem(this);
@@ -127,6 +127,9 @@ public final class GameServer extends KcpServer {
 
         // Chata manager
         this.chatManager = new ChatSystem(this);
+
+        // manually scan here to make sure the systems are initialed before tasks are potentially are run
+        taskMap.scan();
 
         // Hook into shutdown event.
         Runtime.getRuntime().addShutdownHook(new Thread(this::onServerShutdown));
