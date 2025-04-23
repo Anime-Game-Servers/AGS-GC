@@ -28,7 +28,7 @@ public enum QuestCond implements QuestTrigger {
     QUEST_COND_PLAYER_LEVEL_EQUAL_GREATER (17),
     QUEST_COND_SCENE_AREA_UNLOCKED (18), // missing, only NPC groups/talks
     QUEST_COND_ITEM_GIVING_ACTIVED (19), // missing
-    QUEST_COND_ITEM_GIVING_FINISHED (20), // missing
+    QUEST_COND_ITEM_GIVING_FINISHED (20),
     QUEST_COND_IS_DAYTIME (21),
     QUEST_COND_CURRENT_AVATAR (22), // missing
     QUEST_COND_CURRENT_AREA (23), // missing
@@ -85,7 +85,7 @@ public enum QuestCond implements QuestTrigger {
     QUEST_COND_LUNARITE_MARK_ALL_FINISH (74), // missing, only NPC groups
     QUEST_COND_NEW_HOMEWORLD_SHOP_ITEM (75), // missing, only Gadget groups
     QUEST_COND_SCENE_POINT_UNLOCK (76), // missing, only NPC groups
-    QUEST_COND_SCENE_LEVEL_TAG_EQ (77), // missing
+    QUEST_COND_SCENE_LEVEL_TAG_EQ (77),
     QUEST_COND_PLAYER_ENTER_REGION (78), // missing
     QUEST_COND_UNKNOWN (9999);
 

@@ -181,6 +181,61 @@ public class Inventory extends BasePlayerManager implements Iterable<GameItem> {
         getPlayer().sendPacket(new PacketStoreItemChangeNotify(changedItems));
     }
 
+    /**
+     * Finds the first item in the inventory with the given item id.
+     *
+     * @param itemId The item id to search for.
+     * @return The first item found with the given item id, or null if no item was
+     */
+    public GameItem getFirstItem(int itemId) {
+        return this.getItems().values().stream()
+            .filter(item -> item.getItemId() == itemId)
+            .findFirst()
+            .orElse(null);
+    }
+
+    /**
+     * Checks to see if the player has the item in their inventory. This will succeed if the player
+     * has at least the minimum count of the item.
+     *
+     * @param itemId   The item id to check for.
+     * @param minCount The minimum count of the item to check for.
+     * @return True if the player has the item, false otherwise.
+     */
+    public boolean hasItem(int itemId, int minCount) {
+        return hasItem(itemId, minCount, false);
+    }
+
+    /**
+     * Checks to see if the player has the item in their inventory.
+     *
+     * @param itemId  The item id to check for.
+     * @param count   The count of the item to check for.
+     * @param enforce If true, the player must have the exact amount. If false, the player must have
+     *                at least the amount.
+     * @return True if the player has the item, false otherwise.
+     */
+    public boolean hasItem(int itemId, int count, boolean enforce) {
+        var item = this.getFirstItem(itemId);
+        if (item == null) return false;
+
+        return enforce ? item.getCount() == count : item.getCount() >= count;
+    }
+
+    /**
+     * Checks to see if the player has the item in their inventory. This is not exact.
+     *
+     * @param items A map of item game IDs to their count.
+     * @return True if the player has the items, false otherwise.
+     */
+    public boolean hasAllItems(Collection<ItemParam> items) {
+        for (var item : items) {
+            if (!this.hasItem(item.getItemId(), item.getCount(), false)) return false;
+        }
+
+        return true;
+    }
+
     private void triggerAddItemEvents(GameItem result){
         getPlayer().getBattlePassManager().triggerMission(WatcherTriggerType.TRIGGER_OBTAIN_MATERIAL_NUM, result.getItemId(), result.getCount());
         getPlayer().getQuestManager().queueEvent(QuestContent.QUEST_CONTENT_OBTAIN_ITEM, result.getItemId(), result.getCount());
@@ -204,7 +259,7 @@ public class Inventory extends BasePlayerManager implements Iterable<GameItem> {
     }
 
     private synchronized GameItem putItem(GameItem item) {
-        // Dont add items that dont have a valid item definition.
+        // Don't add items that don't have a valid item definition.
         var data = item.getItemData();
         if (data == null) return null;
 

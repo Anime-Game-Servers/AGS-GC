@@ -143,7 +143,7 @@ public final class TaskMap {
         return this.tasks.get(taskName);
     }
 
-    private void scan() {
+    public void scan() {
         Set<Class<?>> classes = Grasscutter.reflector.getTypesAnnotatedWith(Task.class);
         classes.forEach(annotated -> {
             try {
