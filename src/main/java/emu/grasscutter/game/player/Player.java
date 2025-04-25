@@ -37,6 +37,7 @@ import emu.grasscutter.game.mail.MailHandler;
 import emu.grasscutter.game.managers.FurnitureManager;
 import emu.grasscutter.game.managers.ResinManager;
 import emu.grasscutter.game.managers.SotSManager;
+import emu.grasscutter.game.managers.bargain.BargainManager;
 import emu.grasscutter.game.managers.blossom.BlossomManager;
 import emu.grasscutter.game.managers.cooking.ActiveCookCompoundData;
 import emu.grasscutter.game.managers.cooking.CookingCompoundManager;
@@ -189,6 +190,7 @@ public class Player {
     @Getter private transient PlayerProgressManager progressManager;
     @Getter private transient DungeonEntryManager dungeonEntryManager;
     @Getter private transient GivingManager givingManager;
+    @Getter private transient BargainManager bargainManager;
 
     @Getter private transient int lastWeatherAreaId = 0;
     @Getter @Setter private transient int weatherAreaId = 0;
@@ -319,6 +321,7 @@ public class Player {
         this.dungeonEntryManager = new DungeonEntryManager(this);
         this.coopHandler = new CoopHandler(this);
         this.givingManager = new GivingManager(this);
+        this.bargainManager = new BargainManager(this);
     }
 
     // On player creation
