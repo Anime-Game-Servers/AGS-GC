@@ -28,7 +28,7 @@ public class BargainRecord {
     public static BargainRecord resolve(int bargainId) {
         var bargainData = GameData.getBargainDataMap().get(bargainId);
         if (bargainData == null)
-            throw new RuntimeException("No bargain data found for " + bargainId + ".");
+            throw new IllegalArgumentException("No bargain data found for " + bargainId + ".");
 
         return BargainRecord.builder().bargainId(bargainId).build().determineBase(bargainData);
     }
@@ -64,31 +64,34 @@ public class BargainRecord {
             // Decrease the mood.
             this.currentMood -= Utils.randomRange(1, 3);
             // Return a failure.
-            return this.result = BargainResultType.BARGAIN_SINGLE_FAIL;
+            this.result = BargainResultType.BARGAIN_SINGLE_FAIL;
+            return this.result;
         }
 
         if (offer > this.getExpectedPrice()) {
             // Complete the bargain.
             this.setFinished(true);
             // Return a success.
-            return this.result = BargainResultType.BARGAIN_COMPLETE_SUCC;
+            this.result = BargainResultType.BARGAIN_COMPLETE_SUCC;
+            return this.result;
         }
 
         // Compare the offer against the mood and expected price.
         // The mood is out of 100; 1 mood should decrease the price by 100.
         var moodAdjustment = (int) Math.floor(this.getCurrentMood() / 100.0);
-        var expectedPrice = this.getExpectedPrice() - moodAdjustment;
+        expectedPrice = this.getExpectedPrice() - moodAdjustment;
         if (offer < expectedPrice) {
             // Decrease the mood.
             this.currentMood -= Utils.randomRange(1, 3);
             // Return a failure.
-            return this.result = BargainResultType.BARGAIN_SINGLE_FAIL;
+            this.result = BargainResultType.BARGAIN_SINGLE_FAIL;
         } else {
             // Complete the bargain.
             this.setFinished(true);
             // Return a success.
-            return this.result = BargainResultType.BARGAIN_COMPLETE_SUCC;
+            this.result = BargainResultType.BARGAIN_COMPLETE_SUCC;
         }
+        return this.result;
     }
 
     /**

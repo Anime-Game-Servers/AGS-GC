@@ -5,9 +5,9 @@ import emu.grasscutter.net.packet.BaseTypedPacket;
 import org.anime_game_servers.multi_proto.gi.messages.quest.bargain.BargainStartNotify;
 
 public class PacketBargainStartNotify extends BaseTypedPacket<BargainStartNotify> {
-    public PacketBargainStartNotify(BargainRecord record) {
+    public PacketBargainStartNotify(BargainRecord bargainRecord) {
         super(new BargainStartNotify());
-        proto.setBargainId(record.getBargainId());
-        proto.setSnapshot(record.toBargainSnapshotProto());
+        proto.setBargainId(bargainRecord.getBargainId());
+        proto.setSnapshot(bargainRecord.toBargainSnapshotProto());
     }
 }

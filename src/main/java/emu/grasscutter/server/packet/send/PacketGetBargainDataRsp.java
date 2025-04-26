@@ -12,10 +12,10 @@ public class PacketGetBargainDataRsp extends BaseTypedPacket<GetBargainDataRsp> 
         proto.setRetCode(retcode);
     }
 
-    public PacketGetBargainDataRsp(BargainRecord record) {
+    public PacketGetBargainDataRsp(BargainRecord bargainRecord) {
         super(new GetBargainDataRsp());
         proto.setRetCode(Retcode.RET_SUCC);
-        proto.setBargainId(record.getBargainId());
-        proto.setSnapshot(record.toBargainSnapshotProto());
+        proto.setBargainId(bargainRecord.getBargainId());
+        proto.setSnapshot(bargainRecord.toBargainSnapshotProto());
     }
 }

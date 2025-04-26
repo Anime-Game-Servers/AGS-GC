@@ -32,6 +32,8 @@ public class HandlerBargainOfferPriceReq extends TypedPacketHandler<BargainOffer
                 questManager.queueEvent(QuestContent.QUEST_CONTENT_ITEM_LESS_THAN_BARGAIN, bargainId, 0);
             case BARGAIN_COMPLETE_FAIL ->
                 questManager.queueEvent(QuestContent.QUEST_CONTENT_BARGAIN_FAIL, bargainId, 0);
+            default ->
+                Grasscutter.getLogger().warn("Encountered unknown BargainResultType.");
         }
 
         // Return the resulting packet.
