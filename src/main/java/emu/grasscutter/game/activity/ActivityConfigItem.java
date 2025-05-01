@@ -19,7 +19,7 @@ public class ActivityConfigItem {
     Date closeTime;
     Date endTime;
 
-    transient ActivityHandler activityHandler;
+    transient ActivityHandler<?> activityHandler;
 
     void onLoad(){
         if(openTime == null){

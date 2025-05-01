@@ -117,6 +117,7 @@ public class Scene {
         this.startWorldTime = world.getWorldTime();
 
         this.scriptManager = new SceneScriptManager(this);
+        getWorld().getHost().getActivityManager().triggerSceneLoadForActiveActivity(this);
 
         //Create scene entity
         this.sceneEntity = new EntityScene(this);

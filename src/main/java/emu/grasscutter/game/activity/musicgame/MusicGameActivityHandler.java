@@ -13,13 +13,14 @@ import org.anime_game_servers.multi_proto.gi.messages.activity.user_generated_co
 import java.util.stream.Collectors;
 
 @GameActivity(ActivityType.NEW_ACTIVITY_MUSIC_GAME)
-public class MusicGameActivityHandler extends ActivityHandler {
+public class MusicGameActivityHandler extends ActivityHandler<MusicGamePlayerData> {
 
     @Override
-    public void onInitPlayerActivityData(PlayerActivityData playerActivityData) {
+    public MusicGamePlayerData onInitPlayerActivityData(PlayerActivityData playerActivityData) {
         var musicGamePlayerData = MusicGamePlayerData.create();
 
         playerActivityData.setDetail(musicGamePlayerData);
+        return musicGamePlayerData;
     }
 
     @Override

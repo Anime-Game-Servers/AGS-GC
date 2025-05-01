@@ -366,7 +366,8 @@ public class QuestManager extends BasePlayerManager {
 
     public void triggerEvent(QuestCond condType, String paramStr, int... params) {
         QuestSystem.getLogger().debug("Trigger Event {}, {}, {}", condType, paramStr, params);
-        val potentialQuests = GameData.getQuestDataByConditions(condType, params[0], paramStr);
+        val param = params.length > 0 ? params[0] : 0;
+        val potentialQuests = GameData.getQuestDataByConditions(condType, param, paramStr);
         if(potentialQuests == null){
             return;
         }

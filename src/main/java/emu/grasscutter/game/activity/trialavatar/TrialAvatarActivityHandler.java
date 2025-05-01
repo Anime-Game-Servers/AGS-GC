@@ -24,14 +24,16 @@ import lombok.*;
 import org.anime_game_servers.multi_proto.gi.messages.activity.general.ActivityInfo;
 
 @GameActivity(ActivityType.NEW_ACTIVITY_TRIAL_AVATAR)
-public class TrialAvatarActivityHandler extends ActivityHandler {
+public class TrialAvatarActivityHandler extends ActivityHandler<TrialAvatarPlayerData> {
     @Getter private int selectedTrialAvatarIndex;
     private static final WatcherTriggerType triggerType = WatcherTriggerType.TRIGGER_FINISH_CHALLENGE;
     private static final TrialAvatarDungeonSettleListener TRIAL_AVATAR_DUNGEON_SETTLE_LISTENER = new TrialAvatarDungeonSettleListener();
 
     @Override
-    public void onInitPlayerActivityData(@NonNull PlayerActivityData playerActivityData) {
-        playerActivityData.setDetail(TrialAvatarPlayerData.create(getActivityConfigItem().getScheduleId()));
+    public TrialAvatarPlayerData onInitPlayerActivityData(@NonNull PlayerActivityData playerActivityData) {
+        val detailData = TrialAvatarPlayerData.create(getActivityConfigItem().getScheduleId());
+        playerActivityData.setDetail(detailData);
+        return detailData;
     }
 
     @Override

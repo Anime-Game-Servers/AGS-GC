@@ -1361,6 +1361,9 @@ public class Player {
     }
 
     public void onLogin() {
+        // Activity needed for some quests
+        activityManager = new ActivityManager(this);
+
         // Create world
         World world = new World(this);
         world.addPlayer(this);
@@ -1376,9 +1379,6 @@ public class Player {
         if (this.levelTags.isEmpty()) {
             this.initializeLevelTags();
         }
-
-        // Activity needed for some quests
-        activityManager = new ActivityManager(this);
 
         // Rewind active quests, and put the player to a rewind position it finds (if any) of an active quest
         getQuestManager().onLogin();

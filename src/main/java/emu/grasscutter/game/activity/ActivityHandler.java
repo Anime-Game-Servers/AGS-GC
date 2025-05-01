@@ -8,6 +8,7 @@ import emu.grasscutter.game.activity.condition.ActivityConditionExecutor;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.WatcherTriggerType;
 import emu.grasscutter.game.quest.enums.QuestCond;
+import emu.grasscutter.game.world.Scene;
 import emu.grasscutter.utils.DateHelper;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public abstract class ActivityHandler {
+public abstract class ActivityHandler<PLAYER_DETAIL_DATA> {
     /**
      * Must set before initWatchers
      */
@@ -30,8 +31,22 @@ public abstract class ActivityHandler {
     @Getter ActivityData activityData;
     Map<WatcherTriggerType, List<ActivityWatcher>> watchersMap = new HashMap<>();
 
-    abstract public void onProtoBuild(PlayerActivityData playerActivityData, ActivityInfo activityInfo);
-    abstract public void onInitPlayerActivityData(PlayerActivityData playerActivityData);
+    public abstract void onProtoBuild(PlayerActivityData playerActivityData, ActivityInfo activityInfo);
+    public abstract PLAYER_DETAIL_DATA onInitPlayerActivityData(PlayerActivityData playerActivityData);
+
+    public void onLoadScene(Scene scene, Player player, ActivityConfigItem activityInfo) {
+        if(scene.getId() != 3){
+            return;
+        }
+        val activityId = activityInfo.getActivityId();
+
+        val activityExtraInfo = GameData.getActivityExtraMap().get(activityId);
+        if(activityExtraInfo == null || !activityExtraInfo.hasDefaultGroups()){
+            return;
+        }
+
+        activityExtraInfo.getDefaultGroups().forEach(scene::loadDynamicGroup);
+    }
 
     public void initWatchers(Map<WatcherTriggerType, ConstructorAccess<?>> activityWatcherTypeMap){
         activityData = GameData.getActivityDataMap().get(activityConfigItem.getActivityId());
@@ -53,6 +68,8 @@ public abstract class ActivityHandler {
             watchersMap.get(watcherData.getTriggerConfig().getWatcherTriggerType()).add(watcher);
         });
     }
+
+    public void initCurrencyHandlers(PlayerActivityData playerActivityData){}
 
     protected void triggerCondEvents(Player player){
         if(activityData == null){

@@ -16,6 +16,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.anime_game_servers.multi_proto.gi.messages.activity.general.ActivityWatcherInfo;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +95,14 @@ public class PlayerActivityData {
         player.getInventory().addItems(rewards, ActionReason.ActivityWatcher);
         watcher.setTakenReward(true);
         save();
+    }
+
+    @Nullable
+    public <T> T getDetail(Class<T> clazz) {
+        if (detail == null || detail.isBlank()) {
+            return null;
+        }
+        return JsonUtils.decode(detail, clazz);
     }
 
     @Entity
