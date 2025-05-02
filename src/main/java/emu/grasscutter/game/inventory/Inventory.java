@@ -34,6 +34,7 @@ import static emu.grasscutter.config.Configuration.INVENTORY_LIMITS;
 public class Inventory extends BasePlayerManager implements Iterable<GameItem> {
     private final Long2ObjectMap<GameItem> store;
     private final Int2ObjectMap<InventoryTab> inventoryTypes;
+    private final Int2ObjectMap<VirtualCurrencyHandlerEntry> virtualCurrencyHandlers = new Int2ObjectOpenHashMap<>();
 
     public Inventory(Player player) {
         super(player);
@@ -362,6 +363,11 @@ public class Inventory extends BasePlayerManager implements Iterable<GameItem> {
                 this.player.setCrystals(this.player.getCrystals() + count);
             case 204 -> // Home Coin
                 this.player.setHomeCoin(this.player.getHomeCoin() + count);
+            default -> {
+                if (virtualCurrencyHandlers.containsKey(itemId)) {
+                    virtualCurrencyHandlers.get(itemId).modifyCurrency(count);
+                }
+            }
         }
     }
 
@@ -380,6 +386,10 @@ public class Inventory extends BasePlayerManager implements Iterable<GameItem> {
             case 204 ->  // Home Coin
                 player.setHomeCoin(player.getHomeCoin() - count);
             default -> {
+                if (virtualCurrencyHandlers.containsKey(itemId)) {
+                    virtualCurrencyHandlers.get(itemId).modifyCurrency(-count);
+                    return null;
+                }
                 var gameItem = getInventoryTab(ItemType.ITEM_MATERIAL).getItemById(itemId);
                 removeItem(gameItem, count);
                 return gameItem;
@@ -403,8 +413,12 @@ public class Inventory extends BasePlayerManager implements Iterable<GameItem> {
             case 204:  // Home Coin
                 return this.player.getHomeCoin();
             default:
-                GameItem item = getInventoryTab(ItemType.ITEM_MATERIAL).getItemById(itemId);  // What if we ever want to operate on weapons/relics/furniture? :S
-                return (item == null) ? 0 : item.getCount();
+                if (virtualCurrencyHandlers.containsKey(itemId)) {
+                    return virtualCurrencyHandlers.get(itemId).getCurrency();
+                } else {
+                    GameItem item = getInventoryTab(ItemType.ITEM_MATERIAL).getItemById(itemId);  // What if we ever want to operate on weapons/relics/furniture? :S
+                    return (item == null) ? 0 : item.getCount();
+                }
         }
     }
 
@@ -619,5 +633,43 @@ public class Inventory extends BasePlayerManager implements Iterable<GameItem> {
 
     public Stream<GameItem> stream() {
         return this.getItems().values().stream();
+    }
+
+    public <T> void registerVirtualCurrencyHandler(int itemId, VirtualCurrencyHandler<T> handler, @Nullable T extraData) {
+        this.virtualCurrencyHandlers.put(itemId, new VirtualCurrencyHandlerEntry<>(itemId, handler, extraData));
+    }
+
+    public void unregisterVirtualCurrencyHandler(int itemId) {
+        this.virtualCurrencyHandlers.remove(itemId);
+    }
+
+    private static class VirtualCurrencyHandlerEntry<T>{
+        private final int itemId;
+        private final VirtualCurrencyHandler<T> handler;
+        private final T extraData;
+
+        public VirtualCurrencyHandlerEntry(int itemId, VirtualCurrencyHandler<T> handler, T extraData) {
+            this.itemId = itemId;
+            this.handler = handler;
+            this.extraData = extraData;
+        }
+
+        public int getCurrency() {
+            return handler.getCurrency(extraData, itemId);
+        }
+
+        public void setCurrency(int count) {
+            handler.setCurrency(extraData, itemId, count);
+        }
+
+        public void modifyCurrency(int count) {
+            handler.modifyCurrency(extraData, itemId, count);
+        }
+    }
+
+    public interface VirtualCurrencyHandler<T>{
+        int getCurrency(T extraData, int itemId);
+        void setCurrency(T extraData, int itemId, int count);
+        void modifyCurrency(T extraData, int itemId, int count);
     }
 }

@@ -9,7 +9,7 @@ public class HandlerMusicGameStartReq extends TypedPacketHandler<MusicGameStartR
 
 	@Override
 	public void handle(GameSession session, byte[] header, MusicGameStartReq req) throws Exception {
-		session.send(new PacketMusicGameStartRsp(req.getMusicBasicId(), req.getMusicBasicId()));
+		session.send(new PacketMusicGameStartRsp(req.getMusicBasicId(), req.getUgcGuid()));
 	}
 
 }

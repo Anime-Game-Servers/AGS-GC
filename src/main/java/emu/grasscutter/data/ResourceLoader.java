@@ -15,6 +15,7 @@ import emu.grasscutter.data.common.quest.MainQuestData;
 import emu.grasscutter.data.common.quest.SubQuestData;
 import emu.grasscutter.data.custom.TrialAvatarActivityCustomData;
 import emu.grasscutter.data.custom.TrialAvatarCustomData;
+import emu.grasscutter.data.custom.activity.ActivityExtraInfo;
 import emu.grasscutter.data.excels.TrialAvatarActivityDataData;
 import emu.grasscutter.data.server.*;
 import emu.grasscutter.game.ability.Ability;
@@ -145,6 +146,7 @@ public class ResourceLoader {
         loadWeatherMappings();
         loadMonsterMappings();
         loadActivityCondGroups();
+        loadCustomActivityData();
         loadTrialAvatarCustomData();
         loadGlobalCombatConfig();
         EntityControllerScriptManager.load();
@@ -975,6 +977,18 @@ public class ResourceLoader {
             logger.debug("Loaded trial avatar custom data.");
         } catch (Exception e) {
             logger.error("Unable to load trial avatar custom data.", e);
+        }
+    }
+
+    private static void loadCustomActivityData() {
+        try {
+            val activityMap = GameData.getActivityExtraMap();
+            try {
+                JsonUtils.loadToList(getResourcePath("Server/ActivityExtraInfo.json"), ActivityExtraInfo.class).forEach(entry -> activityMap.put(entry.getActivityId(), entry));
+            } catch (IOException | NullPointerException ignored) {}
+            logger.debug("Loaded {} extra activity info.", activityMap.size());
+        } catch (Exception e) {
+            logger.error("Unable to load extra activity info.", e);
         }
     }
 

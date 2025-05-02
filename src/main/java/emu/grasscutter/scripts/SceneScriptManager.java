@@ -434,7 +434,10 @@ public class SceneScriptManager {
             return;
         }
         this.meta = meta;
-        meta.loadActivity(ScriptSystem.getScriptLoader(), 2001);
+        val activeActivities = this.getScene().getWorld().getHost().getActivityManager().getActiveActivityIds();
+        activeActivities.forEach(activityId -> {
+            meta.loadActivity(ScriptSystem.getScriptLoader(), activityId);
+        });
 
         // TEMP
         this.isInit = true;
