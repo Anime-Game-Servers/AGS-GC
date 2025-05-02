@@ -283,6 +283,8 @@ public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> impleme
         scene.triggerDungeonEvent(DungeonPassConditionType.DUNGEON_COND_KILL_GROUP_MONSTER, this.getGroupId());
         scene.triggerDungeonEvent(DungeonPassConditionType.DUNGEON_COND_KILL_TYPE_MONSTER, this.getMonsterData().getType().getValue());
         scene.triggerDungeonEvent(DungeonPassConditionType.DUNGEON_COND_KILL_MONSTER, this.getMonsterId());
+
+        scene.getSealBattleManager().onKill(this);
     }
 
     public void recalcStats() {

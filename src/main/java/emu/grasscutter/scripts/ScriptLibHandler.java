@@ -1124,9 +1124,9 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
 
     @Override
     public int StartSealBattle(GroupEventLuaContext context, int gadgetId, SealBattleParams battleParams) {
-        return handleUnimplemented(gadgetId, battleParams);
-        //TODO implement var2 containt int radius, int battle_time, int monster_group_id, int default_kill_charge, int auto_charge, int auto_decline, int max_energy, SealBattleType battleType
-        // for type KILL_MONSTER watch group monster_group_id and afterwards trigger EVENT_SEAL_BATTLE_END with the result in param2
+        val groupId = context.getCurrentGroup().getGroupInfo().getId();
+        val sealBattleManager = context.getSceneScriptManager().getScene().getSealBattleManager();
+        return sealBattleManager.startSealBattle(groupId, gadgetId, battleParams) ? 0 : 1;
     }
 
     @Override
