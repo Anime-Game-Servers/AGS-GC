@@ -48,9 +48,9 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
     }
 
     @Override
-    public int AutoMonsterTide(GroupEventLuaContext context, int challengeIndex, int groupId, Integer[] ordersConfigId, int tideCount, int sceneLimit, int param6) {
+    public int AutoMonsterTide(GroupEventLuaContext context, int challengeIndex, int groupId, Integer[] ordersConfigId, int tideCount, int sceneLimit, int spawnLimit) {
         logger.debug("[LUA] Call AutoMonsterTide with {},{},{},{},{},{}",
-            challengeIndex,groupId,ordersConfigId,tideCount,sceneLimit,param6);
+            challengeIndex,groupId,ordersConfigId,tideCount,sceneLimit,spawnLimit);
 
         val group = getGroupOrCurrent(context, groupId);
 
@@ -58,7 +58,7 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
             return 1;
         }
 
-        context.getSceneScriptManager().startMonsterTideInGroup(challengeIndex, group, ordersConfigId, tideCount, sceneLimit);
+        context.getSceneScriptManager().startMonsterTideInGroup(challengeIndex, group, ordersConfigId, tideCount, sceneLimit, spawnLimit);
 
         return 0;
     }
