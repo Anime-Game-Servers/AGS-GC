@@ -25,6 +25,7 @@ public class CreateMonsterEntityConfig extends CreateEntityConfig<CreateMonsterE
     private int titleId = 0;
     private int specialNameId = 0;
     private int weaponId = 0;
+    private int killScore = 0;
     //TODO
 
     public CreateMonsterEntityConfig(int monsterId){
@@ -68,6 +69,7 @@ public class CreateMonsterEntityConfig extends CreateEntityConfig<CreateMonsterE
         this.dropId = monster.getDropId();
         this.aiId = monster.getAiConfigId();
         this.poseId = monster.getPoseId();
+        this.killScore = monster.getKillScore();
         if(monster.getSpecialNameId() != 0){
             this.specialNameId = monster.getSpecialNameId();
             this.titleId = monster.getTitleId();

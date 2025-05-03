@@ -29,6 +29,7 @@ import emu.grasscutter.game.player.TeamInfo;
 import emu.grasscutter.game.props.*;
 import emu.grasscutter.game.quest.QuestGroupSuite;
 import emu.grasscutter.game.world.data.TeleportProperties;
+import emu.grasscutter.game.world.managers.seal_battle.SealBattleManager;
 import emu.grasscutter.net.packet.BasePacket;
 import emu.grasscutter.scripts.SceneIndexManager;
 import emu.grasscutter.scripts.SceneScriptManager;
@@ -79,6 +80,7 @@ public class Scene {
     private final List<Runnable> afterLoadedCallbacks = new ArrayList<>();
     private final long startWorldTime;
     @Getter @Setter DungeonManager dungeonManager;
+    @Getter @Setter SealBattleManager sealBattleManager;
     @Getter Int2ObjectMap<Route> sceneRoutes;
     @Getter List<ScenePointArrayData> pointArrays;
     private Set<SpawnDataEntry.GridBlockId> loadedGridBlocks = new HashSet<>();
@@ -118,6 +120,7 @@ public class Scene {
 
         this.scriptManager = new SceneScriptManager(this);
         getWorld().getHost().getActivityManager().triggerSceneLoadForActiveActivity(this);
+        this.sealBattleManager = new SealBattleManager(this);
 
         //Create scene entity
         this.sceneEntity = new EntityScene(this);
@@ -476,6 +479,7 @@ public class Scene {
         checkNpcGroup();
         finishLoading();
         checkPlayerRespawn();
+        this.getSealBattleManager().onTick();
 
         if (this.tickCount % 10 == 0) {
             broadcastPacket(new PacketSceneTimeNotify(this));
