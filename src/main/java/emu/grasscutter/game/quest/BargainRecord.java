@@ -58,13 +58,13 @@ public class BargainRecord {
      * @return The result of the offer.
      */
 
-    //TODO: IMPORTANT!!! needs to return a BARGAIN_COMPLETE_FAIL in some sort of case
+    //TODO: Refine this algorithm to be more game-accurate
     public BargainResultType applyOffer(int offer) {
         if (offer < this.getLowestPrice()) {
             // Decrease the mood.
             this.currentMood -= Utils.randomRange(1, 3);
             // Return a failure.
-            this.result = BargainResultType.BARGAIN_SINGLE_FAIL;
+            this.result = BargainResultType.BARGAIN_COMPLETE_FAIL;
             return this.result;
         }
 
