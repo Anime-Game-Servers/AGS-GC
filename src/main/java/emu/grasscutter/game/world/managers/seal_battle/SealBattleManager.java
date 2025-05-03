@@ -12,9 +12,7 @@ import lombok.Getter;
 import lombok.val;
 import org.anime_game_servers.gi_lua.models.ScriptArgs;
 import org.anime_game_servers.gi_lua.models.constants.EventType;
-import org.anime_game_servers.gi_lua.script_lib.EnergySealBattleParams;
-import org.anime_game_servers.gi_lua.script_lib.MonsterSealBattleParams;
-import org.anime_game_servers.gi_lua.script_lib.SealBattleParams;
+import org.anime_game_servers.gi_lua.script_lib.handler.scene.SealBattleParams;
 import org.anime_game_servers.multi_proto.gi.messages.scene.seal_battle.SealBattleType;
 
 public class SealBattleManager {
@@ -104,19 +102,6 @@ public class SealBattleManager {
             .setParam2(result.ordinal());
         scene.getScriptManager().callEvent(args);
         scene.broadcastPacket(new PacketSealBattleEndNotify(gadget.getId(), result == SealBattleResult.SUCCESS));
-    }
-
-    int getDuration() {
-        if (activeSealBattleParams == null) {
-            return 0;
-        }
-        if (activeSealBattleParams instanceof MonsterSealBattleParams monsterParams) {
-            return monsterParams.getKill_time();
-        }
-        if (activeSealBattleParams instanceof EnergySealBattleParams energyParams) {
-            return energyParams.getBattleTime();
-        }
-        return 0;
     }
 
     public void updateProgress(int newValue) {

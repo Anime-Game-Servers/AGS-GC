@@ -1093,13 +1093,13 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
     }
 
     @Override
-    public int getGivingItemList(GroupEventLuaContext context, int givingId) {
-        return handleUnimplemented(givingId);
+    public int[] getGivingItemList(GroupEventLuaContext context, int givingId) {
+        return new int[]{handleUnimplemented(givingId)};
     }
 
     @Override
-    public int getGroupAliveMonsterList(GroupEventLuaContext context, int groupId) {
-        return handleUnimplemented(groupId);
+    public int[] getGroupAliveMonsterList(GroupEventLuaContext context, int groupId) {
+        return new int[]{handleUnimplemented(groupId)};
     }
 
     @Override
@@ -1158,8 +1158,8 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
     }
 
     @Override
-    public int getSurroundUidList(GroupEventLuaContext context, int configId, int radius) {
-        return handleUnimplemented(configId, radius);
+    public int[] getSurroundUidList(GroupEventLuaContext context, int configId, int radius) {
+        return new int[] {handleUnimplemented(configId, radius)};
     }
 
     @Override
@@ -1228,7 +1228,7 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
     }
 
     @Override
-    public int recieveAllAranaraCollectionByType(GroupEventLuaContext context, int groupId, int type) {
+    public int receiveAllAranaraCollectionByType(GroupEventLuaContext context, int groupId, int type) {
         return handleUnimplemented(groupId, type);
     }
 

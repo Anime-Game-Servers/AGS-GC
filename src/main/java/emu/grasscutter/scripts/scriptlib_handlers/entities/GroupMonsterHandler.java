@@ -7,7 +7,6 @@ import emu.grasscutter.scripts.scriptlib_handlers.BaseHandler;
 import lombok.Getter;
 import lombok.val;
 import org.anime_game_servers.core.gi.models.Vector;
-import org.anime_game_servers.gi_lua.models.Position;
 import org.anime_game_servers.gi_lua.script_lib.handler.entites.MonsterFaceAvatarParameters;
 import org.anime_game_servers.lua.engine.LuaTable;
 import org.jetbrains.annotations.NotNull;

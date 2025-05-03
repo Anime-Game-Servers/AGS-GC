@@ -3,9 +3,8 @@ package emu.grasscutter.game.world.managers.seal_battle.handlers;
 import emu.grasscutter.game.entity.EntityMonster;
 import emu.grasscutter.game.world.managers.seal_battle.SealBattleManager;
 import lombok.val;
-import org.anime_game_servers.gi_lua.script_lib.EnergySealBattleParams;
-import org.anime_game_servers.gi_lua.script_lib.MonsterSealBattleParams;
-import org.anime_game_servers.gi_lua.script_lib.SealBattleParams;
+import org.anime_game_servers.gi_lua.script_lib.handler.scene.MonsterSealBattleParams;
+import org.anime_game_servers.gi_lua.script_lib.handler.scene.SealBattleParams;
 
 public class KillMonsterSealBattleHandler implements SealBattleManager.SealBattleHandler {
     @Override
@@ -14,7 +13,7 @@ public class KillMonsterSealBattleHandler implements SealBattleManager.SealBattl
         val maxScore = sealBattleParams.getMaxProgress();
         val currentScore = manager.getCurrentProgress();
 
-        if(monster.getGroupId() != sealBattleParams.getMonster_group_id()){
+        if(monster.getGroupId() != sealBattleParams.getMonsterGroupId()){
             return;
         }
 
@@ -45,6 +44,6 @@ public class KillMonsterSealBattleHandler implements SealBattleManager.SealBattl
     @Override
     public int getEndTime(SealBattleParams params, int startTime) {
         val monsterParams = (MonsterSealBattleParams) params;
-        return startTime + monsterParams.getKill_time()*1000;
+        return startTime + monsterParams.getKillTime()*1000;
     }
 }
