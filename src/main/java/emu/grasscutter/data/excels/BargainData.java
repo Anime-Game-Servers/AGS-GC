@@ -26,6 +26,7 @@ public class BargainData extends GameResource {
     private List<Integer> successTalkId;
     private int failTalkId;
     private int moodNpcId;
+    private int moodUpperLimit;
     /**
      * This is a list of 2 integers.
      * The first integer is the minimum value of the mood.

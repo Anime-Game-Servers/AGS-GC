@@ -16,6 +16,7 @@ public class BargainRecord {
     private int lowestPrice;
     private int expectedPrice;
     private int currentMood;
+    private int moodUpperLimit;
     private boolean finished;
     private BargainResultType result;
 
@@ -30,7 +31,10 @@ public class BargainRecord {
         if (bargainData == null)
             throw new IllegalArgumentException("No bargain data found for " + bargainId + ".");
 
-        return BargainRecord.builder().bargainId(bargainId).build().determineBase(bargainData);
+        return BargainRecord.builder()
+            .bargainId(bargainId)
+            .moodUpperLimit(bargainData.getMoodUpperLimit())
+            .build().determineBase(bargainData);
     }
 
     /**
@@ -77,8 +81,8 @@ public class BargainRecord {
         }
 
         // Compare the offer against the mood and expected price.
-        // The mood is out of 100; 1 mood should decrease the price by 100.
-        var moodAdjustment = (int) Math.floor(this.getCurrentMood() / 100.0);
+        // The mood is out of moodUpperLimit; 1 mood should decrease the price by 100.
+        var moodAdjustment = (int) Math.floor((double) this.getCurrentMood() / moodUpperLimit);
         expectedPrice = this.getExpectedPrice() - moodAdjustment;
         if (offer < expectedPrice) {
             // Decrease the mood.
