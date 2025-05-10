@@ -16,7 +16,7 @@ public enum QuestExec implements QuestTrigger {
     QUEST_EXEC_LOCK_FORCE (5),                              //#Missing #Unused
     QUEST_EXEC_CHANGE_AVATAR_ELEMET (6),
     QUEST_EXEC_REFRESH_GROUP_MONSTER (7),
-    QUEST_EXEC_SET_IS_FLYABLE (8),                          //#Missing #Gives the glider
+    QUEST_EXEC_SET_IS_FLYABLE (8),
     QUEST_EXEC_SET_IS_WEATHER_LOCKED (9),
     QUEST_EXEC_SET_IS_GAME_TIME_LOCKED (10),
     QUEST_EXEC_SET_IS_TRANSFERABLE (11),                    //#Missing #Unused
@@ -74,7 +74,7 @@ public enum QuestExec implements QuestTrigger {
     QUEST_EXEC_CHANGE_SCENE_LEVEL_TAG (64),
     QUEST_EXEC_UNLOCK_PLAYER_WORLD_SCENE (65),
     QUEST_EXEC_LOCK_PLAYER_WORLD_SCENE (66),                //#Missing
-    QUEST_EXEC_FAIL_MAINCOOP (67),                          //#Missing
+    QUEST_EXEC_FAIL_MAINCOOP (67),                          //#Missing #Unused
     QUEST_EXEC_MODIFY_WEATHER_AREA (68),
     QUEST_EXEC_MODIFY_ARANARA_COLLECTION_STATE (69),        //#Missing
     QUEST_EXEC_GRANT_TRIAL_AVATAR_BATCH_AND_LOCK_TEAM (70), //#Missing
