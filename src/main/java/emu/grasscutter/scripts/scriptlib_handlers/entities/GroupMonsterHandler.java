@@ -7,8 +7,8 @@ import emu.grasscutter.scripts.scriptlib_handlers.BaseHandler;
 import lombok.Getter;
 import lombok.val;
 import org.anime_game_servers.core.gi.models.Vector;
+import org.anime_game_servers.gi_lua.script_lib.handler.entites.CreateMonsterParameters;
 import org.anime_game_servers.gi_lua.script_lib.handler.entites.MonsterFaceAvatarParameters;
-import org.anime_game_servers.lua.engine.LuaTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -21,14 +21,12 @@ public class GroupMonsterHandler extends BaseHandler implements org.anime_game_s
     private static final Logger logger = Loggers.getScriptSystem();
 
     @Override
-    public int createMonster(@NotNull GroupEventLuaContext context, @Nullable LuaTable table) {
-        logger.debug("[LUA] Call CreateMonster with {}",
-            printTable(table));
-        val configId = table.getInt("config_id");
-        val delayTime = table.getInt("delay_time");
+    public int createMonster(@NotNull GroupEventLuaContext context, @NotNull CreateMonsterParameters parameters) {
+        logger.debug("[LUA] Call CreateMonster with {}", parameters);
         val group = context.getCurrentGroup();
+        // todo handle all the other parameters for creation
 
-        context.getSceneScriptManager().spawnMonstersByConfigId(group, configId, delayTime);
+        context.getSceneScriptManager().spawnMonstersByConfigId(group, parameters.getConfigId(), parameters.getDelayTime());
         return 0;
     }
 

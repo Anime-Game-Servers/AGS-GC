@@ -6,7 +6,6 @@ import emu.grasscutter.scripts.lua_engine.ControllerLuaContext;
 import lombok.Getter;
 import lombok.val;
 import org.anime_game_servers.gi_lua.script_lib.handler.parameter.KillByConfigIdParams;
-import org.anime_game_servers.lua.engine.LuaTable;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -117,13 +116,10 @@ public class GadgetControllerHandler extends BaseHandler implements org.anime_ga
     }
 
     @Override
-    public int dropSubfield(ControllerLuaContext context, LuaTable params) {
+    public int dropSubfield(ControllerLuaContext context, @NotNull String subfieldName) {
         val gadget = context.getEntity();
-        String subfield_name = params.getString("subfield_name");
 
-        gadget.dropSubfield(subfield_name);
-
-        return -1;
+        return gadget.dropSubfield(subfieldName) ? 0 : -1;
     }
 
     @Override

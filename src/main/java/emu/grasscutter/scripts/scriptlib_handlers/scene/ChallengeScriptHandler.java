@@ -11,12 +11,11 @@ import lombok.Getter;
 import lombok.val;
 import org.anime_game_servers.gi_lua.models.constants.ChallengeEventMarkType;
 import org.anime_game_servers.gi_lua.models.constants.FatherChallengeProperty;
-import org.anime_game_servers.lua.engine.LuaTable;
+import org.anime_game_servers.gi_lua.script_lib.handler.scene.AttachChildChallengePointConfig;
+import org.anime_game_servers.gi_lua.script_lib.handler.scene.CreateFatherChallengeParameters;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class ChallengeScriptHandler extends BaseHandler implements org.anime_game_servers.gi_lua.script_lib.handler.scene.ChallengeScriptHandler<GroupEventLuaContext> {
@@ -46,11 +45,11 @@ public class ChallengeScriptHandler extends BaseHandler implements org.anime_gam
     }
 
     @Override
-    public int startChallenge(@NotNull GroupEventLuaContext context, int challengeIndex, int challengeId, @Nullable LuaTable challengeParams) {
+    public int startChallenge(@NotNull GroupEventLuaContext context, int challengeIndex, int challengeId, @NotNull List<Integer> challengeParams) {
         logger.info("[LUA] Call StartChallenge with {},{},{}", challengeIndex, challengeId, challengeParams);
         val challenge = ChallengeFactory.getChallenge(
             new ChallengeInfo(challengeIndex, challengeId, 0),
-            Arrays.stream(challengeParams.getAsIntArray()).boxed().toList(),
+            challengeParams,
             new ChallengeScoreInfo(0, 0),
             context.getSceneScriptManager().getScene(),
             context.getCurrentGroup()
@@ -91,14 +90,16 @@ public class ChallengeScriptHandler extends BaseHandler implements org.anime_gam
     }
 
     @Override
-    public int createFatherChallenge(@NotNull GroupEventLuaContext context, int challengeIndex, int challengeId, int timeLimit, @Nullable LuaTable conditionTable) {
+    public int createFatherChallenge(@NotNull GroupEventLuaContext context, int challengeIndex, int challengeId,
+                                     int timeLimit, @NotNull CreateFatherChallengeParameters parameters) {
         logger.debug("[LUA] Call CreateFatherChallenge with {} {} {} {}",
-            challengeIndex, challengeId, timeLimit, conditionTable);
+            challengeIndex, challengeId, timeLimit, parameters);
 
+        // TODO handle failOnWipe too
         WorldChallenge challenge = ChallengeFactory.getChallenge(
             new ChallengeInfo(challengeIndex, challengeId, challengeIndex),
-            List.of(conditionTable.getInt("success"), conditionTable.getInt("fail"), timeLimit),
-            new ChallengeScoreInfo(conditionTable.getInt("success"), conditionTable.getInt("fail")),
+            List.of(parameters.getSuccess(), parameters.getFail(), timeLimit),
+            new ChallengeScoreInfo(parameters.getSuccess(), parameters.getFail()),
             context.getSceneScriptManager().getScene(),
             context.getCurrentGroup()
         );
@@ -130,15 +131,16 @@ public class ChallengeScriptHandler extends BaseHandler implements org.anime_gam
     }
 
     @Override
-    public int attachChildChallenge(@NotNull GroupEventLuaContext context, int fatherChallengeIndex, int childChallengeIndex, int childChallengeId, @Nullable LuaTable conditionArray, @Nullable LuaTable var5, @Nullable LuaTable conditionTable) {
+    public int attachChildChallenge(@NotNull GroupEventLuaContext context, int fatherChallengeIndex, int childChallengeIndex, int childChallengeId,
+                                    @NotNull List<Integer> parameterList, @NotNull List<Integer> uidList, @NotNull AttachChildChallengePointConfig pointConfig) {
         logger.debug("[LUA] Call AttachChildChallenge with {} {} {} {} {} {}",
             fatherChallengeIndex, childChallengeIndex, childChallengeId,
-            printTable(conditionArray), printTable(var5), printTable(conditionTable));
+            parameterList, uidList, pointConfig);
 
         val challenge = ChallengeFactory.getChallenge(
             new ChallengeInfo(childChallengeIndex, childChallengeId, fatherChallengeIndex),
-            Arrays.stream(conditionArray.getAsIntArray()).boxed().toList(),
-            new ChallengeScoreInfo(conditionTable.getInt("success"), conditionTable.getInt("fail")),
+            parameterList,
+            new ChallengeScoreInfo(pointConfig.getSuccess(), pointConfig.getFail()),
             context.getSceneScriptManager().getScene(),
             context.getCurrentGroup()
         );

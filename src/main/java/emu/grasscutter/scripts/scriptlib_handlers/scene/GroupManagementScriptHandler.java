@@ -12,10 +12,11 @@ import org.anime_game_servers.gi_lua.models.ScriptArgs;
 import org.anime_game_servers.gi_lua.models.constants.EventType;
 import org.anime_game_servers.gi_lua.models.constants.FlowSuiteOperatePolicy;
 import org.anime_game_servers.gi_lua.models.scene.group.SceneGroup;
-import org.anime_game_servers.gi_lua.script_lib.handler.scene.SealBattleParams;
-import org.anime_game_servers.lua.engine.LuaTable;
+import org.anime_game_servers.gi_lua.script_lib.handler.scene.RefreshGroupParams;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
+
+import java.util.List;
 
 public class GroupManagementScriptHandler extends BaseHandler implements org.anime_game_servers.gi_lua.script_lib.handler.scene.GroupManagementScriptHandler<GroupEventLuaContext> {
     @Getter
@@ -140,17 +141,17 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
     }
 
     @Override
-    public int addExtraFlowSuite(@NotNull GroupEventLuaContext context, int groupId, int suiteId, FlowSuiteOperatePolicy flowSuitePolicy) {
+    public int addExtraFlowSuite(@NotNull GroupEventLuaContext context, int groupId, int suiteId, @NotNull FlowSuiteOperatePolicy flowSuitePolicy) {
         return handleUnimplemented(groupId, suiteId, flowSuitePolicy.name());
     }
 
     @Override
-    public int removeExtraFlowSuite(@NotNull GroupEventLuaContext context, int groupId, int suiteId, FlowSuiteOperatePolicy flowSuitePolicy) {
+    public int removeExtraFlowSuite(@NotNull GroupEventLuaContext context, int groupId, int suiteId, @NotNull FlowSuiteOperatePolicy flowSuitePolicy) {
         return handleUnimplemented(groupId, suiteId, flowSuitePolicy.name(), flowSuitePolicy);
     }
 
     @Override
-    public int killExtraFlowSuite(@NotNull GroupEventLuaContext context, int groupId, int suiteId, FlowSuiteOperatePolicy flowSuitePolicy) {
+    public int killExtraFlowSuite(@NotNull GroupEventLuaContext context, int groupId, int suiteId, @NotNull FlowSuiteOperatePolicy flowSuitePolicy) {
         return handleUnimplemented(groupId, suiteId, flowSuitePolicy.name(), flowSuitePolicy);
     }
 
@@ -183,12 +184,17 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
 
     /* group variables*/
     private static int getGroupVariableValue(SceneScriptManager sceneScriptManager, int groupId, String varName){
-        return sceneScriptManager.getVariables(groupId).getOrDefault(varName, 0);
+        val variables = sceneScriptManager.getVariables(groupId);
+        return variables != null ? variables.getOrDefault(varName, 0) : 0;
     }
 
     private static int modifyGroupVariableValue(SceneScriptManager sceneScriptManager, int groupId, String varName, int value,
                                                 boolean isSet){
         val variables = sceneScriptManager.getVariables(groupId);
+        if (variables == null) {
+            logger.warn("[LUA] trying to modify variables of unloaded/unknown group {}", groupId);
+            return 1;
+        }
 
         val old = variables.getOrDefault(varName, value);
         val newValue = isSet ? value : old + value;
@@ -261,27 +267,28 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
 
     /* Group temp value */
     @Override
-    public int setGroupTempValue(@NotNull GroupEventLuaContext context, @NotNull String name, int value, LuaTable var3Table) {
-        return handleUnimplemented(name, value, printTable(var3Table));
+    public int setGroupTempValue(@NotNull GroupEventLuaContext context, @NotNull String name, int value, int groupId) {
+        return handleUnimplemented(name, value, groupId);
     }
 
     @Override
-    public int getGroupTempValue(@NotNull GroupEventLuaContext context, @NotNull String name, LuaTable var2) {
-        return handleUnimplemented(name, printTable(var2));
+    public int getGroupTempValue(@NotNull GroupEventLuaContext context, @NotNull String name, int groupId) {
+        return handleUnimplemented(name, groupId);
     }
 
     @Override
-    public int changeGroupTempValue(@NotNull GroupEventLuaContext context, @NotNull String name, int diff, LuaTable var3) {
-        return handleUnimplemented(name, diff, printTable(var3));
+    public int changeGroupTempValue(@NotNull GroupEventLuaContext context, @NotNull String name, int diff, int groupId) {
+        return handleUnimplemented(name, diff, groupId);
     }
 
     /* misc */
     @Override
-    public int refreshGroup(@NotNull GroupEventLuaContext context, LuaTable table) {
-        logger.debug("[LUA] Call RefreshGroup with {}", printTable(table));
+    public int refreshGroup(@NotNull GroupEventLuaContext context, @NotNull RefreshGroupParams params) {
+        logger.debug("[LUA] Call RefreshGroup with {}", params);
         // Kill and Respawn?
-        val groupId = getGroupIdOrCurrentId(context, table.getInt("group_id"));
-        val suite = table.getInt("suite");
+        val groupId = getGroupIdOrCurrentId(context, params.getGroupId());
+        val suite = params.getSuiteId();
+        // TODO handle other optional params
 
         SceneGroupInstance groupInstance = context.getSceneScriptManager().getGroupInstanceById(groupId);
 
@@ -330,12 +337,14 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
 
     /* group lua execution*/
     @Override
-    public int executeActiveGroupLua(org.anime_game_servers.gi_lua.script_lib.@NotNull GroupEventLuaContext groupEventLuaContext, int groupId, String functionName, LuaTable callParamsTable) {
-        return handleUnimplemented(groupId, functionName, printTable(callParamsTable));
+    public int executeActiveGroupLua(@NotNull GroupEventLuaContext groupEventLuaContext, int groupId, @NotNull String functionName,
+                                     @NotNull List<Integer> callParams) {
+        return handleUnimplemented(groupId, functionName, callParams);
     }
 
     @Override
-    public int executeGroupLua(org.anime_game_servers.gi_lua.script_lib.GroupEventLuaContext groupEventLuaContext, int groupId, String functionName, LuaTable callParamsTable) {
-        return handleUnimplemented(groupId, functionName, printTable(callParamsTable));
+    public int executeGroupLua(@NotNull GroupEventLuaContext groupEventLuaContext, int groupId, @NotNull String functionName,
+                               @NotNull List<Integer> callParams) {
+        return handleUnimplemented(groupId, functionName, callParams);
     }
 }

@@ -47,27 +47,6 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
         }
     }
 
-    @Override
-    public int AutoMonsterTide(GroupEventLuaContext context, int challengeIndex, int groupId, Integer[] ordersConfigId, int tideCount, int sceneLimit, int spawnLimit) {
-        logger.debug("[LUA] Call AutoMonsterTide with {},{},{},{},{},{}",
-            challengeIndex,groupId,ordersConfigId,tideCount,sceneLimit,spawnLimit);
-
-        val group = getGroupOrCurrent(context, groupId);
-
-        if (group == null || group.getMonsters() == null) {
-            return 1;
-        }
-
-        context.getSceneScriptManager().startMonsterTideInGroup(challengeIndex, group, ordersConfigId, tideCount, sceneLimit, spawnLimit);
-
-        return 0;
-    }
-
-    @Override
-    public int KillMonsterTide(GroupEventLuaContext groupEventLuaContext, int groupId, int tideId) {
-        return 0;
-    }
-
 
 
     @Override
@@ -165,18 +144,6 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
     }
 
     @Override
-    public int CheckRemainGadgetCountByGroupId(GroupEventLuaContext context, LuaTable table) {
-        logger.debug("[LUA] Call CheckRemainGadgetCountByGroupId with {}",
-            printTable(table));
-        val actualGroupId = getGroupIdOrCurrentId(context, table.getInt("group_id"));
-
-        var count = context.getSceneScriptManager().getScene().getEntities().values().stream()
-            .filter(g -> g instanceof EntityGadget entityGadget && entityGadget.getGroupId() == actualGroupId)
-            .count();
-        return (int)count;
-    }
-
-    @Override
     public int MarkPlayerAction(GroupEventLuaContext context, int var1, int var2, int var3) {
         logger.debug("[LUA] Call MarkPlayerAction with {},{},{}",
             var1, var2,var3);
@@ -216,11 +183,6 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
             return new int[0];
         }
         return scriptManager.getScene().getPlayers().stream().mapToInt(Player::getUid).toArray();
-    }
-
-    @Override
-    public int GetSeaLampActivityPhase(GroupEventLuaContext context) {
-        return handleUnimplemented();
     }
 
     @Override
@@ -812,85 +774,8 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
     }
 
     @Override
-    public int AddChessBuildingPoints(GroupEventLuaContext context, int groupId, int param2, int uid, int pointsToAdd) {
-        return handleUnimplemented(groupId, param2, uid, pointsToAdd);
-    }
-
-    /**
-     * TODO implement
-     * @param context
-     * @param uid
-     * @param param2  probably the name of the data field
-     * @param param3
-     * @return
-     */
-    @Override
-    public int AddExhibitionAccumulableData(GroupEventLuaContext context, int uid, String param2, int param3) {
-        return handleUnimplemented(uid, param2, param3);
-    }
-
-
-    /**
-     * TODO implement
-     * @param context
-     * @param uid
-     * @param param2 probably the name of the data field
-     * @param param3
-     * @param exhibitionPlayType
-     * @param galleryId
-     * @return
-     */
-    @Override
-    public int AddExhibitionAccumulableDataAfterSuccess(GroupEventLuaContext context, int uid, String param2, int param3, ExhibitionPlayType exhibitionPlayType, int galleryId) {
-        return handleUnimplemented(uid, param2, param3, exhibitionPlayType.name(), galleryId);
-    }
-
-
-    /**
-     * TODO implement
-     * @param context
-     * @param uid
-     * @param param2  probably the name of the data field
-     * @param param3
-     * @return
-     */
-    @Override
-    public int AddExhibitionReplaceableData(GroupEventLuaContext context, int uid, String param2, int param3) {
-        return handleUnimplemented(uid, param2, param3);
-    }
-
-    /**
-     * TODO implement
-     * @param context
-     * @param uid
-     * @param param2 probably the name of the data field
-     * @param param3
-     * @param param4 contains the fields "play_type" is part of the enum [ExhibitionPlayType] and "gallery_id"
-     * @return
-     */
-    @Override
-    public int AddExhibitionReplaceableDataAfterSuccess(GroupEventLuaContext context, int uid, String param2, int param3, LuaTable param4) {
-        return handleUnimplemented(uid, param2, param3, printTable(param4));
-    }
-
-    @Override
     public int AddGadgetPlayProgress(GroupEventLuaContext context, int param1, int param2, int progressChange) {
         return handleUnimplemented(param1, param2, progressChange);
-    }
-
-    @Override
-    public int AddIrodoriChessBuildingPoints(GroupEventLuaContext context, int groupId, int param2, int points) {
-        return handleUnimplemented(groupId, param2, points);
-    }
-
-    @Override
-    public int AddIrodoriChessTowerServerGlobalValue(GroupEventLuaContext context, int groupId, int param2, int param3, int delta) {
-        return handleUnimplemented(groupId, param2, param3, delta);
-    }
-
-    @Override
-    public int AddMechanicusBuildingPoints(GroupEventLuaContext context, int groupId, int param2, int uid, int delta) {
-        return handleUnimplemented(groupId, param2, uid, delta);
     }
 
     @Override
@@ -930,23 +815,12 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
         return handleUnimplemented(printTable(param1Table));
     }
 
-    @Override
-    public int CreateTreasureMapSpotRewardGadget(GroupEventLuaContext context, int gadgetCfgId) {
-        return handleUnimplemented(gadgetCfgId);
-    }
-
     /**
      * TODO implement
      */
     @Override
     public int updateBundleMarkShowStateByGroupId(GroupEventLuaContext groupEventLuaContext, int groupId, boolean val2) {
         return handleUnimplemented(groupId, val2);
-    }
-
-    @Override
-    public int autoPoolMonsterTide(GroupEventLuaContext context, int index, int groupId, int[] monsterPool, int routeId, int[] routePoints, int[] monsterAffix, LuaTable monsterPoolParam) {
-        return handleUnimplemented(index, groupId, monsterPool, routeId, routePoints, monsterAffix, printTable(monsterPoolParam));
-        //TODO implement monsterPoolParam contains int totalCount, int minCount, int tag, int fillTime, int fillCount, bool isOrdered
     }
 
     @Override
@@ -959,22 +833,6 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
     public boolean checkIsInGroup(GroupEventLuaContext context, int groupId, int configId) {
         return handleUnimplemented(groupId, configId) == 0;
     }
-
-    @Override
-    public int clearExhibitionReplaceableData(GroupEventLuaContext context, int uid, String key) {
-        return handleUnimplemented(uid, key);
-    }
-
-    @Override
-    public int clearPoolMonsterTide(GroupEventLuaContext context, int groupId, int tideNum) {
-        return handleUnimplemented(groupId, tideNum);
-    }
-
-    @Override
-    public int continueAutoMonster(GroupEventLuaContext context, int groupId, int tideNum) {
-        return handleUnimplemented(groupId, tideNum);
-    }
-
     @Override
     public int continueTimeAxis(GroupEventLuaContext context, String key) {
         return handleUnimplemented(key);
@@ -1011,15 +869,7 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
         return handleUnimplemented();
     }
 
-    @Override
-    public int endMonsterTide(GroupEventLuaContext context, int groupId, int tideIndex, int endType) {
-        return handleUnimplemented(groupId, tideIndex, endType);
-    }
 
-    @Override
-    public int endPoolMonsterTide(GroupEventLuaContext context, int groupId, int index) {
-        return handleUnimplemented(groupId, index);
-    }
 
     @Override
     public int endSceneMultiStagePlay(GroupEventLuaContext context, int playIndex, boolean isSucc) {
@@ -1060,16 +910,6 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
     @Override
     public int getChainLevel(GroupEventLuaContext context, int chainId) {
         return handleUnimplemented(chainId);
-    }
-
-    @Override
-    public int getExhibitionAccumulableData(GroupEventLuaContext context, int uid, int exhibitionId) {
-        return handleUnimplemented(uid, exhibitionId);
-    }
-
-    @Override
-    public int getExhibitionReplaceableData(GroupEventLuaContext context, int uid, int exhibitionId) {
-        return handleUnimplemented(uid, exhibitionId);
     }
 
     @Override
@@ -1207,16 +1047,6 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
     }
 
     @Override
-    public int pauseAutoMonsterTide(GroupEventLuaContext context, int groupId, int monsterTideIndex) {
-        return handleUnimplemented(groupId, monsterTideIndex);
-    }
-
-    @Override
-    public int pauseAutoPoolMonsterTide(GroupEventLuaContext context, int groupId, int tideStage) {
-        return handleUnimplemented(groupId, tideStage);
-    }
-
-    @Override
     public int pauseTimeAxis(GroupEventLuaContext context, String key) {
         return handleUnimplemented(key);
     }
@@ -1230,11 +1060,6 @@ public class ScriptLibHandler extends BaseHandler implements org.anime_game_serv
     @Override
     public int receiveAllAranaraCollectionByType(GroupEventLuaContext context, int groupId, int type) {
         return handleUnimplemented(groupId, type);
-    }
-
-    @Override
-    public int resumeAutoPoolMonsterTide(GroupEventLuaContext context, int groupId, int tideStage) {
-        return handleUnimplemented(groupId, tideStage);
     }
 
     @Override
