@@ -35,7 +35,7 @@ public enum QuestExec implements QuestTrigger {
     QUEST_EXEC_NOTIFY_DAILY_TASK (24),                      //#Missing
     QUEST_EXEC_CREATE_PATTERN_GROUP (25),                   //#Missing #RandomQuestExcel
     QUEST_EXEC_REMOVE_PATTERN_GROUP (26),                   //#Missing #RandomQuestExcel
-    QUEST_EXEC_REFRESH_GROUP_SUITE_RANDOM (27),             //#Missing
+    QUEST_EXEC_REFRESH_GROUP_SUITE_RANDOM (27),
     QUEST_EXEC_ACTIVE_ITEM_GIVING (28),
     QUEST_EXEC_DEL_ALL_SPECIFIC_PACK_ITEM (29),             //#Missing
     QUEST_EXEC_ROLLBACK_PARENT_QUEST (30),
