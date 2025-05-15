@@ -37,7 +37,7 @@ public enum QuestExec implements QuestTrigger {
     QUEST_EXEC_REMOVE_PATTERN_GROUP (26),                   //#Missing #RandomQuestExcel
     QUEST_EXEC_REFRESH_GROUP_SUITE_RANDOM (27),
     QUEST_EXEC_ACTIVE_ITEM_GIVING (28),
-    QUEST_EXEC_DEL_ALL_SPECIFIC_PACK_ITEM (29),             //#Missing
+    QUEST_EXEC_DEL_ALL_SPECIFIC_PACK_ITEM (29),
     QUEST_EXEC_ROLLBACK_PARENT_QUEST (30),
     QUEST_EXEC_LOCK_AVATAR_TEAM (31),                       //#Missing
     QUEST_EXEC_UNLOCK_AVATAR_TEAM (32),                     //#Missing
