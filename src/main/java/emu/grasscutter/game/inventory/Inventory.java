@@ -478,24 +478,26 @@ public class Inventory extends BasePlayerManager implements Iterable<GameItem> {
     }
 
     public void removeItems(List<GameItem> items) {
-        // TODO Bulk delete
-        for (GameItem item : items) {
-            this.removeItem(item, item.getCount());
-        }
+        items.forEach(this::removeItem);
     }
 
     public boolean removeItem(long guid) {
-        return removeItem(guid, 1);
+        return removeItem(this.getItemByGuid(guid));
     }
 
     public synchronized boolean removeItem(long guid, int count) {
-        GameItem item = this.getItemByGuid(guid);
+        return removeItem(this.getItemByGuid(guid), count);
+    }
 
-        if (item == null) {
-            return false;
-        }
-
-        return removeItem(item, count);
+    /**
+     * Removes every amount of an item by its item ID.
+     *
+     * @param itemId The ID of the item to remove.
+     * @return True if the item was removed, false otherwise.
+     */
+    public synchronized boolean removeItemById(int itemId) {
+        var item = this.getItems().values().stream().filter(i -> i.getItemId() == itemId).findFirst();
+        return item.filter(this::removeItem).isPresent();
     }
 
     /**
