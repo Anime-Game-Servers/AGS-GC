@@ -7,7 +7,7 @@ import emu.grasscutter.game.quest.enums.QuestExec;
 import emu.grasscutter.game.quest.handlers.QuestExecHandler;
 import lombok.val;
 
-import java.util.Random;
+import static emu.grasscutter.utils.Utils.random;
 
 @QuestValueExec(QuestExec.QUEST_EXEC_REFRESH_GROUP_SUITE_RANDOM)
 public class ExecRefreshGroupSuiteRandom extends QuestExecHandler {
@@ -22,7 +22,7 @@ public class ExecRefreshGroupSuiteRandom extends QuestExecHandler {
         for (var entry : entries) {
             val entryArray = entry.split(",");
             val groupId = Integer.parseInt(entryArray[0]);
-            val randomSuiteIndex = new Random().nextInt(1, entryArray.length);
+            val randomSuiteIndex = random.nextInt(1, entryArray.length);
             val suiteId = Integer.parseInt(entryArray[randomSuiteIndex]);
 
             if (!scriptManager.refreshGroupSuite(groupId, suiteId, quest)) {
