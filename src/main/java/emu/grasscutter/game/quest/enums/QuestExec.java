@@ -41,7 +41,7 @@ public enum QuestExec implements QuestTrigger {
     QUEST_EXEC_ROLLBACK_PARENT_QUEST (30),
     QUEST_EXEC_LOCK_AVATAR_TEAM (31),                       //#Missing
     QUEST_EXEC_UNLOCK_AVATAR_TEAM (32),                     //#Missing
-    QUEST_EXEC_UPDATE_PARENT_QUEST_REWARD_INDEX (33),       //#Missing
+    QUEST_EXEC_UPDATE_PARENT_QUEST_REWARD_INDEX (33),
     QUEST_EXEC_SET_DAILY_TASK_VAR (34),                     //#Missing
     QUEST_EXEC_INC_DAILY_TASK_VAR (35),                     //#Missing
     QUEST_EXEC_DEC_DAILY_TASK_VAR (36),                     //#Missing #Unused

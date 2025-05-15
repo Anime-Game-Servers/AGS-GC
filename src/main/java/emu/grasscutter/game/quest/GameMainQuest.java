@@ -25,12 +25,13 @@ import emu.grasscutter.server.packet.send.PacketQuestUpdateQuestVarNotify;
 import emu.grasscutter.utils.Position;
 import emu.grasscutter.utils.Utils;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.val;
 import org.anime_game_servers.core.gi.enums.QuestState;
+import org.anime_game_servers.multi_proto.gi.messages.quest.parent.ChildQuest;
+import org.anime_game_servers.multi_proto.gi.messages.quest.parent.ParentQuest;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
-import org.anime_game_servers.multi_proto.gi.messages.quest.parent.ParentQuest;
-import org.anime_game_servers.multi_proto.gi.messages.quest.parent.ChildQuest;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -51,7 +52,7 @@ public class GameMainQuest {
     @Getter private ParentQuestState state;
     @Getter private boolean isFinished;
     @Getter List<QuestGroupSuite> questGroupSuites;
-
+    @Getter @Setter private int rewardIndex = 0;
     @Getter int[] suggestTrackMainQuestList;
     @Getter private Map<Integer,TalkData> talks;
 
@@ -206,13 +207,9 @@ public class GameMainQuest {
         // Add rewards
         val mainQuestData = getMainQuestData();
         if(mainQuestData!= null && mainQuestData.getRewardIdList()!=null) {
-            for (int rewardId : mainQuestData.getRewardIdList()) {
-                RewardData rewardData = GameData.getRewardDataMap().get(rewardId);
-
-                if (rewardData == null) {
-                    continue;
-                }
-
+            int rewardId = mainQuestData.getRewardIdList()[rewardIndex];
+            RewardData rewardData = GameData.getRewardDataMap().get(rewardId);
+            if (rewardData != null) {
                 getOwner().getInventory().addItemParamDatas(rewardData.getRewardItemList(), ActionReason.QuestReward);
             }
         }
