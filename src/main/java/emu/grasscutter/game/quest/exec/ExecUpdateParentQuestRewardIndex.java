@@ -11,7 +11,6 @@ public class ExecUpdateParentQuestRewardIndex extends QuestExecHandler {
     @Override
     public boolean execute(GameQuest quest, QuestExecParam condition, String... paramStr) {
         int rewardIndex = Integer.parseInt(paramStr[0]);
-        quest.getMainQuest().setRewardIndex(rewardIndex);
-        return true;
+        return quest.getMainQuest().setRewardIndex(rewardIndex);
     }
 }

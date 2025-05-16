@@ -25,7 +25,6 @@ import emu.grasscutter.server.packet.send.PacketQuestUpdateQuestVarNotify;
 import emu.grasscutter.utils.Position;
 import emu.grasscutter.utils.Utils;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.val;
 import org.anime_game_servers.core.gi.enums.QuestState;
 import org.anime_game_servers.multi_proto.gi.messages.quest.parent.ChildQuest;
@@ -52,7 +51,7 @@ public class GameMainQuest {
     @Getter private ParentQuestState state;
     @Getter private boolean isFinished;
     @Getter List<QuestGroupSuite> questGroupSuites;
-    @Getter @Setter private int rewardIndex = 0;
+    @Getter private int rewardIndex = 0;
     @Getter int[] suggestTrackMainQuestList;
     @Getter private Map<Integer,TalkData> talks;
 
@@ -206,7 +205,7 @@ public class GameMainQuest {
 
         // Add rewards
         val mainQuestData = getMainQuestData();
-        if(mainQuestData!= null && mainQuestData.getRewardIdList()!=null) {
+        if (mainQuestData != null && mainQuestData.getRewardIdList() != null && mainQuestData.getRewardIdList().length > rewardIndex) {
             int rewardId = mainQuestData.getRewardIdList()[rewardIndex];
             RewardData rewardData = GameData.getRewardDataMap().get(rewardId);
             if (rewardData != null) {
@@ -498,5 +497,11 @@ public class GameMainQuest {
         }
 
         return owner.getWorld().getTotalGameTimeDays() - World.getHoursForGameTime(varTime);
+    }
+
+    public boolean setRewardIndex(int index) {
+        this.rewardIndex = index;
+        this.save();
+        return true;
     }
 }
