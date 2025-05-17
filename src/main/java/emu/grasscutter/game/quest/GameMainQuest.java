@@ -27,10 +27,10 @@ import emu.grasscutter.utils.Utils;
 import lombok.Getter;
 import lombok.val;
 import org.anime_game_servers.core.gi.enums.QuestState;
+import org.anime_game_servers.multi_proto.gi.messages.quest.parent.ChildQuest;
+import org.anime_game_servers.multi_proto.gi.messages.quest.parent.ParentQuest;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
-import org.anime_game_servers.multi_proto.gi.messages.quest.parent.ParentQuest;
-import org.anime_game_servers.multi_proto.gi.messages.quest.parent.ChildQuest;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -51,7 +51,7 @@ public class GameMainQuest {
     @Getter private ParentQuestState state;
     @Getter private boolean isFinished;
     @Getter List<QuestGroupSuite> questGroupSuites;
-
+    @Getter private int rewardIndex = 0;
     @Getter int[] suggestTrackMainQuestList;
     @Getter private Map<Integer,TalkData> talks;
 
@@ -205,14 +205,10 @@ public class GameMainQuest {
 
         // Add rewards
         val mainQuestData = getMainQuestData();
-        if(mainQuestData!= null && mainQuestData.getRewardIdList()!=null) {
-            for (int rewardId : mainQuestData.getRewardIdList()) {
-                RewardData rewardData = GameData.getRewardDataMap().get(rewardId);
-
-                if (rewardData == null) {
-                    continue;
-                }
-
+        if (mainQuestData != null && mainQuestData.getRewardIdList() != null && mainQuestData.getRewardIdList().length > rewardIndex) {
+            int rewardId = mainQuestData.getRewardIdList()[rewardIndex];
+            RewardData rewardData = GameData.getRewardDataMap().get(rewardId);
+            if (rewardData != null) {
                 getOwner().getInventory().addItemParamDatas(rewardData.getRewardItemList(), ActionReason.QuestReward);
             }
         }
@@ -501,5 +497,11 @@ public class GameMainQuest {
         }
 
         return owner.getWorld().getTotalGameTimeDays() - World.getHoursForGameTime(varTime);
+    }
+
+    public boolean setRewardIndex(int index) {
+        this.rewardIndex = index;
+        this.save();
+        return true;
     }
 }
