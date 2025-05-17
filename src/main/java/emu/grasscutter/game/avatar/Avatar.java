@@ -1,24 +1,6 @@
 package emu.grasscutter.game.avatar;
 
 import dev.morphia.annotations.*;
-import static emu.grasscutter.config.Configuration.GAME_OPTIONS;
-import static emu.grasscutter.game.props.PlayerProperty.PROP_SATIATION_PENALTY_TIME;
-import static emu.grasscutter.game.props.PlayerProperty.PROP_SATIATION_VAL;
-
-import java.util.*;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
-import lombok.*;
-import org.anime_game_servers.multi_proto.gi.messages.general.PropValue;
-import org.anime_game_servers.multi_proto.gi.messages.general.avatar.*;
-import org.anime_game_servers.multi_proto.gi.messages.general.avatar.FetterData;
-import org.bson.types.ObjectId;
-
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.binout.OpenConfigEntry;
 import emu.grasscutter.data.binout.OpenConfigEntry.SkillPointModifier;
@@ -29,16 +11,33 @@ import emu.grasscutter.data.excels.ItemData.WeaponProperty;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.entity.EntityAvatar;
 import emu.grasscutter.game.entity.EntityWeapon;
+import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
 import emu.grasscutter.game.inventory.EquipType;
 import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.game.inventory.ItemType;
 import emu.grasscutter.game.player.Player;
-import emu.grasscutter.game.props.*;
+import emu.grasscutter.game.props.ElementType;
+import emu.grasscutter.game.props.FetterState;
+import emu.grasscutter.game.props.FightProperty;
+import emu.grasscutter.game.props.PlayerProperty;
 import emu.grasscutter.server.packet.send.*;
 import emu.grasscutter.utils.ProtoHelper;
 import it.unimi.dsi.fastutil.ints.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.val;
+import org.anime_game_servers.multi_proto.gi.messages.general.PropValue;
+import org.anime_game_servers.multi_proto.gi.messages.general.avatar.*;
+import org.anime_game_servers.multi_proto.gi.messages.general.avatar.FetterData;
+import org.bson.types.ObjectId;
 
 import javax.annotation.Nonnull;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static emu.grasscutter.config.Configuration.GAME_OPTIONS;
+import static emu.grasscutter.game.props.PlayerProperty.PROP_SATIATION_VAL;
 
 @Entity(value = "avatars", useDiscriminator = false)
 public class Avatar {
@@ -214,8 +213,12 @@ public class Avatar {
      * @return false if failed or already using that element, true if it actually changed
      */
     public boolean changeElement(@Nonnull ElementType elementTypeToChange) {
-        val candSkillDepotIdsList = data.getCandSkillDepotIds();
         val candSkillDepotIndex = elementTypeToChange.getDepotIndex();
+        return changeSkillDepot(candSkillDepotIndex);
+    }
+
+    public boolean changeSkillDepot(int candSkillDepotIndex) {
+        val candSkillDepotIdsList = data.getCandSkillDepotIds();
 
         // if no candidate skill to change or index out of bound
         if (candSkillDepotIdsList == null || candSkillDepotIndex >= candSkillDepotIdsList.size()) {
