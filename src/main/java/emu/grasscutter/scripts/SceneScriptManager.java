@@ -13,6 +13,7 @@ import emu.grasscutter.game.entity.create_config.CreateNpcEntityConfig;
 import emu.grasscutter.game.entity.create_config.CreateRegionEntityConfig;
 import emu.grasscutter.game.quest.GameQuest;
 import emu.grasscutter.game.quest.QuestGroupSuite;
+import emu.grasscutter.game.quest.enums.QuestCond;
 import emu.grasscutter.game.quest.enums.QuestContent;
 import emu.grasscutter.game.world.Scene;
 import emu.grasscutter.game.world.SceneGroupInstance;
@@ -604,6 +605,9 @@ public class SceneScriptManager {
             .setSourceEntityId(region.getId())
             .setTargetEntityId(entity.getId())
         );
+        if (eventType == EventType.EVENT_ENTER_REGION && entity instanceof EntityAvatar avatar) {
+            avatar.getPlayer().getQuestManager().queueEvent(QuestCond.QUEST_COND_PLAYER_ENTER_REGION, region.getGroupId(), region.getConfigId());
+        }
     }
 
     public List<EntityGadget> getGadgetsInGroupSuite(SceneGroupInstance groupInstance, SceneSuite suite) {

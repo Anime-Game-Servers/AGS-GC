@@ -12,11 +12,11 @@ public enum QuestContent implements QuestTrigger {
     QUEST_CONTENT_KILL_MONSTER (1),                         //#Unused
     QUEST_CONTENT_COMPLETE_TALK (2),
     QUEST_CONTENT_MONSTER_DIE (3),
-    QUEST_CONTENT_FINISH_PLOT (4),
+    QUEST_CONTENT_FINISH_PLOT (4),                          //gets sent by AddQuestContentProgressReq
     QUEST_CONTENT_OBTAIN_ITEM (5),
     QUEST_CONTENT_TRIGGER_FIRE (6),
     QUEST_CONTENT_CLEAR_GROUP_MONSTER (7),
-    QUEST_CONTENT_NOT_FINISH_PLOT (8),                      //#Missing the trigger #RandomQuestExcel
+    QUEST_CONTENT_NOT_FINISH_PLOT (8),                      //gets sent by AddQuestContentProgressReq
     QUEST_CONTENT_ENTER_DUNGEON (9),
     QUEST_CONTENT_ENTER_MY_WORLD (10),
     QUEST_CONTENT_FINISH_DUNGEON (11),
