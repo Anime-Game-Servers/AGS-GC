@@ -11,12 +11,12 @@ public enum QuestCond implements QuestTrigger {
     QUEST_COND_NONE (0),
     QUEST_COND_STATE_EQUAL (1),
     QUEST_COND_STATE_NOT_EQUAL (2),
-    QUEST_COND_PACK_HAVE_ITEM (3),
+    QUEST_COND_PACK_HAVE_ITEM (3),                  //#Missing the trigger
     QUEST_COND_AVATAR_ELEMENT_EQUAL (4),            //#Missing #NpcGroup #TalkExcel
     QUEST_COND_AVATAR_ELEMENT_NOT_EQUAL (5),        //#Missing #NpcGroup #TalkExcel
     QUEST_COND_AVATAR_CAN_CHANGE_ELEMENT (6),       //#Missing #NpcGroup #TalkExcel
     QUEST_COND_CITY_LEVEL_EQUAL_GREATER (7),        //#Missing #QuestTalks #TalkExcel
-    QUEST_COND_ITEM_NUM_LESS_THAN (8),
+    QUEST_COND_ITEM_NUM_LESS_THAN (8),              //#Missing the trigger
     QUEST_COND_DAILY_TASK_START (9),                //#Missing #QuestExcel
     QUEST_COND_OPEN_STATE_EQUAL (10),
     QUEST_COND_DAILY_TASK_OPEN (11),                //#Missing #NpcGroup #TalkExcel
@@ -39,7 +39,7 @@ public enum QuestCond implements QuestTrigger {
     QUEST_COND_DAILY_TASK_IN_PROGRESS (28),         //#Missing #QuestTalks #TalkExcel
     QUEST_COND_DAILY_TASK_FINISHED (29),            //#Missing #Unused
     QUEST_COND_ACTIVITY_COND (30),
-    QUEST_COND_ACTIVITY_OPEN (31),
+    QUEST_COND_ACTIVITY_OPEN (31),                  //#Missing the trigger
     QUEST_COND_DAILY_TASK_VAR_GT (32),              //#Missing #QuestExcel #QuestTalks #TalkExcel
     QUEST_COND_DAILY_TASK_VAR_EQ (33),              //#Missing #QuestExcel #QuestTalks #NpcGroup #TalkExcel
     QUEST_COND_DAILY_TASK_VAR_LT (34),              //#Missing #QuestExcel #QuestTalks #TalkExcel
@@ -63,7 +63,7 @@ public enum QuestCond implements QuestTrigger {
     QUEST_COND_CITY_REPUTATION_UNLOCK (52),         //#Missing #Unused
     QUEST_COND_LUA_NOTIFY (53),
     QUEST_COND_CUR_CLIMATE (54),                    //#Missing #QuestExcel
-    QUEST_COND_ACTIVITY_END (55),
+    QUEST_COND_ACTIVITY_END (55),                   //#Missing the trigger
     QUEST_COND_COOP_POINT_RUNNING (56),             //#Missing #Unused
     QUEST_COND_GADGET_TALK_STATE_EQUAL (57),        //#Missing #QuestTalks #GadgetGroup #NpcGroup #TalkExcel
     QUEST_COND_AVATAR_FETTER_GT (58),               //#Missing #QuestTalks #NpcGroup #TalkExcel
@@ -86,7 +86,7 @@ public enum QuestCond implements QuestTrigger {
     QUEST_COND_NEW_HOMEWORLD_SHOP_ITEM (75),        //#Missing #GadgetGroup #TalkExcel
     QUEST_COND_SCENE_POINT_UNLOCK (76),             //#Missing #NpcGroup #TalkExcel
     QUEST_COND_SCENE_LEVEL_TAG_EQ (77),
-    QUEST_COND_PLAYER_ENTER_REGION (78),            //#Missing #QuestExcel
+    QUEST_COND_PLAYER_ENTER_REGION (78),
     QUEST_COND_UNKNOWN (9999);
 
     private final int value;
