@@ -18,9 +18,9 @@ public class ConditionPlayerEnterRegion extends BaseCondition {
             Grasscutter.getLogger().error("Unexpected number of params on QUEST_COND_PLAYER_ENTER_REGION for quest {}", questData.getSubId());
             return false;
         }
-        val groupId = condition.getParam()[0]; //already checked
+        val groupId = condition.getParam()[0];
         val configId = condition.getParam()[1];
-        return params[1] == configId;
+        return params[0] == groupId && params[1] == configId;
     }
 
 }
