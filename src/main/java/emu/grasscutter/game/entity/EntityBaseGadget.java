@@ -8,7 +8,6 @@ import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
 import emu.grasscutter.game.entity.gadget.content.GadgetContent;
 import emu.grasscutter.game.entity.interfaces.ConfigAbilityDataAbilityEntity;
 import emu.grasscutter.game.player.Player;
-import emu.grasscutter.game.props.EntityIdType;
 import emu.grasscutter.game.props.FightProperty;
 import emu.grasscutter.game.quest.enums.QuestContent;
 import emu.grasscutter.game.world.Scene;
@@ -24,7 +23,6 @@ import org.anime_game_servers.multi_proto.gi.messages.gadget.GadgetInteractReq;
 import org.anime_game_servers.multi_proto.gi.messages.scene.VisionType;
 
 import javax.annotation.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -188,5 +186,10 @@ public abstract class EntityBaseGadget extends GameEntity<CreateGadgetEntityConf
             .setParam2(this.getConfigId())
             .setParam3(oldState)
             .setSourceEntityId(getId()));
+        getScene().getPlayers().forEach(player ->
+                player.getQuestManager().queueEvent(QuestContent.QUEST_CONTENT_GADGET_STATE_CHANGE,
+                        String.valueOf(state),
+                        this.getGroupId(),
+                        this.getConfigId()));
     }
 }
