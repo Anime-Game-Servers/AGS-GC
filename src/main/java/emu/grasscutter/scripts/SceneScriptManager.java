@@ -330,6 +330,14 @@ public class SceneScriptManager {
 
         return true;
     }
+
+    public EntityRegion getRegionByConfigId(int configId, int groupId) {
+        return this.regions.values().stream()
+            .filter(x -> x.getConfigId() == configId && x.getGroupId() == groupId)
+            .findFirst()
+            .orElse(null);
+    }
+
     public EntityRegion getRegionById(int id) {
         return regions.get(id);
     }
