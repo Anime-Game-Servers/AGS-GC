@@ -97,6 +97,48 @@ public class GivingManager extends BasePlayerDataManager {
     }
 
     /**
+     * Checks if a giving action is marked completed.
+     *
+     * @param givingId The giving action ID.
+     */
+    public boolean isCompleted(int givingId) {
+        if (!this.itemGivings.containsKey(givingId)) {
+            return false;
+        }
+        return this.itemGivings.get(givingId).isFinished();
+    }
+
+    /**
+     * Gets the last GroupId.
+     *
+     * @param givingId The giving action ID.
+     */
+    @Nullable
+    public Integer getLastGroupId(int givingId) {
+        if (!this.itemGivings.containsKey(givingId)) {
+            return null;
+        }
+        return this.itemGivings.get(givingId).getLastGroupId();
+    }
+
+
+    /**
+     * Set the last groupId for a giving action.
+     *
+     * @param givingId The giving action ID.
+     * @param groupId  The last groupId.
+     */
+    public void setLastGroupId(int givingId, int groupId) throws IllegalStateException {
+        // Check if the action is already present.
+        if (!this.itemGivings.containsKey(givingId)) {
+            throw new IllegalStateException("Giving action " + givingId + " is not active.");
+        }
+
+        // Mark the action as finished.
+        this.itemGivings.get(givingId).setLastGroupId(groupId);
+    }
+
+    /**
      * Attempts to add the giving action.
      *
      * @param givingId The giving action ID.
@@ -111,16 +153,6 @@ public class GivingManager extends BasePlayerDataManager {
         this.sendGivingRecordNotify();
         return success == null;
     }
-
-    /**
-     * Checks if itemGivings contains the key.
-     *
-     * @param givingId The giving action ID.
-     */
-    public boolean containsGiveItemAction(int givingId) {
-        return this.itemGivings.containsKey(givingId);
-    }
-
 
     /**
      * Verifies, performs and notifies a requested giving action.
@@ -155,6 +187,8 @@ public class GivingManager extends BasePlayerDataManager {
         // Send the response packet.
         player.sendPacket(new PacketItemGivingRsp(result));
         if(result.isSuccess()) {
+            //store last GroupId.
+            setLastGroupId(result.givingId, result.givingGroupId);
             // Mark the giving action as completed.
             markCompleted(giveId);
 
@@ -175,7 +209,7 @@ public class GivingManager extends BasePlayerDataManager {
      */
     @Nullable
     public GivingData checkAndGetGivingData(int giveId){
-        if (!containsGiveItemAction(giveId)) return null;
+        if (!this.itemGivings.containsKey(giveId)) return null;
 
         // Check the items against the resources.
         var data = GameData.getGivingDataMap().get(giveId);
