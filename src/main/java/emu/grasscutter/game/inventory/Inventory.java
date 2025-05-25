@@ -13,6 +13,7 @@ import emu.grasscutter.game.props.ActionReason;
 import emu.grasscutter.game.props.ItemUseAction.UseItemParams;
 import emu.grasscutter.game.props.PlayerProperty;
 import emu.grasscutter.game.props.WatcherTriggerType;
+import emu.grasscutter.game.quest.enums.QuestCond;
 import emu.grasscutter.game.quest.enums.QuestContent;
 import emu.grasscutter.server.packet.send.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -241,10 +242,12 @@ public class Inventory extends BasePlayerManager implements Iterable<GameItem> {
         getPlayer().getBattlePassManager().triggerMission(WatcherTriggerType.TRIGGER_OBTAIN_MATERIAL_NUM, result.getItemId(), result.getCount());
         getPlayer().getQuestManager().queueEvent(QuestContent.QUEST_CONTENT_OBTAIN_ITEM, result.getItemId(), result.getCount());
         getPlayer().getQuestManager().queueEvent(QuestContent.QUEST_CONTENT_OBTAIN_VARIOUS_ITEM, result.getItemId(), result.getCount());
+        getPlayer().getQuestManager().queueEvent(QuestCond.QUEST_COND_PACK_HAVE_ITEM, result.getItemId(), result.getCount());
     }
     private void triggerRemItemEvents(GameItem item, int removeCount){
         getPlayer().getBattlePassManager().triggerMission(WatcherTriggerType.TRIGGER_COST_MATERIAL, item.getItemId(), removeCount);
         getPlayer().getQuestManager().queueEvent(QuestContent.QUEST_CONTENT_ITEM_LESS_THAN, item.getItemId(), item.getCount());
+        getPlayer().getQuestManager().queueEvent(QuestCond.QUEST_COND_ITEM_NUM_LESS_THAN, item.getItemId(), item.getCount());
     }
 
     public void addItemParams(Collection<ItemParam> items) {
