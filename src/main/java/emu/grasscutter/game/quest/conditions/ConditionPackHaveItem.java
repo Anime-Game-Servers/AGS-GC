@@ -14,7 +14,9 @@ public class ConditionPackHaveItem extends BaseCondition {
     @Override
     public boolean execute(Player owner, SubQuestData questData, QuestAcceptCondition condition, String paramStr, int... params) {
         val itemId = condition.getParam()[0];
-        val targetAmount = condition.getParam()[1];
+        var targetAmount = 1;
+        if (condition.getParam().length > 1)
+            targetAmount = condition.getParam()[1];
         val itemCount = owner.getInventory().getItemCountById(itemId);
         return itemCount >= targetAmount;
     }
