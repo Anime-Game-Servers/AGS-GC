@@ -5,6 +5,7 @@ import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.binout.AbilityModifier;
 import emu.grasscutter.data.binout.config.ConfigEntityGadget;
 import emu.grasscutter.data.excels.GadgetData;
+import emu.grasscutter.data.excels.GatherData;
 import emu.grasscutter.data.excels.ItemData;
 import emu.grasscutter.game.entity.GameEntity;
 import emu.grasscutter.game.entity.gadget.content.GadgetContent;
@@ -44,6 +45,7 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
     private GameEntity<?> owner;
     private boolean isPersistent = false;
     private boolean enableInteract = true;
+    private boolean forbidGuest = false;
     private int draftId = 0;
     private Set<Integer> worktopOptions;
     private boolean worktopIsPersistent;
@@ -126,6 +128,17 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
         initBaseData();
     }
 
+    public CreateGadgetEntityConfig(GameEntity<?> parent, GatherData gatherData){
+        super(parent);
+        this.gadgetId = gatherData.getGadgetId();
+        this.enableInteract = !gatherData.isInitDisableInteract();
+        this.forbidGuest = gatherData.isForbidGuest();
+        this.item = new GameItem(gatherData.getItemId(), 1);
+        this.pointType = gatherData.getPointType();
+
+        initBaseData();
+    }
+
     public CreateGadgetEntityConfig(AbilityModifier.AbilityModifierAction action, AbilityActionCreateGadget createGadgetInfo){
         super(action);
         this.gadgetId = action.gadgetID;
@@ -154,6 +167,9 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
         this.gadgetId = spawnDataEntry.getGadgetId();
         if (spawnDataEntry.getGadgetState() > 0) {
             this.gadgetState = spawnDataEntry.getGadgetState();
+        }
+        if(spawnDataEntry.getGatherItemId()>0){
+            this.item = new GameItem(spawnDataEntry.getGatherItemId(), 1);
         }
         initBaseData();
     }

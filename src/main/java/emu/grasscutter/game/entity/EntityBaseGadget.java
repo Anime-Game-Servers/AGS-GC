@@ -73,11 +73,6 @@ public abstract class EntityBaseGadget extends GameEntity<CreateGadgetEntityConf
         this.arguments = gadgetCreateConfig.getArguments();
         this.owner = gadgetCreateConfig.getPlayerOwner();
 
-        GatherData gatherData = GameData.getGatherDataMap().get(gadgetCreateConfig.getPointType());
-        if(gatherData != null) {
-            this.interactEnabled = !gatherData.initDisableInteract();
-        }
-
         if(gadgetCreateConfig.getContent() == null) {
             this.content = buildContent(gadgetCreateConfig);
         } else {

@@ -4,7 +4,6 @@ import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.excels.GatherData;
 import emu.grasscutter.game.entity.EntityGadget;
 import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
-import emu.grasscutter.game.entity.gadget.content.GadgetContent;
 import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.ActionReason;
@@ -25,13 +24,15 @@ public class GadgetGatherPoint extends GadgetContent {
         val originalConfig = getGadget().getSpawnConfig();
         this.gatherData = GameData.getGatherDataMap().get(originalConfig.getPointType());
 
+        if(gatherData == null) {
+            throw new IllegalArgumentException("Invalid gather object: " + originalConfig.getConfigId());
+        }
 
         val scene = gadget.getScene();
-        val createConfig = new CreateGadgetEntityConfig(gadget, gatherData.getGadgetId())
+        val createConfig = new CreateGadgetEntityConfig(gadget, gatherData)
             .setBornPos(originalConfig.getBornPos().clone())
             .setBornRot(originalConfig.getBornRot().clone())
-            .setGadgetState(originalConfig.getGadgetState())
-            .setPointType(originalConfig.getPointType());
+            .setGadgetState(originalConfig.getGadgetState());
         createConfig.setInitDataSource(gadget.getSpawnConfig().getInitDataSource());
 
         gatherObjectChild = new EntityGadget(scene, createConfig);
