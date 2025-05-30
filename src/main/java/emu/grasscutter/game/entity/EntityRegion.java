@@ -20,10 +20,10 @@ public class EntityRegion extends GameEntity<CreateRegionEntityConfig> {
     private final Position position;
     private boolean hasNewEntities;
     private boolean entityLeave;
-    private final Set<GameEntity> entities; // Ids of entities inside this region
-    private final Set<GameEntity> notContainEntities; // Ids of entities outside this region
-    private final Set<GameEntity> newEntities; // Ids that entered this region since the last check
-    private final Set<GameEntity> leftEntities; // Ids that left this region since the last check
+    private final Set<GameEntity<?>> entities; // Ids of entities inside this region
+    private final Set<GameEntity<?>> notContainEntities; // Ids of entities outside this region
+    private final Set<GameEntity<?>> newEntities; // Ids that entered this region since the last check
+    private final Set<GameEntity<?>> leftEntities; // Ids that left this region since the last check
 
     public EntityRegion(Scene scene, CreateRegionEntityConfig createConfig) {
         super(scene, createConfig);
@@ -56,7 +56,7 @@ public class EntityRegion extends GameEntity<CreateRegionEntityConfig> {
         this.newEntities.clear();
     }
 
-    public void removeEntity(GameEntity entity) {
+    public void removeEntity(GameEntity<?> entity) {
         if (this.notContainEntities.contains(entity)) {
             return;
         }
