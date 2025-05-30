@@ -1,13 +1,10 @@
 package emu.grasscutter.game.entity.gadget.content;
 
-import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.excels.GatherData;
 import emu.grasscutter.data.excels.ItemData;
 import emu.grasscutter.game.entity.EntityGadget;
 import emu.grasscutter.game.entity.EntityItem;
 import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
-import emu.grasscutter.game.entity.gadget.content.GadgetContent;
 import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.ActionReason;
@@ -30,20 +27,8 @@ public class GadgetGatherObject extends GadgetContent {
         super(gadget);
 
         val config = gadget.getSpawnConfig();
-
-        // overwrites the default spawn handling
-        if (gadget.getSpawnEntry() != null) {
-            this.itemId = gadget.getSpawnEntry().getGatherItemId();
-            return;
-        }
-
-        GatherData gatherData = GameData.getGatherDataMap().get(config.getPointType());
-        if(gatherData != null) {
-            this.itemId = gatherData.getItemId();
-            this.isForbidGuest = gatherData.isForbidGuest();
-        } else {
-            Grasscutter.getLogger().error("invalid gather object: {}", config.getConfigId());
-        }
+        this.itemId = config.getItem().getItemId();
+        this.isForbidGuest = config.isForbidGuest();
     }
 
     public int getItemId() {
