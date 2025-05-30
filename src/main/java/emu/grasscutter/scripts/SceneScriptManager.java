@@ -11,6 +11,7 @@ import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
 import emu.grasscutter.game.entity.create_config.CreateMonsterEntityConfig;
 import emu.grasscutter.game.entity.create_config.CreateNpcEntityConfig;
 import emu.grasscutter.game.entity.create_config.CreateRegionEntityConfig;
+import emu.grasscutter.game.props.EntityType;
 import emu.grasscutter.game.quest.GameQuest;
 import emu.grasscutter.game.quest.QuestGroupSuite;
 import emu.grasscutter.game.quest.enums.QuestCond;
@@ -589,12 +590,16 @@ public class SceneScriptManager {
         }
 
         for (var region : this.regions.values()) {
+            region.clearDeadEntities();
+
             getScene().getEntities().values().stream()
+                .filter(e -> e.getEntityType() == EntityType.Avatar)
                 .filter(e -> region.isPosInRegion(e.getPosition()) && !region.getEntities().contains(e))
                 .forEach(region::addEntity);
 
-            region.getEntities().stream()
-                .filter(e -> !region.isPosInRegion(e.getPosition()))
+            getScene().getEntities().values().stream()
+                .filter(e -> e.getEntityType() == EntityType.Avatar)
+                .filter(e -> !region.isPosInRegion(e.getPosition()) && !region.getNotContainEntities().contains(e))
                 .forEach(region::removeEntity);
 
             // call enter region events for new entities
@@ -607,7 +612,7 @@ public class SceneScriptManager {
         }
     }
 
-    private void callRegionEvent(EntityRegion region, int eventType, GameEntity entity) {
+    private void callRegionEvent(EntityRegion region, int eventType, GameEntity<?> entity) {
         callEvent(new ScriptArgs(region.getGroupId(), eventType, region.getConfigId())
             .setEventSource(entity.getEntityType().getValue())
             .setSourceEntityId(region.getId())
@@ -961,20 +966,20 @@ public class SceneScriptManager {
         return entity;
     }
 
-    public void addEntity(GameEntity gameEntity) {
+    public void addEntity(GameEntity<?> gameEntity) {
         getScene().addEntity(gameEntity);
     }
 
-    public void meetEntities(List<? extends GameEntity> gameEntity) {
+    public void meetEntities(List<? extends GameEntity<?>> gameEntity) {
         getScene().addEntities(gameEntity, VisionType.VISION_MEET);
     }
 
-    public void addEntities(List<? extends GameEntity> gameEntity) {
+    public void addEntities(List<? extends GameEntity<?>> gameEntity) {
         getScene().addEntities(gameEntity);
     }
 
-    public void removeEntities(List<? extends GameEntity> gameEntity) {
-        getScene().removeEntities(gameEntity.stream().map(e -> (GameEntity) e).collect(Collectors.toList()), VisionType.VISION_REFRESH);
+    public void removeEntities(List<? extends GameEntity<?>> gameEntity) {
+        getScene().removeEntities(gameEntity.stream().map(e -> (GameEntity<?>) e).collect(Collectors.toList()), VisionType.VISION_REFRESH);
     }
 
     public void removeMonstersInGroup(SceneGroup group, SceneSuite suite) {
