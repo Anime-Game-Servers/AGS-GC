@@ -2,6 +2,7 @@ package emu.grasscutter.game.managers.dailyQuest;
 
 import emu.grasscutter.game.player.BasePlayerDataManager;
 import emu.grasscutter.game.player.Player;
+import emu.grasscutter.game.quest.enums.QuestCond;
 import emu.grasscutter.server.packet.send.PacketDailyTaskDataNotify;
 import emu.grasscutter.server.packet.send.PacketTaskVarNotify;
 import lombok.Getter;
@@ -46,7 +47,7 @@ public class DailyTaskManager extends BasePlayerDataManager {
     }
 
     //outputs taskVars as a proto as seen in DailyTaskDataNotify.
-    public List<TaskVar> getTaskVars() {
+    public List<TaskVar> getTaskVarsProto() {
         return this.taskVars.entrySet().stream().map(e -> {
             val taskVar = new TaskVar();
             taskVar.setKey(e.getKey());
@@ -56,35 +57,43 @@ public class DailyTaskManager extends BasePlayerDataManager {
     }
 
     public void setTaskVar(int taskId, int index, int value) {
-        val list = this.taskVars.computeIfAbsent(taskId, k -> new ArrayList<>());
-
-        //pad the list of variables with 0 entries in order to reach the index
-        while (list.size() <= index) {
-            list.add(0);
-        }
-
-        list.set(index, value);
-
-        this.player.save();
-        this.player.sendPacket(new PacketTaskVarNotify(this.player));
+        getVarList(taskId, index).set(index, value);
+        triggerTaskVarAction(taskId, index, value);
     }
 
     public void incTaskVar(int taskId, int index, int value) {
-        val list = this.taskVars.computeIfAbsent(taskId, k -> new ArrayList<>());
-
-        //pad the list of variables with 0 entries in order to reach the index
-        while (list.size() <= index) {
-            list.add(0);
-        }
-
-        list.set(index, list.get(index) + value);
-
-        this.player.save();
-        this.player.sendPacket(new PacketTaskVarNotify(this.player));
+        val oldValue = getTaskVar(taskId, taskId);
+        getVarList(taskId, index).set(index, oldValue + value);
+        triggerTaskVarAction(taskId, index, oldValue + value);
     }
 
     public void decTaskVar(int taskId, int index, int value) {
         incTaskVar(taskId, index, -value);
+    }
+
+    public int getTaskVar(int taskId, int index) {
+        return getVarList(taskId, index).get(index);
+    }
+
+    private List<Integer> getVarList(int taskId, int index) {
+        val list = this.taskVars.computeIfAbsent(taskId, k -> new ArrayList<>());
+
+        //pad the list of variables with 0 entries in order to reach the index
+        while (list.size() <= index) {
+            list.add(0);
+
+        }
+
+        return list;
+    }
+
+    private void triggerTaskVarAction(int taskId, int index, int value) {
+        this.player.save();
+        var questManager = this.player.getQuestManager();
+        questManager.queueEvent(QuestCond.QUEST_COND_DAILY_TASK_VAR_EQ, taskId, value, index);
+        questManager.queueEvent(QuestCond.QUEST_COND_DAILY_TASK_VAR_GT, taskId, value, index);
+        questManager.queueEvent(QuestCond.QUEST_COND_DAILY_TASK_VAR_LT, taskId, value, index);
+        this.player.sendPacket(new PacketTaskVarNotify(this.player));
     }
 
 }
