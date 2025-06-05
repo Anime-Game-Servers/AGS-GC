@@ -8,6 +8,6 @@ public class PacketTaskVarNotify extends BaseTypedPacket<TaskVarNotify> {
 
     public PacketTaskVarNotify(Player player) {
         super(new TaskVarNotify());
-        proto.setTaskVarList(player.getDailyTaskManager().getTaskVars());
+        proto.setTaskVarList(player.getDailyTaskManager().getTaskVarsProto());
     }
 }

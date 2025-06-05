@@ -32,7 +32,7 @@ public class DailyTaskManager extends BasePlayerDataManager {
     //takes a seed and
     public void randomizeQuests(int seed) {
         //todo: make the seed the current day
-        val dailyTaskSeededRandom = new Random(seed);
+        //val dailyTaskSeededRandom = new Random(seed);
 
         //temp. Please remove.
         if (unlockedCities.isEmpty())//todo: proper city unlocking code
