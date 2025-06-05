@@ -1,4 +1,4 @@
-package emu.grasscutter.game.managers.dailyQuest;
+package emu.grasscutter.game.managers.dailyquest;
 
 import emu.grasscutter.game.player.BasePlayerDataManager;
 import emu.grasscutter.game.player.Player;
