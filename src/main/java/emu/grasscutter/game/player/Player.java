@@ -42,7 +42,7 @@ import emu.grasscutter.game.managers.blossom.BlossomManager;
 import emu.grasscutter.game.managers.cooking.ActiveCookCompoundData;
 import emu.grasscutter.game.managers.cooking.CookingCompoundManager;
 import emu.grasscutter.game.managers.cooking.CookingManager;
-import emu.grasscutter.game.managers.dailyQuest.DailyTaskManager;
+import emu.grasscutter.game.managers.dailyquest.DailyTaskManager;
 import emu.grasscutter.game.managers.deforestation.DeforestationManager;
 import emu.grasscutter.game.managers.energy.EnergyManager;
 import emu.grasscutter.game.managers.forging.ActiveForgeData;
