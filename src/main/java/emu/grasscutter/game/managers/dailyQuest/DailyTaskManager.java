@@ -55,4 +55,36 @@ public class DailyTaskManager extends BasePlayerDataManager {
         }).toList();
     }
 
+    public void setTaskVar(int taskId, int index, int value) {
+        val list = this.taskVars.computeIfAbsent(taskId, k -> new ArrayList<>());
+
+        //pad the list of variables with 0 entries in order to reach the index
+        while (list.size() <= index) {
+            list.add(0);
+        }
+
+        list.set(index, value);
+
+        this.player.save();
+        this.player.sendPacket(new PacketTaskVarNotify(this.player));
+    }
+
+    public void incTaskVar(int taskId, int index, int value) {
+        val list = this.taskVars.computeIfAbsent(taskId, k -> new ArrayList<>());
+
+        //pad the list of variables with 0 entries in order to reach the index
+        while (list.size() <= index) {
+            list.add(0);
+        }
+
+        list.set(index, list.get(index) + value);
+
+        this.player.save();
+        this.player.sendPacket(new PacketTaskVarNotify(this.player));
+    }
+
+    public void decTaskVar(int taskId, int index, int value) {
+        incTaskVar(taskId, index, -value);
+    }
+
 }
