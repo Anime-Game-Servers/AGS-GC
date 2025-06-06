@@ -109,9 +109,9 @@ public class DailyTaskManager extends BasePlayerDataManager {
     private void triggerTaskVarAction(int taskId, int index, int value) {
         this.player.save();
         var questManager = this.player.getQuestManager();
-        questManager.queueEvent(QuestCond.QUEST_COND_DAILY_TASK_VAR_EQ, taskId, value, index);
-        questManager.queueEvent(QuestCond.QUEST_COND_DAILY_TASK_VAR_GT, taskId, value, index);
-        questManager.queueEvent(QuestCond.QUEST_COND_DAILY_TASK_VAR_LT, taskId, value, index);
+        questManager.queueEvent(QuestCond.QUEST_COND_DAILY_TASK_VAR_EQ, taskId, index, value);
+        questManager.queueEvent(QuestCond.QUEST_COND_DAILY_TASK_VAR_GT, taskId, index, value);
+        questManager.queueEvent(QuestCond.QUEST_COND_DAILY_TASK_VAR_LT, taskId, index, value);
         this.player.sendPacket(new PacketTaskVarNotify(this.player));
     }
 
