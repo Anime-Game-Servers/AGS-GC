@@ -100,6 +100,7 @@ public class GameData {
     @Getter private static final Int2ObjectMap<CoopRewardData> coopRewardDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<CompoundData> compoundDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<DailyDungeonData> dailyDungeonDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<DailyTaskData> dailyTaskDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<DungeonData> dungeonDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<DungeonElementChallengeData> dungeonElementChallengeDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<DungeonEntryData> dungeonEntryDataMap = new Int2ObjectOpenHashMap<>();

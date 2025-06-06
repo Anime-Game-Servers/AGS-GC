@@ -1,11 +1,14 @@
 package emu.grasscutter.game.managers.dailyquest;
 
+import emu.grasscutter.data.GameData;
+import emu.grasscutter.data.excels.DailyTaskData;
 import emu.grasscutter.game.player.BasePlayerDataManager;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.quest.enums.QuestCond;
 import emu.grasscutter.server.packet.send.PacketDailyTaskDataNotify;
 import emu.grasscutter.server.packet.send.PacketTaskVarNotify;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.val;
 import org.anime_game_servers.multi_proto.gi.messages.quest.daily.TaskVar;
 
@@ -16,29 +19,45 @@ import java.util.*;
  * This system handles daily quest variables, packets, and randomization.
  */
 public class DailyTaskManager extends BasePlayerDataManager {
+    @Getter private List<Integer> currentTasks;
     @Getter private List<Integer> unlockedCities;
+    @Setter private int cityFilter;
     @Getter private int scoreRewardId;
     private Map<Integer, List<Integer>> taskVars;
 
 
     public DailyTaskManager(Player player) {
         super(player);
+        currentTasks = new ArrayList<>();
         unlockedCities = new ArrayList<>();
-        scoreRewardId = 2006;
+        scoreRewardId = 2006; //todo: figure out and remove
+        cityFilter = 0;
         taskVars = new HashMap<>();
     }
 
-
-    //takes a seed and
-    public void randomizeQuests(int seed) {
-        //todo: make the seed the current day
-        //val dailyTaskSeededRandom = new Random(seed);
-
-        //temp. Please remove.
-        if (unlockedCities.isEmpty())//todo: proper city unlocking code
+    public void randomizeTasks() {
+        //todo: proper city unlocking code via CityTaskOpenExcelConfigData.json
+        if (unlockedCities.isEmpty())
             unlockedCities.add(1);
 
-        //todo: pull one quest from each pool associated with the cityIds found in unlockedCities.
+        //filter tasks
+        var taskList = new ArrayList<>(GameData.getDailyTaskDataMap().values().stream()
+            .filter(task -> cityFilter == 0 || task.getCityId() == cityFilter)
+            .filter(task -> unlockedCities.contains(task.getCityId())).toList());
+
+        //shuffle tasks
+        Collections.shuffle(taskList);
+
+        //limit tasks to at most 5 tasks
+        if (taskList.size() >= 5) {
+            this.currentTasks = taskList.subList(0, 5).stream().map(DailyTaskData::getId).toList();
+        } else {
+            this.currentTasks = taskList.stream().map(DailyTaskData::getId).toList();
+        }
+
+        //Start Tasks
+        this.currentTasks.forEach(task ->
+            this.player.getQuestManager().queueEvent(QuestCond.QUEST_COND_DAILY_TASK_START, task));
     }
 
     public void onPlayerLogin() {

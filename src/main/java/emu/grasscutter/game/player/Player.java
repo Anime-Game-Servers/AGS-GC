@@ -1314,7 +1314,7 @@ public class Player {
         this.setResinBuyCount(0);
 
         // Reset daily tasks
-        this.dailyTaskManager.randomizeQuests(4); //todo: make the seed the current day
+        this.dailyTaskManager.randomizeTasks();
 
         // Done. Update last reset time.
         this.setLastDailyReset(currentTime);
