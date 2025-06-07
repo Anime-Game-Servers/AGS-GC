@@ -517,6 +517,7 @@ public class Player {
 
             // Handle open state unlocks from level-up.
             this.getProgressManager().tryUnlockOpenStates();
+            this.getDailyTaskManager().updateTaskLevel();
             this.getQuestManager().queueEvent(QuestContent.QUEST_CONTENT_PLAYER_LEVEL_UP, level);
             this.getQuestManager().queueEvent(QuestCond.QUEST_COND_PLAYER_LEVEL_EQUAL_GREATER, level);
             this.getCoopHandler().conditionMetChapterUpdateNotify(level, "COOP_COND_PLAYER_LEVEL");

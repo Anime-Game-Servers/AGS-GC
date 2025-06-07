@@ -22,17 +22,20 @@ public class DailyTaskManager extends BasePlayerDataManager {
     @Getter private List<Integer> currentTasks;
     @Getter private List<Integer> unlockedCities;
     @Setter private int cityFilter;
-    @Getter private int scoreRewardId;
+    @Getter private int taskLevel;
     private Map<Integer, List<Integer>> taskVars;
-
 
     public DailyTaskManager(Player player) {
         super(player);
         currentTasks = new ArrayList<>();
         unlockedCities = new ArrayList<>();
-        scoreRewardId = 2006; //todo: figure out and remove
+        taskLevel = 1;
         cityFilter = 0;
         taskVars = new HashMap<>();
+    }
+
+    public void updateTaskLevel() {
+        this.taskLevel = 1 + ((this.player.getLevel() - 1) / 5); //see DailyTaskLevelExcelConfigData.json
     }
 
     public void randomizeTasks() {
@@ -61,8 +64,13 @@ public class DailyTaskManager extends BasePlayerDataManager {
     }
 
     public void onPlayerLogin() {
+        updateTaskLevel();
         this.player.sendPacket(new PacketDailyTaskDataNotify(this.player));
         this.player.sendPacket(new PacketTaskVarNotify(this.player));
+    }
+
+    public int getScoreRewardId() {
+        return GameData.getDailyTaskLevelDataMap().get(this.taskLevel).getScorePreviewRewardId();
     }
 
     //outputs taskVars as a proto as seen in DailyTaskDataNotify.
