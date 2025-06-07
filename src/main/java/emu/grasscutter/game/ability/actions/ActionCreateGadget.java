@@ -15,11 +15,6 @@ public class ActionCreateGadget extends AbilityActionHandler {
 
     @Override
     public boolean execute(Ability ability, AbilityModifierAction action,byte[] abilityData, GameEntity<?> target) {
-        if(!action.byServer) {
-            logger.debug("Action not executed by server");
-
-            return true;
-        }
 
         var entity = ability.getOwner();
         AbilityActionCreateGadget createGadget;
