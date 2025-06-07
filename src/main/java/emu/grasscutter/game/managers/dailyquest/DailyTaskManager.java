@@ -10,6 +10,7 @@ import emu.grasscutter.server.packet.send.PacketTaskVarNotify;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import org.anime_game_servers.multi_proto.gi.messages.quest.daily.DailyTaskInfo;
 import org.anime_game_servers.multi_proto.gi.messages.quest.daily.TaskVar;
 
 import java.util.*;
@@ -21,7 +22,7 @@ import java.util.*;
 public class DailyTaskManager extends BasePlayerDataManager {
     @Getter private List<Integer> currentTasks;
     @Getter private List<Integer> unlockedCities;
-    @Setter private int cityFilter;
+    @Getter @Setter private int cityFilter;
     @Getter private int taskLevel;
     private Map<Integer, List<Integer>> taskVars;
 
@@ -80,6 +81,23 @@ public class DailyTaskManager extends BasePlayerDataManager {
             taskVar.setKey(e.getKey());
             taskVar.setValueList(e.getValue().stream().toList());
             return taskVar;
+        }).toList();
+    }
+
+    //outputs currentTasks as a proto as seen in WorldOwnerDailyTaskNotify.
+    public List<DailyTaskInfo> getTaskListProto() {
+        return this.currentTasks.stream().map(task -> {
+            val dailyTaskInfo = new DailyTaskInfo();
+            dailyTaskInfo.setDailyTaskId(task);
+            val taskData = GameData.getDailyTaskDataMap().get((int) task);
+            dailyTaskInfo.setFinishProgress(taskData.getFinishProgress());
+            val rewardId = GameData.getDailyTaskRewardDataMap()
+                .get(taskData.getTaskRewardId())
+                .getDropVec()
+                .get(taskLevel - 1) //adjust for zero index
+                .getPreviewRewardId();
+            dailyTaskInfo.setRewardId(rewardId);
+            return dailyTaskInfo;
         }).toList();
     }
 

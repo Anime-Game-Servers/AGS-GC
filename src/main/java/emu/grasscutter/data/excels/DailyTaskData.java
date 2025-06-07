@@ -13,4 +13,6 @@ public class DailyTaskData extends GameResource {
     private int id;
     private int cityId;
     private int poolId;
+    private int finishProgress;
+    private int taskRewardId;
 }
