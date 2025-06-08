@@ -15,9 +15,9 @@ public class AutoMonsterTideScriptHandler extends BaseHandler implements org.ani
     private static final Logger logger = Loggers.getScriptSystem();
 
     @Override
-    public int autoMonsterTide(@NotNull GroupEventLuaContext context, int challengeIndex, int groupId, Integer[] ordersConfigId, int tideCount, int sceneLimit, int spawnLimit) {
+    public int autoMonsterTide(@NotNull GroupEventLuaContext context, int challengeIndex, int groupId, Integer[] ordersConfigId, int tideSize, int spawnThreshold, int spawnLimit) {
         logger.debug("[LUA] Call AutoMonsterTide with {},{},{},{},{},{}",
-            challengeIndex,groupId,ordersConfigId,tideCount,sceneLimit,spawnLimit);
+            challengeIndex,groupId,ordersConfigId,tideSize,spawnThreshold,spawnLimit);
 
         val group = getGroupOrCurrent(context, groupId);
 
@@ -25,7 +25,7 @@ public class AutoMonsterTideScriptHandler extends BaseHandler implements org.ani
             return 1;
         }
 
-        context.getSceneScriptManager().startMonsterTideInGroup(challengeIndex, group, ordersConfigId, tideCount, sceneLimit, spawnLimit);
+        context.getSceneScriptManager().startMonsterTideInGroup(challengeIndex, group, ordersConfigId, tideSize, spawnThreshold, spawnLimit);
 
         return 0;
     }
