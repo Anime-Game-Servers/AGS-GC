@@ -1,5 +1,6 @@
 package emu.grasscutter.game.managers.dailyquest;
 
+import dev.morphia.annotations.Entity;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.excels.DailyTaskData;
 import emu.grasscutter.game.player.BasePlayerDataManager;
@@ -19,12 +20,23 @@ import java.util.*;
  * Handles logic related to the daily quest system.
  * This system handles daily quest variables, packets, and randomization.
  */
+@Entity
 public class DailyTaskManager extends BasePlayerDataManager {
     @Getter private List<Integer> currentTasks;
     @Getter private List<Integer> unlockedCities;
     @Getter @Setter private int cityFilter;
     @Getter private int taskLevel;
     private Map<Integer, List<Integer>> taskVars;
+
+    @Deprecated // Morphia
+    public DailyTaskManager() {
+        super();
+        currentTasks = new ArrayList<>();
+        unlockedCities = new ArrayList<>();
+        taskLevel = 1;
+        cityFilter = 0;
+        taskVars = new HashMap<>();
+    }
 
     public DailyTaskManager(Player player) {
         super(player);

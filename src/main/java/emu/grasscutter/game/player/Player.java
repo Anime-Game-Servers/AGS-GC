@@ -174,7 +174,7 @@ public class Player {
     @Getter @Setter private transient MessageHandler messageHandler;
     @Getter private transient AbilityManager abilityManager;
     @Getter @Setter private transient QuestManager questManager;
-    @Getter private transient DailyTaskManager dailyTaskManager;
+    @Getter private DailyTaskManager dailyTaskManager;
     @Getter private transient TowerManager towerManager;
     @Getter private transient SotSManager sotsManager;
     @Getter private transient MapMarksManager mapMarksManager;
@@ -1363,6 +1363,7 @@ public class Player {
         this.getQuestManager().loadFromDatabase();
 
         this.loadBattlePassManager();
+        this.getDailyTaskManager().setPlayer(this);
         this.getAvatars().postLoad(); // Needs to be called after inventory is handled
     }
 
