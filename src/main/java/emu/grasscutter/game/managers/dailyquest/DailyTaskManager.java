@@ -28,7 +28,7 @@ public class DailyTaskManager extends BasePlayerDataManager {
     @Getter private int taskLevel;
     private Map<Integer, List<Integer>> taskVars;
 
-    @Deprecated // Morphia
+    // For Morphia Only
     public DailyTaskManager() {
         super();
         currentTasks = new ArrayList<>();
