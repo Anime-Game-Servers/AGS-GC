@@ -5,6 +5,7 @@ import emu.grasscutter.utils.Position;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.anime_game_servers.multi_proto.gi.messages.scene.camera.BeginCameraSceneLookNotify;
+import org.anime_game_servers.multi_proto.gi.messages.scene.camera.KeepRotType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,12 +28,12 @@ public class PacketBeginCameraSceneLookNotify extends BaseTypedPacket<BeginCamer
         proto.setForceWalk(parameters.isForceWalk);
         proto.setEntityId(parameters.entityId);
         proto.setOtherParams(parameters.otherParams.stream().toList());
-        //proto.setKeepRotType(); //KeepRotType
-        //proto.setCustomRadius(); //Float
-        //proto.setBlendType(); //Int
-        //proto.setAbsFollowPos(); //Boolean
-        //proto.setDisableProtect(); //Int
-        //proto.setBlendDuration(); //Float
+        proto.setKeepRotType(parameters.keepRotType);
+        proto.setCustomRadius(parameters.customRadius);
+        proto.setAbsFollowPos(parameters.isAbsFollowPos);
+        proto.setDisableProtect(parameters.disableProtect ? 1:0);
+        proto.setBlendType(parameters.blendType);
+        proto.setBlendDuration(parameters.blendDuration);
 	}
 
     // TODO check default values
@@ -55,9 +56,15 @@ public class PacketBeginCameraSceneLookNotify extends BaseTypedPacket<BeginCamer
         boolean isForceWalk = false;
         boolean isForce = false;
         boolean isChangePlayMode = false;
-        float screenY = 0.0f;
-        float screenX = 0.0f;
+        boolean isAbsFollowPos = false;
+        boolean disableProtect = false;
+        float screenY = 0f;
+        float screenX = 0f;
+        int blendType = 0;
+        float blendDuration = 0f;
         int entityId = 0;
+        KeepRotType keepRotType = KeepRotType.KEEP_ROT_X;
+        float customRadius = 0f;
         Collection<String> otherParams = new ArrayList<>(0);
     }
 }

@@ -2,6 +2,7 @@
 package emu.grasscutter.scripts.scriptlib_handlers.scene;
 
 import emu.grasscutter.Loggers;
+import emu.grasscutter.game.entity.EntityMonster;
 import emu.grasscutter.game.world.SceneGroupInstance;
 import emu.grasscutter.scripts.SceneScriptManager;
 import emu.grasscutter.scripts.lua_engine.GroupEventLuaContext;
@@ -182,6 +183,11 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
         return handleUnimplemented(groupId);
     }
 
+    @Override
+    public int updateBundleMarkShowStateByGroupId(GroupEventLuaContext groupEventLuaContext, int groupId, boolean val2) {
+        return handleUnimplemented(groupId, val2);
+    }
+
     /* group variables*/
     private static int getGroupVariableValue(SceneScriptManager sceneScriptManager, int groupId, String varName){
         val variables = sceneScriptManager.getVariables(groupId);
@@ -319,6 +325,47 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
     public int createGroupTrigger(@NotNull GroupEventLuaContext context, @NotNull String triggerName) {
         return handleUnimplemented(triggerName);
     }
+
+    // might need to return the trigger count for the triggered that caused the call instead
+    @Override
+    public int getCurTriggerCount(GroupEventLuaContext context) {
+        logger.debug("[LUA] Call GetCurTriggerCount");
+        //TODO check
+        return context.getSceneScriptManager().getTriggerCount();
+    }
+
+    @Override
+    public int[] getGroupAliveMonsterList(GroupEventLuaContext context, int groupId) {
+        return new int[]{handleUnimplemented(groupId)};
+    }
+
+    @Override
+    public int getGroupMonsterCountByGroupId(GroupEventLuaContext context, int groupId) {
+        logger.debug("[LUA] Call GetGroupMonsterCountByGroupId with {}",
+            groupId);
+        val actualGroupId = getGroupIdOrCurrentId(context, groupId);
+        return (int) context.getSceneScriptManager().getScene().getEntities().values().stream()
+            .filter(e -> e instanceof EntityMonster && e.getGroupId() == actualGroupId)
+            .count();
+    }
+
+
+
+    @Override
+    public int getGroupMonsterCount(GroupEventLuaContext context) {
+        logger.debug("[LUA] Call GetGroupMonsterCount ");
+
+        val groupId = context.getCurrentGroup().getGroupInfo().getId();
+        return (int) context.getSceneScriptManager().getScene().getEntities().values().stream()
+            .filter(e -> e instanceof EntityMonster &&
+                e.getGroupId() == groupId)
+            .count();
+    }
+    @Override
+    public boolean checkIsInGroup(@NotNull GroupEventLuaContext context, int groupId, int configId) {
+        return context.getSceneScriptManager().getScene().getEntityByConfigId(configId, groupId) != null;
+    }
+
 
     @Override
     public int setGroupDead(@NotNull GroupEventLuaContext context, int groupId) {

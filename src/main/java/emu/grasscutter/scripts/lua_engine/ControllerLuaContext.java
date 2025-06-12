@@ -1,11 +1,9 @@
 package emu.grasscutter.scripts.lua_engine;
 
 import emu.grasscutter.Grasscutter;
-import emu.grasscutter.game.entity.EntityBaseGadget;
 import emu.grasscutter.game.entity.EntityGadget;
 import lombok.Getter;
 import org.anime_game_servers.gi_lua.script_lib.ScriptLibControllerHandlerProvider;
-import org.anime_game_servers.gi_lua.script_lib.ScriptLibHandler;
 import org.anime_game_servers.lua.engine.LuaEngine;
 import org.jetbrains.annotations.NotNull;
 

@@ -89,6 +89,11 @@ public class GroupEntityHandler extends BaseHandler implements org.anime_game_se
     }
 
     @Override
+    public int[] getSurroundUidList(@NotNull GroupEventLuaContext context, int configId, int radius) {
+        return new int[] {handleUnimplemented(configId, radius)};
+    }
+
+    @Override
     public int killEntityByConfigId(GroupEventLuaContext groupEventLuaContext, KillByConfigIdParams killByConfigIdParams) {
         logger.debug("[LUA] Call KillEntityByConfigId with {}", killByConfigIdParams);
         SceneScriptManager scriptManager = groupEventLuaContext.getSceneScriptManager();
@@ -132,7 +137,7 @@ public class GroupEntityHandler extends BaseHandler implements org.anime_game_se
     }
 
     @Override
-    public int killGroupEntityByPolicy(GroupEventLuaContext context, int groupId, GroupKillPolicy policy) {
+    public int killGroupEntityByPolicy(GroupEventLuaContext context, int groupId, @NotNull GroupKillPolicy policy) {
         val sceneManager = context.getSceneScriptManager();
 
         val group = getGroupOrCurrent(context, groupId);
@@ -180,4 +185,16 @@ public class GroupEntityHandler extends BaseHandler implements org.anime_game_se
 
         return 0;
     }
+
+
+    @Override
+    public int tryReallocateEntityAuthority(GroupEventLuaContext context, int uid, int configId, int regionConfigId) {
+        return handleUnimplemented(uid, configId, regionConfigId);
+    }
+
+    @Override
+    public int forceRefreshAuthorityByConfigId(GroupEventLuaContext context, int configId, int uid) {
+        return handleUnimplemented(configId, uid);
+    }
+
 }

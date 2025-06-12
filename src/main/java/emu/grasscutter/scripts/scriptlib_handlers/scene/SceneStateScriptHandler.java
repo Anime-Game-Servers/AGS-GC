@@ -2,9 +2,11 @@
 package emu.grasscutter.scripts.scriptlib_handlers.scene;
 
 import emu.grasscutter.Loggers;
+import emu.grasscutter.game.player.Player;
 import emu.grasscutter.scripts.lua_engine.GroupEventLuaContext;
 import emu.grasscutter.scripts.scriptlib_handlers.BaseHandler;
 import lombok.Getter;
+import lombok.val;
 import org.anime_game_servers.gi_lua.script_lib.handler.scene.ChangeLevelTagParams;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -82,5 +84,27 @@ public class SceneStateScriptHandler extends BaseHandler implements org.anime_ga
     public boolean isLevelTagChangeInCD(@NotNull GroupEventLuaContext context, int levelTagGroupId) {
         logger.warn("[LUA] Call unimplemented IsLevelTagChangeInCD with {}", levelTagGroupId);
         return false;
+    }
+
+    @Override
+    public int getSceneOwnerUid(GroupEventLuaContext context) {
+        return context.getSceneScriptManager().getScene().getWorld().getHost().getUid();
+    }
+
+    @Override
+    public int[] getSceneUidList(GroupEventLuaContext context) {
+        logger.warn("[LUA] Call unchecked GetSceneUidList");
+        //TODO check
+        val scriptManager = context.getSceneScriptManager();
+        if(scriptManager == null){
+            return new int[0];
+        }
+        return scriptManager.getScene().getPlayers().stream().mapToInt(Player::getUid).toArray();
+    }
+
+    @Override
+    public boolean checkIsInMpMode(GroupEventLuaContext context) {
+        logger.debug("[LUA] Call CheckIsInMpMode");
+        return context.getSceneScriptManager().getScene().getWorld().isMultiplayer();
     }
 }

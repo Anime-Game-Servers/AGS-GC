@@ -1,31 +1,38 @@
 package emu.grasscutter.scripts.scriptlib_handlers;
 
 import emu.grasscutter.scripts.lua_engine.GroupEventLuaContext;
+import emu.grasscutter.scripts.scriptlib_handlers.activity.ActivityHandler;
 import emu.grasscutter.scripts.scriptlib_handlers.activity.SummerTimeHandler;
 import emu.grasscutter.scripts.scriptlib_handlers.entities.GroupEntityHandler;
 import emu.grasscutter.scripts.scriptlib_handlers.entities.GroupGadgetHandler;
 import emu.grasscutter.scripts.scriptlib_handlers.entities.GroupMonsterHandler;
+import emu.grasscutter.scripts.scriptlib_handlers.entities.GroupRegionHandler;
+import emu.grasscutter.scripts.scriptlib_handlers.gadget.PlatformHandler;
+import emu.grasscutter.scripts.scriptlib_handlers.other.*;
 import emu.grasscutter.scripts.scriptlib_handlers.player.QuestScriptHandler;
 import emu.grasscutter.scripts.scriptlib_handlers.scene.*;
-import org.anime_game_servers.gi_lua.script_lib.ScriptLibHandler;
 import org.anime_game_servers.gi_lua.script_lib.handler.activity.SummerTimeScriptHandler;
 import org.anime_game_servers.gi_lua.script_lib.handler.scene.MonsterTideScriptHandler;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ScriptLibGroupHandlerProvider implements org.anime_game_servers.gi_lua.script_lib.ScriptLibGroupHandlerProvider<GroupEventLuaContext> {
-    // will be replaced by smaller scriptlib_handlers
-    final ScriptLibHandler oldHandler = new emu.grasscutter.scripts.ScriptLibHandler();
 
     // scene
     final AutoMonsterTideScriptHandler autoMonsterTideHandler = new AutoMonsterTideScriptHandler();
+    final BlossomScriptHandler blossomHandler = new BlossomScriptHandler();
     final ChallengeScriptHandler challengeHandler = new ChallengeScriptHandler();
     // TODO death zone
     final DungeonScriptHandler dungeonHandler = new DungeonScriptHandler();
     // TODO Gallery
     final GroupManagementScriptHandler groupManagementHandler = new GroupManagementScriptHandler();
+    final ScenePlayerHandler scenePlayerHandler = new ScenePlayerHandler();
+    // TODO Hunting
+    // TODO GadgetChain
+    // TODO ScenePlay
     final SceneStateScriptHandler sceneStateHandler = new SceneStateScriptHandler();
     final SealBattleScriptHandler sealBattleScriptHandler = new SealBattleScriptHandler();
+    final TimersScriptHandler timersScriptHandler = new TimersScriptHandler();
+    final WeatherHandler weatherHandler = new WeatherHandler();
 
     // player
     final QuestScriptHandler questScriptHandler = new QuestScriptHandler();
@@ -35,8 +42,26 @@ public class ScriptLibGroupHandlerProvider implements org.anime_game_servers.gi_
     final GroupEntityHandler groupEntityHandler = new GroupEntityHandler();
     final GroupGadgetHandler groupGadgetHandler = new GroupGadgetHandler();
     final GroupMonsterHandler groupMonsterHandler = new GroupMonsterHandler();
+    final GroupRegionHandler groupRegionHandler = new GroupRegionHandler();
+
+    //Gadget
+    // TODO GadgetGiving
+    // TODO GadgetPlay
+    final PlatformHandler platformHandler = new PlatformHandler();
+    // TODO Vehicle
+
+    // other
+    // TODO Aranara
+    final MiscNotifyHandler miscNotifyHandler = new MiscNotifyHandler();
+    final LoggingHandler loggingHandler = new LoggingHandler();
+    // TODO offering
+    // TODO RegionalPlay
+    final TowerHandler towerHandler = new TowerHandler();
+    final TimeHandler timeHandler = new TimeHandler();
+    final VisionHandler visionHandler = new VisionHandler();
 
     // activity
+    final ActivityHandler activityHandler = new ActivityHandler();
     // TODO aster
     // TODO ChannelerSlab
     // TODO char amusement
@@ -45,8 +70,10 @@ public class ScriptLibGroupHandlerProvider implements org.anime_game_servers.gi_
     // TODO crystalLink
     // TODO dig
     // TODO effigy
+    // TODO expedition
     // TODO FleurFair
     // TODO FungusFighter
+    // TODO GravenInnocence
     // TODO HideAndSeek
     // TODO InstableSpray
     // TODO IrodoriChess
@@ -54,22 +81,24 @@ public class ScriptLibGroupHandlerProvider implements org.anime_game_servers.gi_
     // TODO LuminanceStoneChallenge
     // TODO LunaRite
     // TODO Mechanicus
+    // TODO MichiaeMatsuri
     // TODO MistTrial
+    // TODO Moonfin
     // TODO Potion
     // TODO RogueDiary
     // TODO Roguelike
+    // TODO SeaLamp
     final SummerTimeHandler summerTimeHandler = new SummerTimeHandler();
     // TODO TreasureMap
     // TODO TreasureSeelie
     // TODO UgcDungeon
     // TODO Vintage
+    // TODO WaterSpiritChallenge
     // TODO WinterCamp
 
-
-    @NotNull
     @Override
-    public ScriptLibHandler<GroupEventLuaContext> getScriptLibHandler() {
-        return oldHandler;
+    public ActivityHandler getActivityHandler() {
+        return activityHandler;
     }
 
     @Override
@@ -79,8 +108,13 @@ public class ScriptLibGroupHandlerProvider implements org.anime_game_servers.gi_
 
 
     @Override
-    public @Nullable MonsterTideScriptHandler<GroupEventLuaContext> getMonsterTideHandler() {
+    public MonsterTideScriptHandler<GroupEventLuaContext> getMonsterTideHandler() {
         return autoMonsterTideHandler;
+    }
+
+    @Override
+    public BlossomScriptHandler getBlossomHandler() {
+        return blossomHandler;
     }
 
     @Override
@@ -99,6 +133,11 @@ public class ScriptLibGroupHandlerProvider implements org.anime_game_servers.gi_
     }
 
     @Override
+    public ScenePlayerHandler getScenePlayerHandler() {
+        return scenePlayerHandler;
+    }
+
+    @Override
     public SceneStateScriptHandler getSceneStateHandler() {
         return sceneStateHandler;
     }
@@ -106,6 +145,16 @@ public class ScriptLibGroupHandlerProvider implements org.anime_game_servers.gi_
     @Override
     public SealBattleScriptHandler getSealBattleHandler() {
         return sealBattleScriptHandler;
+    }
+
+    @Override
+    public TimersScriptHandler getTimersHandler() {
+        return timersScriptHandler;
+    }
+
+    @Override
+    public @Nullable WeatherHandler getWeatherHandler() {
+        return weatherHandler;
     }
 
     // Player
@@ -126,7 +175,45 @@ public class ScriptLibGroupHandlerProvider implements org.anime_game_servers.gi_
     }
 
     @Override
-    public @Nullable GroupMonsterHandler getGroupMonsterHandler() {
+    public GroupMonsterHandler getGroupMonsterHandler() {
         return groupMonsterHandler;
+    }
+    @Override
+    public GroupRegionHandler getGroupRegionHandler() {
+        return groupRegionHandler;
+    }
+
+    //Gadget
+    @Override
+    public PlatformHandler getPlatformHandler() {
+        return platformHandler;
+    }
+
+    //other
+
+
+    @Override
+    public MiscNotifyHandler getMiscNotifyHandler() {
+        return miscNotifyHandler;
+    }
+
+    @Override
+    public LoggingHandler getLoggingHandler() {
+        return loggingHandler;
+    }
+
+    @Override
+    public TowerHandler getTowerHandler() {
+        return towerHandler;
+    }
+
+    @Override
+    public TimeHandler getTimeHandler() {
+        return timeHandler;
+    }
+
+    @Override
+    public VisionHandler getVisionHandler() {
+        return visionHandler;
     }
 }

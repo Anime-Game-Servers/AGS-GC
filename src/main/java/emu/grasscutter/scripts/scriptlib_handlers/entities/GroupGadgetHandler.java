@@ -14,6 +14,7 @@ import lombok.val;
 import org.anime_game_servers.core.gi.models.Vector;
 import org.anime_game_servers.gi_lua.script_lib.handler.entites.CreateGadgetParameters;
 import org.anime_game_servers.gi_lua.script_lib.handler.entites.RemainGadgetCountParameters;
+import org.anime_game_servers.lua.engine.LuaTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import javax.annotation.Nonnull;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.anime_game_servers.gi_lua.script_lib.ScriptLibErrors.INVALID_PARAMETER;
 
@@ -159,6 +161,17 @@ public class GroupGadgetHandler extends BaseHandler implements org.anime_game_se
     @Override
     public int createGadgetByParamTable(@NotNull GroupEventLuaContext context, @Nullable CreateGadgetParameters creationParams) {
         return handleUnimplemented(creationParams);
+    }
+
+    @Override
+    public int createGadgetWithGlobalValue(GroupEventLuaContext context, int configId, Map<String, ? extends Number> sgv) {
+        return handleUnimplemented(configId, sgv);
+        //TODO implement Sgv contains ["SGV_BDShootType"] or sometimes nothing.
+    }
+
+    @Override
+    public int createGadgetWave(GroupEventLuaContext context, int areaId, int suitId, int offset, Vector boxSize, Vector gadgetSize) {
+        return handleUnimplemented(areaId, suitId, offset, boxSize, gadgetSize);
     }
 
     @Override

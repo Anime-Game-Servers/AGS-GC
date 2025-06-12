@@ -6,7 +6,6 @@ import lombok.Getter;
 import org.anime_game_servers.gi_lua.models.ScriptArgs;
 import org.anime_game_servers.gi_lua.models.scene.group.SceneGroup;
 import org.anime_game_servers.gi_lua.script_lib.ScriptLibGroupHandlerProvider;
-import org.anime_game_servers.gi_lua.script_lib.ScriptLibHandler;
 import org.anime_game_servers.lua.engine.LuaEngine;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,11 +35,6 @@ public class GroupEventLuaContext implements org.anime_game_servers.gi_lua.scrip
 
     public SceneScriptManager getSceneScriptManager() {
         return scriptManager;
-    }
-
-    @Override
-    public ScriptLibHandler getScriptLibHandler() {
-        return Grasscutter.getGameServer().getScriptSystem().getScriptLibHandler();
     }
 
     @NotNull

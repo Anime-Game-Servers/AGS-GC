@@ -9,6 +9,9 @@ import org.anime_game_servers.gi_lua.script_lib.handler.parameter.KillByConfigId
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import java.util.Collections;
+import java.util.List;
+
 public class GadgetControllerHandler extends BaseHandler implements org.anime_game_servers.gi_lua.script_lib.handler.GadgetControllerHandler<EntityGadget, ControllerLuaContext> {
     @Getter
     private static final Logger logger = BaseHandler.getLogger();
@@ -152,9 +155,9 @@ public class GadgetControllerHandler extends BaseHandler implements org.anime_ga
 
     @NotNull
     @Override
-    public int[] getGadgetArguments(@NotNull ControllerLuaContext controllerLuaContext) {
+    public List<Integer> getGadgetArguments(@NotNull ControllerLuaContext controllerLuaContext) {
         val gadgetArguments = controllerLuaContext.getGadget().getSpawnConfig().getArguments();
-        return gadgetArguments != null ? gadgetArguments.stream().mapToInt(Integer::intValue).toArray() : new int[0];
+        return gadgetArguments != null ? gadgetArguments : Collections.emptyList();
     }
 
     @Override

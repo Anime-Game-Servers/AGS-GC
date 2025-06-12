@@ -227,10 +227,9 @@ public class SceneScriptManager {
         val groupId = groupInstance.getGroupId();
         SceneGroup group = meta.getGroups().get(groupId);
         if(suiteIndex == 0) {
-            if(excludePrevSuite) {
-                suiteIndex = group.findInitSuiteIndex(groupInstance.getActiveSuiteId());
-            } else
-                suiteIndex = group.findInitSuiteIndex(0);
+            val currentSuiteId = groupInstance.getActiveSuiteId();
+            val excludeIndex = excludePrevSuite ? currentSuiteId : 0;
+            suiteIndex = group.findInitSuiteIndex(currentSuiteId, excludeIndex);
         }
         if(suiteIndex == 0) return 0;
 
