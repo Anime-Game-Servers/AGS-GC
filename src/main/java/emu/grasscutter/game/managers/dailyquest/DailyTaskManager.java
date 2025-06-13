@@ -7,6 +7,7 @@ import emu.grasscutter.game.player.BasePlayerDataManager;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.quest.enums.QuestCond;
 import emu.grasscutter.server.packet.send.PacketDailyTaskDataNotify;
+import emu.grasscutter.server.packet.send.PacketDailyTaskUnlockedCitiesNotify;
 import emu.grasscutter.server.packet.send.PacketTaskVarNotify;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,10 +53,6 @@ public class DailyTaskManager extends BasePlayerDataManager {
     }
 
     public void randomizeTasks() {
-        //todo: proper city unlocking code via CityTaskOpenExcelConfigData.json
-        if (unlockedCities.isEmpty())
-            unlockedCities.add(1);
-
         //filter tasks
         var taskList = new ArrayList<>(GameData.getDailyTaskDataMap().values().stream()
             .filter(task -> cityFilter == 0 || task.getCityId() == cityFilter)
@@ -77,13 +74,21 @@ public class DailyTaskManager extends BasePlayerDataManager {
     }
 
     public void onPlayerLogin() {
-        updateTaskLevel();
         this.player.sendPacket(new PacketDailyTaskDataNotify(this.player));
         this.player.sendPacket(new PacketTaskVarNotify(this.player));
     }
 
     public int getScoreRewardId() {
         return GameData.getDailyTaskLevelDataMap().get(this.taskLevel).getScorePreviewRewardId();
+    }
+
+    public void checkForCityUnlock(int subQuestId) {
+        GameData.getCityTaskOpenDataMap().values().forEach(city -> {
+            if (city.getQuestId() == subQuestId && !unlockedCities.contains(city.getCityId())) {
+                unlockedCities.add(city.getCityId());
+                this.player.sendPacket(new PacketDailyTaskUnlockedCitiesNotify(this.player));
+            }
+        });
     }
 
     //outputs taskVars as a proto as seen in DailyTaskDataNotify.
