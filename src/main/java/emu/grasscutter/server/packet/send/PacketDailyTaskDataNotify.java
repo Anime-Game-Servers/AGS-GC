@@ -9,5 +9,6 @@ public class PacketDailyTaskDataNotify extends BaseTypedPacket<DailyTaskDataNoti
     public PacketDailyTaskDataNotify(Player player) {
         super(new DailyTaskDataNotify());
         proto.setScoreRewardId(player.getDailyTaskManager().getScoreRewardId());
+        proto.setFinishedNum(player.getDailyTaskManager().getFinishedCurrentTasks().size());
     }
 }

@@ -5,6 +5,7 @@ import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.excels.DailyTaskData;
 import emu.grasscutter.game.player.BasePlayerDataManager;
 import emu.grasscutter.game.player.Player;
+import emu.grasscutter.game.props.PlayerProperty;
 import emu.grasscutter.game.quest.enums.QuestCond;
 import emu.grasscutter.server.packet.send.PacketDailyTaskDataNotify;
 import emu.grasscutter.server.packet.send.PacketDailyTaskProgressNotify;
@@ -29,6 +30,7 @@ public class DailyTaskManager extends BasePlayerDataManager {
     @Getter private List<Integer> unlockedCities;
     @Getter @Setter private int cityFilter;
     @Getter private int taskLevel;
+    @Getter @Setter private int LegendaryKeyDailyTasks;
     private Map<Integer, List<Integer>> taskVars;
 
     // For Morphia Only
@@ -39,6 +41,7 @@ public class DailyTaskManager extends BasePlayerDataManager {
         unlockedCities = new ArrayList<>();
         taskLevel = 1;
         cityFilter = 0;
+        LegendaryKeyDailyTasks = 0;
         taskVars = new HashMap<>();
     }
 
@@ -49,6 +52,7 @@ public class DailyTaskManager extends BasePlayerDataManager {
         unlockedCities = new ArrayList<>();
         taskLevel = 1;
         cityFilter = 0;
+        LegendaryKeyDailyTasks = 0;
         taskVars = new HashMap<>();
     }
 
@@ -132,10 +136,13 @@ public class DailyTaskManager extends BasePlayerDataManager {
     }
 
     public void finishTask(int taskId) {
-        if (!finishedCurrentTasks.contains(taskId))
+        if (!finishedCurrentTasks.contains(taskId)) {
             finishedCurrentTasks.add(taskId);
+            LegendaryKeyDailyTasks += 1;
+        }
 
         this.player.sendPacket(new PacketDailyTaskProgressNotify(getTaskInfoProto(taskId)));
+        this.player.setProperty(PlayerProperty.PROP_PLAYER_LEGENDARY_DAILY_TASK_NUM, LegendaryKeyDailyTasks);
     }
 
     public void setTaskVar(int taskId, int index, int value) {
