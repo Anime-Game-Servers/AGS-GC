@@ -7,6 +7,7 @@ import emu.grasscutter.game.player.BasePlayerDataManager;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.quest.enums.QuestCond;
 import emu.grasscutter.server.packet.send.PacketDailyTaskDataNotify;
+import emu.grasscutter.server.packet.send.PacketDailyTaskProgressNotify;
 import emu.grasscutter.server.packet.send.PacketDailyTaskUnlockedCitiesNotify;
 import emu.grasscutter.server.packet.send.PacketTaskVarNotify;
 import lombok.Getter;
@@ -24,6 +25,7 @@ import java.util.*;
 @Entity
 public class DailyTaskManager extends BasePlayerDataManager {
     @Getter private List<Integer> currentTasks;
+    @Getter private List<Integer> finishedCurrentTasks;
     @Getter private List<Integer> unlockedCities;
     @Getter @Setter private int cityFilter;
     @Getter private int taskLevel;
@@ -33,6 +35,7 @@ public class DailyTaskManager extends BasePlayerDataManager {
     public DailyTaskManager() {
         super();
         currentTasks = new ArrayList<>();
+        finishedCurrentTasks = new ArrayList<>();
         unlockedCities = new ArrayList<>();
         taskLevel = 1;
         cityFilter = 0;
@@ -42,6 +45,7 @@ public class DailyTaskManager extends BasePlayerDataManager {
     public DailyTaskManager(Player player) {
         super(player);
         currentTasks = new ArrayList<>();
+        finishedCurrentTasks = new ArrayList<>();
         unlockedCities = new ArrayList<>();
         taskLevel = 1;
         cityFilter = 0;
@@ -53,6 +57,9 @@ public class DailyTaskManager extends BasePlayerDataManager {
     }
 
     public void randomizeTasks() {
+        //clear finished tasks
+        finishedCurrentTasks.clear();
+
         //filter tasks
         var taskList = new ArrayList<>(GameData.getDailyTaskDataMap().values().stream()
             .filter(task -> cityFilter == 0 || task.getCityId() == cityFilter)
@@ -103,19 +110,32 @@ public class DailyTaskManager extends BasePlayerDataManager {
 
     //outputs currentTasks as a proto as seen in WorldOwnerDailyTaskNotify.
     public List<DailyTaskInfo> getTaskListProto() {
-        return this.currentTasks.stream().map(task -> {
-            val dailyTaskInfo = new DailyTaskInfo();
-            dailyTaskInfo.setDailyTaskId(task);
-            val taskData = GameData.getDailyTaskDataMap().get((int) task);
-            dailyTaskInfo.setFinishProgress(taskData.getFinishProgress());
-            val rewardId = GameData.getDailyTaskRewardDataMap()
-                .get(taskData.getTaskRewardId())
-                .getDropVec()
-                .get(taskLevel - 1) //adjust for zero index
-                .getPreviewRewardId();
-            dailyTaskInfo.setRewardId(rewardId);
-            return dailyTaskInfo;
-        }).toList();
+        return this.currentTasks.stream().map(this::getTaskInfoProto).toList();
+    }
+
+    public DailyTaskInfo getTaskInfoProto(int taskId) {
+        val dailyTaskInfo = new DailyTaskInfo();
+        dailyTaskInfo.setDailyTaskId(taskId);
+        val taskData = GameData.getDailyTaskDataMap().get(taskId);
+        dailyTaskInfo.setFinishProgress(taskData.getFinishProgress());
+        val rewardId = GameData.getDailyTaskRewardDataMap()
+            .get(taskData.getTaskRewardId())
+            .getDropVec()
+            .get(taskLevel - 1) //adjust for zero index
+            .getPreviewRewardId();
+        dailyTaskInfo.setRewardId(rewardId);
+        if (finishedCurrentTasks.contains(taskId)) {
+            dailyTaskInfo.setProgress(dailyTaskInfo.getFinishProgress());
+            dailyTaskInfo.setFinished(true);
+        }
+        return dailyTaskInfo;
+    }
+
+    public void finishTask(int taskId) {
+        if (!finishedCurrentTasks.contains(taskId))
+            finishedCurrentTasks.add(taskId);
+
+        this.player.sendPacket(new PacketDailyTaskProgressNotify(getTaskInfoProto(taskId)));
     }
 
     public void setTaskVar(int taskId, int index, int value) {
