@@ -64,6 +64,16 @@ public class DailyTaskManager extends BasePlayerDataManager {
         //clear finished tasks
         finishedCurrentTasks.clear();
 
+        //hack: remove old currentTasks from the quest list
+        this.player.getQuestManager().getMainQuests().values().forEach(mQuest ->
+            mQuest.getChildQuests().values().forEach(sQuest ->
+                sQuest.getQuestData().getAcceptCond().stream()
+                    .filter(cond ->
+                        cond.getType() == QuestCond.QUEST_COND_DAILY_TASK_START && currentTasks.contains(cond.getParam()[0]))
+                    .forEach(cond -> mQuest.delete())
+            )
+        );
+
         //filter tasks
         var taskList = new ArrayList<>(GameData.getDailyTaskDataMap().values().stream()
             .filter(task -> cityFilter == 0 || task.getCityId() == cityFilter)
