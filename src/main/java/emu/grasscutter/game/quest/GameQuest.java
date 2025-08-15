@@ -217,6 +217,7 @@ public class GameQuest {
         }
         getOwner().getDungeonEntryManager().checkQuestForDungeonEntryUpdate(this);
         getOwner().getCoopHandler().conditionMetChapterUpdateNotify(this.getSubQuestId(), "COOP_COND_FINISH_QUEST");
+        getOwner().getDailyTaskManager().checkForCityUnlock(this.getSubQuestId());
 
         save();
 

@@ -21,6 +21,7 @@ public class HandlerSceneInitFinishReq extends TypedPacketHandler<SceneInitFinis
             .ifPresent(DungeonManager::sendDungeonInfoPacket);
 
 		session.send(new PacketWorldPlayerInfoNotify(session.getPlayer().getWorld()));
+        session.send(new PacketWorldOwnerDailyTaskNotify(session.getPlayer()));
 		session.send(new PacketWorldDataNotify(session.getPlayer().getWorld()));
         session.send(new PacketWorldOwnerBlossomBriefInfoNotify(session.getPlayer().getWorld()));
 		session.send(new PacketPlayerWorldSceneInfoListNotify(session.getPlayer()));

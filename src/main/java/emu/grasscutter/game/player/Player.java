@@ -42,6 +42,7 @@ import emu.grasscutter.game.managers.blossom.BlossomManager;
 import emu.grasscutter.game.managers.cooking.ActiveCookCompoundData;
 import emu.grasscutter.game.managers.cooking.CookingCompoundManager;
 import emu.grasscutter.game.managers.cooking.CookingManager;
+import emu.grasscutter.game.managers.dailyquest.DailyTaskManager;
 import emu.grasscutter.game.managers.deforestation.DeforestationManager;
 import emu.grasscutter.game.managers.energy.EnergyManager;
 import emu.grasscutter.game.managers.forging.ActiveForgeData;
@@ -173,6 +174,7 @@ public class Player {
     @Getter @Setter private transient MessageHandler messageHandler;
     @Getter private transient AbilityManager abilityManager;
     @Getter @Setter private transient QuestManager questManager;
+    @Getter private DailyTaskManager dailyTaskManager;
     @Getter private transient TowerManager towerManager;
     @Getter private transient SotSManager sotsManager;
     @Getter private transient MapMarksManager mapMarksManager;
@@ -253,6 +255,7 @@ public class Player {
         this.abilityManager = new AbilityManager(this);
         this.deforestationManager = new DeforestationManager(this);
         this.questManager = new QuestManager(this);
+        this.dailyTaskManager = new DailyTaskManager(this);
         this.buffManager = new PlayerBuffManager(this);
         this.position = new Position(GameConstants.START_POSITION);
         this.rotation = new Position(0, 307, 0);
@@ -514,6 +517,7 @@ public class Player {
 
             // Handle open state unlocks from level-up.
             this.getProgressManager().tryUnlockOpenStates();
+            this.getDailyTaskManager().updateTaskLevel();
             this.getQuestManager().queueEvent(QuestContent.QUEST_CONTENT_PLAYER_LEVEL_UP, level);
             this.getQuestManager().queueEvent(QuestCond.QUEST_COND_PLAYER_LEVEL_EQUAL_GREATER, level);
             this.getCoopHandler().conditionMetChapterUpdateNotify(level, "COOP_COND_PLAYER_LEVEL");
@@ -1310,6 +1314,9 @@ public class Player {
         // Reset resin-buying count.
         this.setResinBuyCount(0);
 
+        // Reset daily tasks
+        this.dailyTaskManager.randomizeTasks();
+
         // Done. Update last reset time.
         this.setLastDailyReset(currentTime);
     }
@@ -1356,6 +1363,7 @@ public class Player {
         this.getQuestManager().loadFromDatabase();
 
         this.loadBattlePassManager();
+        this.getDailyTaskManager().setPlayer(this);
         this.getAvatars().postLoad(); // Needs to be called after inventory is handled
     }
 
@@ -1405,6 +1413,7 @@ public class Player {
         session.send(new PacketBattlePassAllDataNotify(this));
         session.send(new PacketQuestListNotify(this));
         getGivingManager().onLogin();
+        session.send(new PacketDailyTaskUnlockedCitiesNotify(this));
         session.send(new PacketCodexDataFullNotify(this));
         session.send(new PacketAllWidgetDataNotify(this));
         session.send(new PacketWidgetGadgetAllDataNotify());
@@ -1420,6 +1429,7 @@ public class Player {
         this.resinManager.onPlayerLogin();
         this.cookingManager.sendCookDataNotify();
         this.cookingCompoundManager.onPlayerLogin();
+        this.dailyTaskManager.onPlayerLogin();
         this.teamManager.onPlayerLogin();
 
         getTodayMoonCard(); // The timer works at 0:0, some users log in after that, use this method to check if they have received a reward today or not. If not, send the reward.

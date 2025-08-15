@@ -17,7 +17,7 @@ public enum QuestCond implements QuestTrigger {
     QUEST_COND_AVATAR_CAN_CHANGE_ELEMENT (6),       //#Missing #NpcGroup #TalkExcel
     QUEST_COND_CITY_LEVEL_EQUAL_GREATER (7),        //#Missing #QuestTalks #TalkExcel
     QUEST_COND_ITEM_NUM_LESS_THAN (8),
-    QUEST_COND_DAILY_TASK_START (9),                //#Missing #QuestExcel
+    QUEST_COND_DAILY_TASK_START (9),
     QUEST_COND_OPEN_STATE_EQUAL (10),
     QUEST_COND_DAILY_TASK_OPEN (11),                //#Missing #NpcGroup #TalkExcel
     QUEST_COND_DAILY_TASK_REWARD_CAN_GET (12),      //#Missing #QuestTalks #NpcGroup #TalkExcel
@@ -40,9 +40,9 @@ public enum QuestCond implements QuestTrigger {
     QUEST_COND_DAILY_TASK_FINISHED (29),            //#Missing #Unused
     QUEST_COND_ACTIVITY_COND (30),
     QUEST_COND_ACTIVITY_OPEN (31),                  //#Missing the trigger
-    QUEST_COND_DAILY_TASK_VAR_GT (32),              //#Missing #QuestExcel #QuestTalks #TalkExcel
-    QUEST_COND_DAILY_TASK_VAR_EQ (33),              //#Missing #QuestExcel #QuestTalks #NpcGroup #TalkExcel
-    QUEST_COND_DAILY_TASK_VAR_LT (34),              //#Missing #QuestExcel #QuestTalks #TalkExcel
+    QUEST_COND_DAILY_TASK_VAR_GT (32),
+    QUEST_COND_DAILY_TASK_VAR_EQ (33),
+    QUEST_COND_DAILY_TASK_VAR_LT (34),
     QUEST_COND_BARGAIN_ITEM_GT (35),                //#Missing #Unused
     QUEST_COND_BARGAIN_ITEM_EQ (36),                //#Missing #Unused
     QUEST_COND_BARGAIN_ITEM_LT (37),                //#Missing #Unused
