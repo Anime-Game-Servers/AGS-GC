@@ -199,11 +199,11 @@ public class Avatar {
             .mapToInt(openData -> (openData.getProudSkillGroupId() * 100) + 1)
             .filter(proudSkillId -> GameData.getProudSkillDataMap().containsKey(proudSkillId))
             .forEach(proudSkillId -> this.proudSkillList.add(proudSkillId));
-        this.recalcStats(notifyChange);
 
         if(notifyChange){
             owner.sendPacket(new PacketAvatarSkillDepotChangeNotify(this));
         }
+        this.recalcStats(notifyChange);
     }
 
     /**
