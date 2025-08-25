@@ -275,6 +275,7 @@ public class SceneScriptManager {
 
         groupInstance.setActiveSuiteId(suiteIndex);
         groupInstance.setLastTimeRefreshed(getScene().getWorld().getGameTime());
+        callEvent(new ScriptArgs(groupId, EventType.EVENT_GROUP_REFRESH));
         return suiteIndex;
     }
 
