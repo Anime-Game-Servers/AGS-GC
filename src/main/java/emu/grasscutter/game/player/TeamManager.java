@@ -562,16 +562,17 @@ public class TeamManager extends BasePlayerDataManager {
     }
 
     public Position getRespawnPosition() {
-        int sceneId = getPlayer().getSceneId();
+        var player = getPlayer();
+        var deathPos = player.getPosition();
+        int sceneId = player.getSceneId();
 
         // Get the closest trans point to where the player died.
-        return getPlayer().getUnlockedScenePoints(sceneId).stream()
+        return player.getUnlockedScenePoints(sceneId).stream()
             .map(pointId -> GameData.getScenePointEntryById(sceneId, pointId))
-            .filter(point -> point.getPointData().getType().equals("SceneTransPoint"))
-            .min(Comparator.comparingDouble(pos ->
-                Utils.getDist(pos.getPointData().getTransPosWithFallback(),
-                getPlayer().getPosition())))
-            .map(scenePointEntry -> scenePointEntry.getPointData().getTransRotWithFallback())
+            .map(ScenePointEntry::getPointData)
+            .filter(point -> point.getType().equals("SceneTransPoint"))
+            .map(PointData::getTransPosWithFallback)
+            .min(Comparator.comparingDouble(pos -> Utils.getDist(pos, deathPos)))
             .orElse(GameConstants.START_POSITION);
     }
     public void saveAvatars() {
