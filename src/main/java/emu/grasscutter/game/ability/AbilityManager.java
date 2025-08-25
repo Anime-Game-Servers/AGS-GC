@@ -152,6 +152,7 @@ public final class AbilityManager extends BasePlayerManager {
             case ABILITY_META_GLOBAL_FLOAT_VALUE -> this.handleGlobalFloatValue(invoke);
             case ABILITY_META_MODIFIER_DURABILITY_CHANGE -> this.handleModifierDurabilityChange(invoke);
             case ABILITY_META_ADD_NEW_ABILITY -> this.handleAddNewAbility(invoke);
+            case ABILITY_META_REMOVE_ABILITY -> this.handleRemoveAbility(invoke);
             case ABILITY_META_TRIGGER_ELEMENT_REACTION -> this.handleTriggerElementReaction(invoke);
             default -> {}
         }
@@ -491,12 +492,26 @@ public final class AbilityManager extends BasePlayerManager {
         var ability = GameData.getAbilityData(abilityName);
         if(ability == null) {
             logger.info("handleAddNewAbility ability not found: {}", abilityName);
-            return;
         }
 
-        entity.getInstancedAbilities().add(new Ability(ability, entity, player));
+        addAbilityToEntity(entity, ability);
 
         logger.debug("Ability added to entity {} at index {}", entity.getId(), entity.getInstancedAbilities().size());
+    }
+
+    private void handleRemoveAbility(AbilityInvokeEntry invoke) {
+        var entity = this.player.getScene().getEntityById(invoke.getEntityId());
+        if(entity == null) {
+            logger.info("handleRemoveAbility entity not found: {}", invoke.getEntityId());
+            return;
+        }
+        var id = invoke.getHead().getInstancedAbilityId() - 1;
+        if (id < 0) {
+            logger.info("handleRemoveAbility invalid id: {}", id);
+            return;
+        }
+        entity.getInstancedAbilities().remove(id);
+        invoke.getHead();
     }
 
     /**
@@ -523,8 +538,14 @@ public final class AbilityManager extends BasePlayerManager {
     }
 
     public void addAbilityToEntity(GameEntity entity, AbilityData abilityData) {
+        var instancedAbilities = entity.getInstancedAbilities();
+        if (abilityData == null) {
+            // add null as placeholder for missing abilities
+            instancedAbilities.add(null);
+            return;
+        }
         Ability ability = new Ability(abilityData, entity, this.player);
-        entity.getInstancedAbilities().add(ability); //This are in order
+        instancedAbilities.add(ability); //This are in order
     }
 }
 
