@@ -1568,7 +1568,6 @@ public class Player {
         if (sendPacket) {
             // Update player with packet
             this.sendPacket(new PacketPlayerPropNotify(this, prop));
-            this.sendPacket(new PacketPlayerPropChangeNotify(this, prop, value - currentValue));
 
             if (prop == PlayerProperty.PROP_MAX_STAMINA) {
                 this.sendPacket(new PacketPlayerPropChangeReasonNotify(this, prop, currentValue, value, PropChangeReason.PROP_CHANGE_CITY_LEVELUP));
