@@ -604,11 +604,11 @@ public class Player {
 
     // Directly give player exp
     public void addExpDirectly(int gain) {
+        int currentExp = getExp();
+        int exp = currentExp + gain;
         int level = getLevel();
-        int exp = getExp();
         int reqExp = getExpRequired(level);
-
-        exp += gain;
+        var changeReason = PropChangeReason.PROP_CHANGE_PLAYER_ADD_EXP;
 
         while (exp >= reqExp && reqExp > 0) {
             exp -= reqExp;
@@ -616,11 +616,17 @@ public class Player {
             reqExp = getExpRequired(level);
 
             // Set level each time to allow level-up specific logic to run.
-            this.setLevel(level);
+            if (!this.setLevel(level)) return;
+
+            // This ensures the number of gained exp is correct (when exp < currentExp)
+            this.sendPacket(new PacketPlayerPropChangeReasonNotify(this, PlayerProperty.PROP_PLAYER_LEVEL, level-1, level, changeReason));
+            changeReason = PropChangeReason.PROP_CHANGE_AVATAR_UPGRADE;
         }
 
         // Set exp
-        this.setProperty(PlayerProperty.PROP_PLAYER_EXP, exp);
+        if (this.setProperty(PlayerProperty.PROP_PLAYER_EXP, exp)) {
+            this.sendPacket(new PacketPlayerPropChangeReasonNotify(this, PlayerProperty.PROP_PLAYER_EXP, currentExp, exp, changeReason));
+        }
     }
 
     private void updateWorldLevel() {
@@ -1564,10 +1570,7 @@ public class Player {
             this.sendPacket(new PacketPlayerPropNotify(this, prop));
             this.sendPacket(new PacketPlayerPropChangeNotify(this, prop, value - currentValue));
 
-            // Make the Adventure EXP pop-up show on screen.
-            if (prop == PlayerProperty.PROP_PLAYER_EXP) {
-                this.sendPacket(new PacketPlayerPropChangeReasonNotify(this, prop, currentValue, value, PropChangeReason.PROP_CHANGE_PLAYER_ADD_EXP));
-            } else if(prop == PlayerProperty.PROP_MAX_STAMINA) {
+            if (prop == PlayerProperty.PROP_MAX_STAMINA) {
                 this.sendPacket(new PacketPlayerPropChangeReasonNotify(this, prop, currentValue, value, PropChangeReason.PROP_CHANGE_CITY_LEVELUP));
             }
         }
