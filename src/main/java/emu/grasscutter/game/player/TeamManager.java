@@ -4,8 +4,6 @@ import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Transient;
 import emu.grasscutter.GameConstants;
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.binout.ScenePointEntry;
-import emu.grasscutter.data.common.PointData;
 import emu.grasscutter.data.excels.AvatarSkillDepotData;
 import emu.grasscutter.game.avatar.Avatar;
 import emu.grasscutter.game.avatar.AvatarStorage;
@@ -571,9 +569,8 @@ public class TeamManager extends BasePlayerDataManager {
         // Get the closest trans point to where the player died.
         return player.getUnlockedScenePoints(sceneId).stream()
             .map(pointId -> GameData.getScenePointEntryById(sceneId, pointId))
-            .map(ScenePointEntry::getPointData)
-            .filter(point -> point.getType().equals("SceneTransPoint"))
-            .map(PointData::getTransPosWithFallback)
+            .filter(entry -> entry.getPointData().getType().equals("SceneTransPoint"))
+            .map(entry -> entry.getPointData().getTransPosWithFallback())
             .min(Comparator.comparingDouble(pos -> Utils.getDist(pos, deathPos)))
             .orElse(GameConstants.START_POSITION);
     }
