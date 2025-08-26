@@ -485,16 +485,39 @@ public final class AbilityManager extends BasePlayerManager {
             return;
         }
 
-        var addAbility = AbilityMetaAddAbility.parseBy(invoke.getAbilityData(), player.getSession().getVersion());
+        var addAbility = AbilityMetaAddAbility
+            .parseBy(invoke.getAbilityData(), player.getSession().getVersion())
+            .getAbility();
 
-        var abilityName = Ability.getAbilityName(addAbility.getAbility().getAbilityName());
-
-        var ability = GameData.getAbilityData(abilityName);
-        if(ability == null) {
-            logger.info("handleAddNewAbility ability not found: {}", abilityName);
+        if (addAbility == null) {
+            logger.debug("handleAddNewAbility no ability to add");
+            return;
         }
 
-        addAbilityToEntity(entity, ability);
+        var instancedId = addAbility.getInstancedAbilityId();
+        if (instancedId <= 0) {
+            logger.info("handleAddNewAbility invalid instancedAbilityId: {}", instancedId);
+            return;
+        }
+
+        // avoid crash when ability_name is not present
+        var abilityName = Optional.ofNullable(addAbility.getAbilityName())
+            .map(Ability::getAbilityName)
+            .orElse(null);
+
+        var abilityData = GameData.getAbilityData(abilityName);
+        if (abilityData == null) {
+            logger.info("handleAddNewAbility ability not found: {}", abilityName);
+        }
+        else {
+            // Gracefully add ability, ensure instancedAbilityId is synced between client and server
+            // instancedId is 1-indexed
+            while (instancedId > entity.getInstancedAbilities().size()) {
+                entity.getInstancedAbilities().add(null);
+            }
+            var ability = new Ability(abilityData, entity, this.player);
+            entity.getInstancedAbilities().set(instancedId-1, ability);
+        }
 
         logger.debug("Ability added to entity {} at index {}", entity.getId(), entity.getInstancedAbilities().size());
     }
@@ -505,13 +528,16 @@ public final class AbilityManager extends BasePlayerManager {
             logger.info("handleRemoveAbility entity not found: {}", invoke.getEntityId());
             return;
         }
-        var id = invoke.getHead().getInstancedAbilityId() - 1;
-        if (id < 0) {
-            logger.info("handleRemoveAbility invalid id: {}", id);
+        // instancedId is 1-indexed
+        var instancedId = Optional.ofNullable(invoke.getHead())
+            .map(it -> it.getInstancedAbilityId())
+            .orElse(0);
+
+        if (instancedId <= 0) {
+            logger.info("handleRemoveAbility invalid id: {}", instancedId);
             return;
         }
-        entity.getInstancedAbilities().remove(id);
-        invoke.getHead();
+        entity.getInstancedAbilities().remove(instancedId-1);
     }
 
     /**
