@@ -50,16 +50,12 @@ public class ScenePlayerHandler extends BaseHandler implements org.anime_game_se
         logger.warn("[LUA] Call unimplemented IsPlayerAllAvatarDie {}", sceneUid);
         var playerEntities = context.getSceneScriptManager().getScene().getEntities().values().stream()
             .filter(e -> e.getEntityType().name().toUpperCase().equals(EntityType.AVATAR.name()))
+            .map(EntityAvatar.class::cast)
+            .filter(EntityAvatar::isAlive)
             .toList();
 
-        for (GameEntity p : playerEntities) {
-            var player = (EntityAvatar) p;
-            if (player.isAlive()) {
-                return false;
-            }
-        }
         //TODO check
-        return true;
+        return playerEntities.isEmpty();
     }
     @Override
     public VehicleType getPlayerVehicleType(@NotNull GroupEventLuaContext context, int uid) {

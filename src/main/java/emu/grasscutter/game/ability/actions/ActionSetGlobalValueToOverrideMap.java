@@ -27,7 +27,7 @@ public class ActionSetGlobalValueToOverrideMap extends AbilityActionHandler {
             return true;
         }
         if(abilityFormula == null) {
-            logger.debug("abiltiy formular null", globalValueKey);
+            logger.debug("abiltiy formular null {}", globalValueKey);
         }
 
         var globalValue = entity.getGlobalAbilityValues().getOrDefault(globalValueKey, 0.0f);

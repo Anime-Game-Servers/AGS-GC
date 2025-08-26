@@ -1,6 +1,7 @@
 package emu.grasscutter.scripts.scriptlib_handlers;
 
 import emu.grasscutter.Loggers;
+import emu.grasscutter.game.entity.EntityGadget;
 import emu.grasscutter.game.entity.GameEntity;
 import emu.grasscutter.scripts.SceneScriptManager;
 import emu.grasscutter.scripts.lua_engine.GroupEventLuaContext;
@@ -42,7 +43,7 @@ public class BaseHandler {
         return sb.toString();
     }
 
-    protected GameEntity createGadget(SceneScriptManager sceneScriptManager, int configId, org.anime_game_servers.gi_lua.models.scene.group.SceneGroup group){
+    protected EntityGadget createGadget(SceneScriptManager sceneScriptManager, int configId, org.anime_game_servers.gi_lua.models.scene.group.SceneGroup group){
         val groupId = group.getGroupInfo().getId();
         val groupBlockId = group.getGroupInfo().getBlockId();
         val groupGadgets = group.getGadgets();

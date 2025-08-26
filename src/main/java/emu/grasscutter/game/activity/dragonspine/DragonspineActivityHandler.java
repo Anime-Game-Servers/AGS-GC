@@ -64,8 +64,6 @@ public class DragonspineActivityHandler extends ActivityHandler<DragonspinePlaye
         dragonspineInfo.setWarmEssence(warmCount);
         dragonspineInfo.setWondrousEssence(miraculousCount);
 
-        //playerActivityData.getPlayer().sendPacket(new PacketAsterMiscInfoNotify(creditCount, tokenCount));
-
         activityInfo.setDetail(new ActivityInfo.Detail.DragonSpineInfo(dragonspineInfo));
         activityInfo.setActivityCoinMap(Map.of(111, 1, 112, 1, 113, 1));
     }

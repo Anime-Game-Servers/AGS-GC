@@ -35,11 +35,11 @@ public class AutoMonsterTideScriptHandler extends BaseHandler implements org.ani
         return handleUnimplemented(groupId, tideId);
     }
 
+    //TODO implement
     @Override
     public int autoPoolMonsterTide(@NotNull GroupEventLuaContext context, int index, int groupId, int[] monsterPool, int routeId,
                                    int[] routePoints, int[] monsterAffix, @NotNull PoolMonsterTideConfig monsterPoolParam) {
         return handleUnimplemented(index, groupId, monsterPool, routeId, routePoints, monsterAffix, monsterPoolParam);
-        //TODO implement monsterPoolParam contains int totalCount, int minCount, int tag, int fillTime, int fillCount, bool isOrdered
     }
 
     @Override

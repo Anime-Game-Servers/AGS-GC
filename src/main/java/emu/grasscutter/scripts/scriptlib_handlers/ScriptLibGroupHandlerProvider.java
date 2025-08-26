@@ -2,6 +2,7 @@ package emu.grasscutter.scripts.scriptlib_handlers;
 
 import emu.grasscutter.scripts.lua_engine.GroupEventLuaContext;
 import emu.grasscutter.scripts.scriptlib_handlers.activity.ActivityHandler;
+import emu.grasscutter.scripts.scriptlib_handlers.activity.ChannelerSlabHandler;
 import emu.grasscutter.scripts.scriptlib_handlers.activity.SummerTimeHandler;
 import emu.grasscutter.scripts.scriptlib_handlers.entities.GroupEntityHandler;
 import emu.grasscutter.scripts.scriptlib_handlers.entities.GroupGadgetHandler;
@@ -63,6 +64,7 @@ public class ScriptLibGroupHandlerProvider implements org.anime_game_servers.gi_
     // activity
     final ActivityHandler activityHandler = new ActivityHandler();
     // TODO aster
+    final ChannelerSlabHandler channelerSlabHandler = new ChannelerSlabHandler();
     // TODO ChannelerSlab
     // TODO char amusement
     // TODO chess
@@ -99,6 +101,11 @@ public class ScriptLibGroupHandlerProvider implements org.anime_game_servers.gi_
     @Override
     public ActivityHandler getActivityHandler() {
         return activityHandler;
+    }
+
+    @Override
+    public ChannelerSlabHandler getChannelerSlabHandler() {
+        return channelerSlabHandler;
     }
 
     @Override

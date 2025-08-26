@@ -57,7 +57,7 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
 
     @Override
     public int getGroupSuite(@NotNull GroupEventLuaContext context, int groupId) {
-        //logger.warn("[LUA] Call GetGroupSuite with {}", groupID);
+        logger.debug("[LUA] Call GetGroupSuite with {}", groupId);
         val actualGroupId = getGroupIdOrCurrentId(context, groupId);
         var instance = context.getSceneScriptManager().getGroupInstanceById(actualGroupId);
         if(instance != null) return instance.getActiveSuiteId();

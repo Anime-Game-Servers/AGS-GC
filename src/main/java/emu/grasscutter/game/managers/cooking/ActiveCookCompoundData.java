@@ -3,7 +3,6 @@ package emu.grasscutter.game.managers.cooking;
 import dev.morphia.annotations.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 
 @Entity @AllArgsConstructor

@@ -851,9 +851,6 @@ public class SceneScriptManager {
 
         val context = new GroupEventLuaContext(script.getEngine(), group, params, this);
         try{
-            //val luaArgs = new Object[args.length+1];
-            //luaArgs[0] = context;
-            //System.arraycopy(args, 0, luaArgs, 1, args.length);
             val result = GIScriptHandler.callGroupFunction(script, funcName, context, args);
             return true;
         } catch (RuntimeException | ScriptException | NoSuchMethodException error) {

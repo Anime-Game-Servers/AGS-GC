@@ -29,9 +29,9 @@ public class ActionServerLuaCall extends AbilityActionHandler {
                  CUR_ROGUE_BOSS_GROUP, ABILITY_GROUP_SOURCE_GROUP -> {
                 Grasscutter.getLogger().error("Unimplemented ActionServerLuaCall {} {}", action.luaCallType, callType);
             }
-            /*default -> {
-                Grasscutter.getLogger().error("Unimplemented ActionServerLuaCall {} {}", action.luaCallType, callType);
-            }*/
+            default -> {
+                Grasscutter.getLogger().error("Unknown ActionServerLuaCall {} {}", action.luaCallType, callType);
+            }
         }
         return false;
     }
