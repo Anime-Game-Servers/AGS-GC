@@ -1566,7 +1566,7 @@ public class Player {
         int currentValue = this.properties.get(prop.getId());
         this.properties.put(prop.getId(), value);
         if (sendPacket) {
-            // Update player with packet
+            // Notify the client about the player property change. For cb1 clients we probably need to send PlayerPropChangeNotify instead. TODO: verify
             this.sendPacket(new PacketPlayerPropNotify(this, prop));
 
             if (prop == PlayerProperty.PROP_MAX_STAMINA) {
