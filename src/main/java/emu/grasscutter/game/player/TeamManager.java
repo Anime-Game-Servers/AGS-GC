@@ -568,9 +568,9 @@ public class TeamManager extends BasePlayerDataManager {
 
         // Get the closest trans point to where the player died.
         return player.getUnlockedScenePoints(sceneId).stream()
-            .map(pointId -> GameData.getScenePointEntryById(sceneId, pointId))
-            .filter(entry -> entry.getPointData().getType().equals("SceneTransPoint"))
-            .map(entry -> entry.getPointData().getTransPosWithFallback())
+            .map(pointId -> GameData.getScenePointEntryById(sceneId, pointId).getPointData())
+            .filter(point -> point.getType().equals("SceneTransPoint"))
+            .map(point -> point.getTransPosWithFallback())
             .min(Comparator.comparingDouble(pos -> Utils.getDist(pos, deathPos)))
             .orElse(GameConstants.START_POSITION);
     }
