@@ -517,9 +517,8 @@ public final class AbilityManager extends BasePlayerManager {
             }
             var ability = new Ability(abilityData, entity, this.player);
             entity.getInstancedAbilities().set(instancedId-1, ability);
+            logger.debug("Ability added to entity {} at index {}", entity.getId(), instancedId);
         }
-
-        logger.debug("Ability added to entity {} at index {}", entity.getId(), entity.getInstancedAbilities().size());
     }
 
     private void handleRemoveAbility(AbilityInvokeEntry invoke) {
