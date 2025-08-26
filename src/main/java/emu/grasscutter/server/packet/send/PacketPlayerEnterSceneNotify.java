@@ -42,6 +42,7 @@ public class PacketPlayerEnterSceneNotify extends BaseTypedPacket<PlayerEnterSce
             .enterType(type)
             .enterReason(reason)
             .sceneId(newScene)
+            .prevPos(player.getPosition())
             .teleportTo(newPos)
             .build());
     }
