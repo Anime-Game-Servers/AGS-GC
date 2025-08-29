@@ -1,5 +1,6 @@
 package emu.grasscutter.scripts.scriptlib_handlers;
 
+import emu.grasscutter.game.entity.EntityBaseGadget;
 import emu.grasscutter.game.entity.EntityGadget;
 import emu.grasscutter.scripts.SceneScriptManager;
 import emu.grasscutter.scripts.lua_engine.ControllerLuaContext;
@@ -26,6 +27,20 @@ public class GadgetControllerHandler extends BaseHandler implements org.anime_ga
         if(gadget == null) return -1;
 
         gadget.updateState(gadgetState);
+        return 0;
+    }
+
+    @Override
+    public int setGadgetStateByConfigId(@NotNull ControllerLuaContext context, int configId, int gadgetState) {
+        EntityGadget gadget = context.getEntity();
+        if(gadget == null) return -1;
+        val groupId = gadget.getGroupId();
+        val targetEntity = gadget.getScene().getEntityByConfigId(configId, groupId);
+        if (!(targetEntity instanceof EntityBaseGadget)){
+            return -2;
+        }
+
+        ((EntityBaseGadget)targetEntity).updateState(gadgetState);
         return 0;
     }
 
