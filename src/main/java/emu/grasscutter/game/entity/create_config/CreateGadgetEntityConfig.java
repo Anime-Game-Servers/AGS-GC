@@ -13,6 +13,7 @@ import emu.grasscutter.game.entity.gadget.platform.BaseRoute;
 import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.CampTargetType;
+import emu.grasscutter.game.props.EntityType;
 import emu.grasscutter.game.world.SpawnDataEntry;
 import emu.grasscutter.scripts.EntityControllerScriptManager;
 import emu.grasscutter.scripts.data.controller.EntityController;
@@ -107,6 +108,7 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
         this.bossChestInfo = BossChestInfo.fromSceneBossChest(gadget.getBossChest());
         this.arguments = gadget.getArguments();
         this.isStartRoute = gadget.isStartRoute();
+
         initBaseData();
     }
 
@@ -175,8 +177,25 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
     }
 
     private void initBaseData(){
+        handleInitialOverwrites();
         initGadgetData(gadgetId);
         initController();
+    }
+
+    /**
+     * Handles overwrites that need to be done before initial data gathering, based on initial data that got set by the creator
+     */
+    private void handleInitialOverwrites(){
+        // todo if gadgetData.getType() == EntityType.AmberWind replace based on WorldAreaLevelupConfig, when actionVec == WORLD_AREA_ACTION_ACTIVATE_ITEM and paramVec1==gadgetId
+        // TODO blossom chest gadgets will be replaced under some conditions based with BlossomChestExcelConfigData.chestGadgetId
+        if(pointType != 0){
+            val gatherData = GameData.getGatherDataMap().get(pointType);
+            if(gatherData!=null){
+                this.gadgetId = gatherData.getGadgetId();
+            } else {
+                Grasscutter.getLogger().warn("Gather data for Point {} not found", pointType);
+            }
+        }
     }
 
     private void initGadgetData(int gadgetId){

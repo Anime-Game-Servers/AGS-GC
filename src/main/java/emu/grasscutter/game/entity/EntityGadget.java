@@ -93,7 +93,6 @@ public class EntityGadget extends EntityBaseGadget implements ConfigAbilityDataA
         }
 
         return switch (this.getGadgetData().getType()) {
-            case GatherPoint -> new GadgetGatherPoint(this);
             case GatherObject -> new GadgetGatherObject(this);
             case Worktop, SealGadget -> new GadgetWorktop(this);
             case RewardStatue -> new GadgetRewardStatue(this);
