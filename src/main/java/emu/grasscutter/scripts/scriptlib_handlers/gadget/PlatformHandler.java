@@ -25,19 +25,19 @@ public class PlatformHandler extends BaseHandler implements org.anime_game_serve
 
 
     @Override
-    public @NotNull PlatformArrayInfo getPlatformArrayInfoByPointId(@NotNull GroupEventLuaContext groupEventLuaContext, int arrayId, int pointId) {
+    public @NotNull PlatformArrayInfo getPlatformArrayInfoByPointId(@NotNull GroupEventLuaContext context, int arrayId, int pointId) {
         handleUnimplemented(arrayId, pointId);
         return new PlatformArrayInfo(-1 , new Position(), new Position());
     }
 
     @Override
-    public List<Integer> getPlatformPointArray(@NotNull GroupEventLuaContext groupEventLuaContext, int configId) {
+    public List<Integer> getPlatformPointArray(@NotNull GroupEventLuaContext context, int configId) {
         handleUnimplemented(configId);
         return List.of();
     }
 
     @Override
-    public int setPlatformRouteIndexToNext(@NotNull GroupEventLuaContext groupEventLuaContext, int configId) {
+    public int setPlatformRouteIndexToNext(@NotNull GroupEventLuaContext context, int configId) {
         return handleUnimplemented(configId);
     }
 

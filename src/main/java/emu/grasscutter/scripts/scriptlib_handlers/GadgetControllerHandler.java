@@ -2,6 +2,7 @@ package emu.grasscutter.scripts.scriptlib_handlers;
 
 import emu.grasscutter.game.entity.EntityBaseGadget;
 import emu.grasscutter.game.entity.EntityGadget;
+import emu.grasscutter.game.entity.GameEntity;
 import emu.grasscutter.scripts.SceneScriptManager;
 import emu.grasscutter.scripts.lua_engine.ControllerLuaContext;
 import lombok.Getter;
@@ -22,9 +23,9 @@ public class GadgetControllerHandler extends BaseHandler implements org.anime_ga
      */
 
     @Override
-    public int setGadgetState(ControllerLuaContext context, int gadgetState) {
+    public int setGadgetState(@NotNull ControllerLuaContext context, int gadgetState) {
         EntityGadget gadget = context.getEntity();
-        if(gadget == null) return -1;
+        if (gadget == null) return -1;
 
         gadget.updateState(gadgetState);
         return 0;
@@ -33,29 +34,29 @@ public class GadgetControllerHandler extends BaseHandler implements org.anime_ga
     @Override
     public int setGadgetStateByConfigId(@NotNull ControllerLuaContext context, int configId, int gadgetState) {
         EntityGadget gadget = context.getEntity();
-        if(gadget == null) return -1;
+        if (gadget == null) return -1;
         val groupId = gadget.getGroupId();
         val targetEntity = gadget.getScene().getEntityByConfigId(configId, groupId);
-        if (!(targetEntity instanceof EntityBaseGadget)){
+        if (!(targetEntity instanceof EntityBaseGadget)) {
             return -2;
         }
 
-        ((EntityBaseGadget)targetEntity).updateState(gadgetState);
+        ((EntityBaseGadget) targetEntity).updateState(gadgetState);
         return 0;
     }
 
     @Override
-    public int getGadgetState(ControllerLuaContext context) {
+    public int getGadgetState(@NotNull ControllerLuaContext context) {
         EntityGadget gadget = context.getEntity();
-        if(gadget == null) return -1;
+        if (gadget == null) return -1;
 
         return gadget.getState();
     }
 
     @Override
-    public int resetGadgetState(ControllerLuaContext context, int gadgetState) {
+    public int resetGadgetState(@NotNull ControllerLuaContext context, int gadgetState) {
         EntityGadget gadget = context.getEntity();
-        if(gadget == null) return -1;
+        if (gadget == null) return -1;
 
         gadget.getPosition().set(gadget.getBornPos());
         gadget.getRotation().set(gadget.getBornRot());
@@ -66,67 +67,67 @@ public class GadgetControllerHandler extends BaseHandler implements org.anime_ga
     }
 
     @Override
-    public int setGearStartValue(ControllerLuaContext context, int startValue) {
+    public int setGearStartValue(@NotNull ControllerLuaContext context, int startValue) {
         EntityGadget gadget = context.getEntity();
-        if(gadget == null) return -1;
+        if (gadget == null) return -1;
 
         gadget.setStartValue(startValue);
         return 0;
     }
 
     @Override
-    public int getGearStartValue(ControllerLuaContext context) {
+    public int getGearStartValue(@NotNull ControllerLuaContext context) {
         EntityGadget gadget = context.getEntity();
-        if(gadget == null) return -1;
+        if (gadget == null) return -1;
 
         return gadget.getStartValue();
     }
 
     @Override
-    public int setGearStopValue(ControllerLuaContext context, int startValue) {
+    public int setGearStopValue(@NotNull ControllerLuaContext context, int startValue) {
         EntityGadget gadget = context.getEntity();
-        if(gadget == null) return -1;
+        if (gadget == null) return -1;
 
         gadget.setStopValue(startValue);
         return 0;
     }
 
     @Override
-    public int getGearStopValue(ControllerLuaContext context) {
+    public int getGearStopValue(@NotNull ControllerLuaContext context) {
         EntityGadget gadget = context.getEntity();
-        if(gadget == null) return -1;
+        if (gadget == null) return -1;
 
         return gadget.getStopValue();
     }
 
     @Override
-    public int getGadgetStateBeginTime(ControllerLuaContext context) {
+    public int getGadgetStateBeginTime(@NotNull ControllerLuaContext context) {
         EntityGadget gadget = context.getEntity();
-        if(gadget == null) return -1;
+        if (gadget == null) return -1;
 
         return gadget.getTicksSinceStateChange();
     }
 
     @Override
-    public int getContextGadgetConfigId(ControllerLuaContext context) {
+    public int getContextGadgetConfigId(@NotNull ControllerLuaContext context) {
         EntityGadget gadget = context.getEntity();
-        if(gadget == null) return -1;
+        if (gadget == null) return -1;
 
         return gadget.getConfigId();
     }
 
     @Override
-    public int getContextGroupId(ControllerLuaContext context) {
+    public int getContextGroupId(@NotNull ControllerLuaContext context) {
         EntityGadget gadget = context.getEntity();
-        if(gadget == null) return -1;
+        if (gadget == null) return -1;
 
         return gadget.getGroupId();
     }
 
     @Override
-    public int setGadgetEnableInteract(ControllerLuaContext context, int groupId, int configId, boolean enable) {
+    public int setGadgetEnableInteract(@NotNull ControllerLuaContext context, int groupId, int configId, boolean enable) {
         val gadget = context.getEntity();
-        if(gadget.getGroupId() != groupId || gadget.getConfigId() != configId) return -1;
+        if (gadget.getGroupId() != groupId || gadget.getConfigId() != configId) return -1;
 
         gadget.setInteractEnabled(enable);
 
@@ -134,23 +135,25 @@ public class GadgetControllerHandler extends BaseHandler implements org.anime_ga
     }
 
     @Override
-    public int dropSubfield(ControllerLuaContext context, @NotNull String subfieldName) {
+    public int dropSubfield(@NotNull ControllerLuaContext context, @NotNull String subfieldName) {
         val gadget = context.getEntity();
 
         return gadget.dropSubfield(subfieldName) ? 0 : -1;
     }
 
     @Override
-    public int[] getGatherConfigIdList(ControllerLuaContext context) {
+    public List<Integer> getGatherConfigIdList(@NotNull ControllerLuaContext context) {
         val gadget = context.getEntity();
-        val children = gadget.getChildren();
-
-        val configIds = new int[children.size()];
-        for(int i = 0; i < children.size(); i++) {
-            configIds[i] = children.get(i).getConfigId();
-        }
-
-        return configIds;
+        return gadget.getChildren()
+            .stream()
+            .<EntityBaseGadget>mapMulti((it, s) -> {
+                if (it instanceof EntityBaseGadget gadgetChild) {
+                    s.accept(gadgetChild);
+                }
+            })
+            .filter(it -> it.getState() == 0)
+            .map(GameEntity::getConfigId)
+            .toList();
     }
 
 

@@ -1,4 +1,3 @@
-
 package emu.grasscutter.scripts.scriptlib_handlers.scene;
 
 import emu.grasscutter.Loggers;
@@ -10,14 +9,17 @@ import org.anime_game_servers.gi_lua.script_lib.handler.scene.PoolMonsterTideCon
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import java.util.List;
+
 public class AutoMonsterTideScriptHandler extends BaseHandler implements org.anime_game_servers.gi_lua.script_lib.handler.scene.MonsterTideScriptHandler<GroupEventLuaContext> {
     @Getter
     private static final Logger logger = Loggers.getScriptSystem();
 
     @Override
-    public int autoMonsterTide(@NotNull GroupEventLuaContext context, int challengeIndex, int groupId, Integer[] ordersConfigId, int tideSize, int spawnThreshold, int spawnLimit) {
+    public int autoMonsterTide(@NotNull GroupEventLuaContext context, int challengeIndex, int groupId, @NotNull List<Integer> ordersConfigId,
+                               int tideSize, int spawnThreshold, int spawnLimit) {
         logger.debug("[LUA] Call AutoMonsterTide with {},{},{},{},{},{}",
-            challengeIndex,groupId,ordersConfigId,tideSize,spawnThreshold,spawnLimit);
+            challengeIndex, groupId, ordersConfigId, tideSize, spawnThreshold, spawnLimit);
 
         val group = getGroupOrCurrent(context, groupId);
 
@@ -37,8 +39,8 @@ public class AutoMonsterTideScriptHandler extends BaseHandler implements org.ani
 
     //TODO implement
     @Override
-    public int autoPoolMonsterTide(@NotNull GroupEventLuaContext context, int index, int groupId, int[] monsterPool, int routeId,
-                                   int[] routePoints, int[] monsterAffix, @NotNull PoolMonsterTideConfig monsterPoolParam) {
+    public int autoPoolMonsterTide(@NotNull GroupEventLuaContext context, int index, int groupId, @NotNull List<Integer> monsterPool, int routeId,
+                                   @NotNull List<Integer> routePoints, @NotNull List<Integer> monsterAffix, @NotNull PoolMonsterTideConfig monsterPoolParam) {
         return handleUnimplemented(index, groupId, monsterPool, routeId, routePoints, monsterAffix, monsterPoolParam);
     }
 

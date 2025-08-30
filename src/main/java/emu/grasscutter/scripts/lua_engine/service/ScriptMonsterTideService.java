@@ -40,7 +40,7 @@ public class ScriptMonsterTideService {
      * @param spawnLimit upper limit of monsters tide monsters to have active at the same time
      */
     public ScriptMonsterTideService(SceneScriptManager sceneScriptManager, int challengeIndex,
-                     SceneGroup group, Integer[] ordersConfigId, int tideSize, int spawnThreshold, int spawnLimit){
+                     SceneGroup group, List<Integer> ordersConfigId, int tideSize, int spawnThreshold, int spawnLimit){
         this.sceneScriptManager = sceneScriptManager;
         this.challengeIndex = challengeIndex;
         this.currentGroup = group;
@@ -49,8 +49,8 @@ public class ScriptMonsterTideService {
         this.monsterKillCount = new AtomicInteger(0);
         this.spawnLimit = spawnLimit;
         this.monstersSpawned = new AtomicInteger(0);
-        this.monsterConfigOrders = new ConcurrentLinkedQueue<>(List.of(ordersConfigId));
-        this.monsterConfigIds = List.of(ordersConfigId);
+        this.monsterConfigOrders = new ConcurrentLinkedQueue<>(ordersConfigId);
+        this.monsterConfigIds = ordersConfigId;
 
         this.sceneScriptManager.getScriptMonsterSpawnService().addMonsterCreatedListener(onMonsterCreated);
         this.sceneScriptManager.getScriptMonsterSpawnService().addMonsterDeadListener(onMonsterDead);

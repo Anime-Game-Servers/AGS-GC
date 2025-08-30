@@ -1,4 +1,3 @@
-
 package emu.grasscutter.scripts.scriptlib_handlers.scene;
 
 import emu.grasscutter.Loggers;
@@ -23,10 +22,34 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
     @Getter
     private static final Logger logger = Loggers.getScriptSystem();
 
+    /* group variables*/
+    private static int getGroupVariableValue(SceneScriptManager sceneScriptManager, int groupId, String varName) {
+        val variables = sceneScriptManager.getVariables(groupId);
+        return variables != null ? variables.getOrDefault(varName, 0) : 0;
+    }
+
+    private static int modifyGroupVariableValue(SceneScriptManager sceneScriptManager, int groupId, String varName, int value,
+                                                boolean isSet) {
+        val variables = sceneScriptManager.getVariables(groupId);
+        if (variables == null) {
+            logger.warn("[LUA] trying to modify variables of unloaded/unknown group {}", groupId);
+            return 1;
+        }
+
+        val old = variables.getOrDefault(varName, value);
+        val newValue = isSet ? value : old + value;
+        variables.put(varName, newValue);
+        sceneScriptManager.callEvent(
+            new ScriptArgs(groupId, EventType.EVENT_VARIABLE_CHANGE, newValue, old)
+                .setEventSource(varName)
+        );
+        return 0;
+    }
+
     @Override
     public int goToGroupSuite(@NotNull GroupEventLuaContext context, int groupId, int suite) {
         logger.debug("[LUA] Call GoToGroupSuite with {},{}",
-            groupId,suite);
+            groupId, suite);
 
         val actualGroupId = getGroupIdOrCurrentId(context, groupId);
         val scriptManager = context.getSceneScriptManager();
@@ -36,7 +59,7 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
             return 1;
         }
         var suiteData = group.getSuiteByIndex(suite);
-        if(suiteData == null){
+        if (suiteData == null) {
             return 1;
         }
 
@@ -46,7 +69,7 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
 			}
 			this.getSceneScriptManager().removeGroupSuite(group, suiteItem);
 		}*/
-        if(groupInstance.getActiveSuiteId() == 0 || groupInstance.getActiveSuiteId() != suite) {
+        if (groupInstance.getActiveSuiteId() == 0 || groupInstance.getActiveSuiteId() != suite) {
             groupInstance.getDeadEntities().clear();
             scriptManager.addGroupSuite(groupInstance, suiteData);
             groupInstance.setActiveSuiteId(suite);
@@ -60,15 +83,14 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
         logger.debug("[LUA] Call GetGroupSuite with {}", groupId);
         val actualGroupId = getGroupIdOrCurrentId(context, groupId);
         var instance = context.getSceneScriptManager().getGroupInstanceById(actualGroupId);
-        if(instance != null) return instance.getActiveSuiteId();
+        if (instance != null) return instance.getActiveSuiteId();
         return 0;
     }
-
 
     @Override
     public int addExtraGroupSuite(GroupEventLuaContext context, int groupId, int suite) {
         logger.debug("[LUA] Call AddExtraGroupSuite with {},{}",
-            groupId,suite);
+            groupId, suite);
         val scriptManager = context.getSceneScriptManager();
         val actualGroupId = getGroupIdOrCurrentId(context, groupId);
         SceneGroup group = getGroupOrCurrent(context, groupId);
@@ -82,7 +104,7 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
         }
 
         var suiteData = group.getSuiteByIndex(suite);
-        if(suiteData == null){
+        if (suiteData == null) {
             logger.warn("trying to get suite that doesn't exist: {} {}", actualGroupId, suite);
             return 1;
         }
@@ -91,17 +113,19 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
         return 0;
     }
 
+    /* Flow suite */
+
     @Override
     public int removeExtraGroupSuite(@NotNull GroupEventLuaContext context, int groupId, int suite) {
         logger.debug("[LUA] Call RemoveExtraGroupSuite with {},{}",
-            groupId,suite);
+            groupId, suite);
 
         SceneGroup group = getGroupOrCurrent(context, groupId);
         if (group == null) {
             return 1;
         }
         var suiteData = group.getSuiteByIndex(suite);
-        if(suiteData == null){
+        if (suiteData == null) {
             return 1;
         }
 
@@ -113,14 +137,14 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
     @Override
     public int killExtraGroupSuite(@NotNull GroupEventLuaContext context, int groupId, int suite) {
         logger.debug("[LUA] Call KillExtraGroupSuite with {},{}",
-            groupId,suite);
+            groupId, suite);
 
         SceneGroup group = getGroupOrCurrent(context, groupId);
         if (group == null) {
             return 1;
         }
         var suiteData = group.getSuiteByIndex(suite);
-        if(suiteData == null){
+        if (suiteData == null) {
             return 1;
         }
 
@@ -128,8 +152,6 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
 
         return 0;
     }
-
-    /* Flow suite */
 
     @Override
     public int goToFlowSuite(@NotNull GroupEventLuaContext context, int groupId, int suite) {
@@ -146,6 +168,8 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
         return handleUnimplemented(groupId, suiteId, flowSuitePolicy.name());
     }
 
+    /* group link bundle */
+
     @Override
     public int removeExtraFlowSuite(@NotNull GroupEventLuaContext context, int groupId, int suiteId, @NotNull FlowSuiteOperatePolicy flowSuitePolicy) {
         return handleUnimplemented(groupId, suiteId, flowSuitePolicy.name(), flowSuitePolicy);
@@ -155,8 +179,6 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
     public int killExtraFlowSuite(@NotNull GroupEventLuaContext context, int groupId, int suiteId, @NotNull FlowSuiteOperatePolicy flowSuitePolicy) {
         return handleUnimplemented(groupId, suiteId, flowSuitePolicy.name(), flowSuitePolicy);
     }
-
-    /* group link bundle */
 
     @Override
     public int activateGroupLinkBundle(@NotNull GroupEventLuaContext context, int groupId) {
@@ -188,32 +210,8 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
         return handleUnimplemented(groupId, val2);
     }
 
-    /* group variables*/
-    private static int getGroupVariableValue(SceneScriptManager sceneScriptManager, int groupId, String varName){
-        val variables = sceneScriptManager.getVariables(groupId);
-        return variables != null ? variables.getOrDefault(varName, 0) : 0;
-    }
-
-    private static int modifyGroupVariableValue(SceneScriptManager sceneScriptManager, int groupId, String varName, int value,
-                                                boolean isSet){
-        val variables = sceneScriptManager.getVariables(groupId);
-        if (variables == null) {
-            logger.warn("[LUA] trying to modify variables of unloaded/unknown group {}", groupId);
-            return 1;
-        }
-
-        val old = variables.getOrDefault(varName, value);
-        val newValue = isSet ? value : old + value;
-        variables.put(varName, newValue);
-        sceneScriptManager.callEvent(
-            new ScriptArgs(groupId, EventType.EVENT_VARIABLE_CHANGE, newValue, old)
-                .setEventSource(varName)
-        );
-        return 0;
-    }
-
     @Override
-    public int createGroupVariable(GroupEventLuaContext context, @NotNull String varName, int value){
+    public int createGroupVariable(GroupEventLuaContext context, @NotNull String varName, int value) {
         val groupId = context.getCurrentGroup().getGroupInfo().getId();
         return modifyGroupVariableValue(context.getSceneScriptManager(), groupId, varName, value, true);
     }
@@ -229,7 +227,7 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
     @Override
     public int getGroupVariableValueByGroup(@NotNull GroupEventLuaContext context, @NotNull String name, int groupId) {
         logger.debug("[LUA] Call GetGroupVariableValueByGroup with {},{}",
-            name,groupId);
+            name, groupId);
 
         val actualGroupId = getGroupIdOrCurrentId(context, groupId);
         return getGroupVariableValue(context.getSceneScriptManager(), actualGroupId, name);
@@ -247,7 +245,7 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
     @Override
     public int setGroupVariableValueByGroup(@NotNull GroupEventLuaContext context, @NotNull String key, int value, int groupId) {
         logger.debug("[LUA] Call SetGroupVariableValueByGroup with {},{},{}",
-            key,value,groupId);
+            key, value, groupId);
 
         val actualGroupId = getGroupIdOrCurrentId(context, groupId);
         return modifyGroupVariableValue(context.getSceneScriptManager(), actualGroupId, key, value, true);
@@ -265,7 +263,7 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
     @Override
     public int changeGroupVariableValueByGroup(@NotNull GroupEventLuaContext context, @NotNull String name, int value, int groupId) {
         logger.debug("[LUA] Call ChangeGroupVariableValueByGroup with {},{}",
-            name,groupId);
+            name, groupId);
 
         val actualGroupId = getGroupIdOrCurrentId(context, groupId);
         return modifyGroupVariableValue(context.getSceneScriptManager(), actualGroupId, name, value, false);
@@ -314,7 +312,7 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
 
         val actualGroupId = getGroupIdOrCurrentId(context, groupId);
         var group = context.getSceneScriptManager().getCachedGroupInstanceById(actualGroupId);
-        if(group != null && group.isReplaceable() != null) {
+        if (group != null && group.isReplaceable() != null) {
             group.setReplaceable(value);
             return 0;
         }
@@ -328,19 +326,19 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
 
     // might need to return the trigger count for the triggered that caused the call instead
     @Override
-    public int getCurTriggerCount(GroupEventLuaContext context) {
+    public int getCurTriggerCount(@NotNull GroupEventLuaContext context) {
         logger.debug("[LUA] Call GetCurTriggerCount");
         //TODO check
         return context.getSceneScriptManager().getTriggerCount();
     }
 
     @Override
-    public int[] getGroupAliveMonsterList(GroupEventLuaContext context, int groupId) {
-        return new int[]{handleUnimplemented(groupId)};
+    public List<Integer> getGroupAliveMonsterList(@NotNull GroupEventLuaContext context, int groupId) {
+        return List.of(handleUnimplemented(groupId));
     }
 
     @Override
-    public int getGroupMonsterCountByGroupId(GroupEventLuaContext context, int groupId) {
+    public int getGroupMonsterCountByGroupId(@NotNull GroupEventLuaContext context, int groupId) {
         logger.debug("[LUA] Call GetGroupMonsterCountByGroupId with {}",
             groupId);
         val actualGroupId = getGroupIdOrCurrentId(context, groupId);
@@ -350,9 +348,8 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
     }
 
 
-
     @Override
-    public int getGroupMonsterCount(GroupEventLuaContext context) {
+    public int getGroupMonsterCount(@NotNull GroupEventLuaContext context) {
         logger.debug("[LUA] Call GetGroupMonsterCount ");
 
         val groupId = context.getCurrentGroup().getGroupInfo().getId();
@@ -361,6 +358,7 @@ public class GroupManagementScriptHandler extends BaseHandler implements org.ani
                 e.getGroupId() == groupId)
             .count();
     }
+
     @Override
     public boolean checkIsInGroup(@NotNull GroupEventLuaContext context, int groupId, int configId) {
         return context.getSceneScriptManager().getScene().getEntityByConfigId(configId, groupId) != null;

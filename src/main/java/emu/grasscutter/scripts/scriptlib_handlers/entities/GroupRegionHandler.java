@@ -31,7 +31,7 @@ public class GroupRegionHandler extends BaseHandler implements org.anime_game_se
     public int getRegionConfigId(GroupEventLuaContext context, int regionEid) {
         logger.debug("[LUA] Call GetRegionConfigId with {}", regionEid);
         val region = context.getSceneScriptManager().getRegionById(regionEid);
-        if (region == null){
+        if (region == null) {
             return -1;
         }
         return region.getConfigId();

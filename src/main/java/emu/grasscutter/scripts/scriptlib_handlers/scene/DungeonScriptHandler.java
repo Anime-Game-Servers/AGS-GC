@@ -1,4 +1,3 @@
-
 package emu.grasscutter.scripts.scriptlib_handlers.scene;
 
 import emu.grasscutter.Loggers;

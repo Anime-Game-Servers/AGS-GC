@@ -696,7 +696,7 @@ public class SceneScriptManager {
         suite.getSceneRegions().forEach(this::deregisterRegion);
     }
 
-    public void startMonsterTideInGroup(int challengeIndex, SceneGroup group, Integer[] ordersConfigId, int tideSize, int spawnThreshold, int spawnLimit) {
+    public void startMonsterTideInGroup(int challengeIndex, SceneGroup group, List<Integer> ordersConfigId, int tideSize, int spawnThreshold, int spawnLimit) {
         unloadCurrentMonsterTide();
         this.scriptMonsterTideService =
                 new ScriptMonsterTideService(this, challengeIndex, group, ordersConfigId, tideSize, spawnThreshold, spawnLimit);

@@ -18,9 +18,9 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.anime_game_servers.gi_lua.models.constants.GroupKillPolicy.*;
-import static org.anime_game_servers.gi_lua.models.constants.GroupKillPolicy.GROUP_KILL_ALL;
 
 public class GroupEntityHandler extends BaseHandler implements org.anime_game_servers.gi_lua.script_lib.handler.entites.GroupEntityHandler<GroupEventLuaContext> {
     @Getter
@@ -89,12 +89,12 @@ public class GroupEntityHandler extends BaseHandler implements org.anime_game_se
     }
 
     @Override
-    public int[] getSurroundUidList(@NotNull GroupEventLuaContext context, int configId, int radius) {
-        return new int[] {handleUnimplemented(configId, radius)};
+    public List<Integer> getSurroundUidList(@NotNull GroupEventLuaContext context, int configId, int radius) {
+        return List.of(handleUnimplemented(configId, radius));
     }
 
     @Override
-    public int killEntityByConfigId(GroupEventLuaContext groupEventLuaContext, KillByConfigIdParams killByConfigIdParams) {
+    public int killEntityByConfigId(GroupEventLuaContext groupEventLuaContext, @NotNull KillByConfigIdParams killByConfigIdParams) {
         logger.debug("[LUA] Call KillEntityByConfigId with {}", killByConfigIdParams);
         SceneScriptManager scriptManager = groupEventLuaContext.getSceneScriptManager();
 
@@ -109,24 +109,24 @@ public class GroupEntityHandler extends BaseHandler implements org.anime_game_se
 
 
     @Override
-    public int killGroupEntityByCfgIds(GroupEventLuaContext context, int groupId, int[] monsters, int[] gadgets) {
+    public int killGroupEntityByCfgIds(GroupEventLuaContext context, int groupId, @NotNull List<Integer> monsters, @NotNull List<Integer> gadgets) {
         val sceneManager = context.getSceneScriptManager();
 
         val group = getGroupOrCurrent(context, groupId);
         if (group == null) {
             return 10;
         }
-        int[] targets = new int[monsters.length + gadgets.length];
+        int[] targets = new int[monsters.size() + gadgets.size()];
         int targetsIndex = 0;
-        for (int i = 0; i < monsters.length; i++, targetsIndex++) {
-            targets[targetsIndex] = monsters[i];
+        for (int i = 0; i < monsters.size(); i++, targetsIndex++) {
+            targets[targetsIndex] = monsters.get(i);
         }
-        for (int i = 0; i < gadgets.length; i++, targetsIndex++) {
-            targets[targetsIndex] = gadgets[i];
+        for (int i = 0; i < gadgets.size(); i++, targetsIndex++) {
+            targets[targetsIndex] = gadgets.get(i);
         }
 
         // kill targets if exists
-        for(int cfgId : targets){
+        for (int cfgId : targets) {
             var entity = sceneManager.getScene().getEntityByConfigId(cfgId, group.getGroupInfo().getId());
             if (entity == null || cfgId == 0) {
                 continue;
@@ -146,14 +146,14 @@ public class GroupEntityHandler extends BaseHandler implements org.anime_game_se
         }
 
         var targets = new ArrayList<SceneObject>();
-        if(policy==GROUP_KILL_MONSTER || policy == GROUP_KILL_ALL){
+        if (policy == GROUP_KILL_MONSTER || policy == GROUP_KILL_ALL) {
             val monsters = group.getMonsters();
-            if(monsters != null)
+            if (monsters != null)
                 targets.addAll(monsters.values());
         }
-        if(policy == GROUP_KILL_GADGET || policy == GROUP_KILL_ALL) {
+        if (policy == GROUP_KILL_GADGET || policy == GROUP_KILL_ALL) {
             val gadgets = group.getGadgets();
-            if(gadgets != null)
+            if (gadgets != null)
                 targets.addAll(gadgets.values());
         }
 
@@ -177,7 +177,7 @@ public class GroupEntityHandler extends BaseHandler implements org.anime_game_se
         val scene = context.getSceneScriptManager().getScene();
         val entity = scene.getEntityByConfigId(configId, actualGroupId);
 
-        if(entity == null || !entity.getEntityType().name().toUpperCase().equals(entityType.name())){
+        if (entity == null || !entity.getEntityType().name().toUpperCase().equals(entityType.name())) {
             return 1;
         }
 

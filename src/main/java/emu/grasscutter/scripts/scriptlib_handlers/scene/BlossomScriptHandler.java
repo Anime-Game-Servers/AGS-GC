@@ -13,10 +13,9 @@ import org.anime_game_servers.gi_lua.models.ScriptArgs;
 import org.anime_game_servers.gi_lua.models.constants.EventType;
 import org.anime_game_servers.gi_lua.models.constants.ScriptGadgetState;
 import org.anime_game_servers.gi_lua.script_lib.handler.scene.RefreshBlossomGroupParams;
-import org.anime_game_servers.lua.engine.LuaTable;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import java.util.List;
 import java.util.Optional;
 
 public class BlossomScriptHandler extends BaseHandler implements org.anime_game_servers.gi_lua.script_lib.handler.scene.BlossomScriptHandler<GroupEventLuaContext> {
@@ -24,7 +23,7 @@ public class BlossomScriptHandler extends BaseHandler implements org.anime_game_
     private static final Logger logger = Loggers.getScriptSystem();
 
     @Override
-    public int createBlossomChestByGroupId(GroupEventLuaContext context, int groupId, int chestConfigId) {
+    public int createBlossomChestByGroupId(@NotNull GroupEventLuaContext context, int groupId, int chestConfigId) {
         logger.debug("[LUA] Call check CreateBlossomChestByGroupId with {} {}", groupId, chestConfigId);
 
         val actualGroupId = getGroupIdOrCurrentId(context, groupId);
@@ -73,7 +72,7 @@ public class BlossomScriptHandler extends BaseHandler implements org.anime_game_
     }
 
     @Override
-    public int refreshBlossomGroup(GroupEventLuaContext context, RefreshBlossomGroupParams params) {
+    public int refreshBlossomGroup(@NotNull GroupEventLuaContext context, @NotNull RefreshBlossomGroupParams params) {
         logger.debug("[LUA] Call check RefreshBlossomGroup with {}", params);
 
         val actualGroupId = getGroupIdOrCurrentId(context, params.getGroupId());
@@ -98,12 +97,12 @@ public class BlossomScriptHandler extends BaseHandler implements org.anime_game_
     }
 
     @Override
-    public int refreshBlossomDropRewardByGroupId(GroupEventLuaContext context, int groupId) {
+    public int refreshBlossomDropRewardByGroupId(@NotNull GroupEventLuaContext context, int groupId) {
         return handleUnimplemented(groupId);
     }
 
     @Override
-    public int addBlossomScheduleProgressByGroupId(GroupEventLuaContext context, int groupId) {
+    public int addBlossomScheduleProgressByGroupId(@NotNull GroupEventLuaContext context, int groupId) {
         logger.debug("[LUA] Call check AddBlossomScheduleProgressByGroupId with {}", groupId);
 
         val actualGroupId = getGroupIdOrCurrentId(context, groupId);
@@ -112,7 +111,7 @@ public class BlossomScriptHandler extends BaseHandler implements org.anime_game_
     }
 
     @Override
-    public int getBlossomRefreshTypeByGroupId(GroupEventLuaContext context, int groupId) {
+    public int getBlossomRefreshTypeByGroupId(@NotNull GroupEventLuaContext context, int groupId) {
         logger.debug("[LUA] Call check GetBlossomRefreshTypeByGroupId with {}", groupId);
 
         val actualGroupId = getGroupIdOrCurrentId(context, groupId);

@@ -163,6 +163,7 @@ public class Scene {
             .orElse(null);
     }
 
+    @Nullable
     public GameEntity<?> getEntityByConfigId(int configId, int groupId) {
         return this.entities.values().stream()
             .filter(x -> x.getConfigId() == configId && x.getGroupId() == groupId)

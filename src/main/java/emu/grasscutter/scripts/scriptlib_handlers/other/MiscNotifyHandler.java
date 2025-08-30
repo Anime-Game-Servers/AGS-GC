@@ -27,7 +27,7 @@ public class MiscNotifyHandler extends BaseHandler implements org.anime_game_ser
     }
 
     @Override
-    public int setEnvironmentEffectState(@NotNull GroupEventLuaContext context, int index, @NotNull String key, float[] floatParamTable, int[] intParam) {
+    public int setEnvironmentEffectState(@NotNull GroupEventLuaContext context, int index, @NotNull String key, @NotNull List<Float> floatParamTable, @NotNull List<Integer> intParam) {
         return 0;
     }
 
@@ -56,9 +56,9 @@ public class MiscNotifyHandler extends BaseHandler implements org.anime_game_ser
 
         val scene = context.getSceneScriptManager().getScene();
         val packet = new PacketScenePlayerSoundNotify(new Position(playPosition), soundName, playType);
-        if(soundInfo.isBroadcast())
+        if (soundInfo.isBroadcast())
             scene.broadcastPacket(packet);
-        else if(context.uid()!=0){
+        else if (context.uid() != 0) {
             scene.getPlayers().stream().filter(player -> player.getUid() == context.uid()).forEach(
                 player -> player.sendPacket(packet)
             );
@@ -69,7 +69,7 @@ public class MiscNotifyHandler extends BaseHandler implements org.anime_game_ser
     }
 
     @Override
-    public int sendServerMessageByLuaKey(@NotNull GroupEventLuaContext context, @NotNull String messageKey, @NotNull List<Integer>  targets) {
+    public int sendServerMessageByLuaKey(@NotNull GroupEventLuaContext context, @NotNull String messageKey, @NotNull List<Integer> targets) {
         return 0;
     }
 
@@ -99,7 +99,7 @@ public class MiscNotifyHandler extends BaseHandler implements org.anime_game_ser
     }
 
     @Override
-    public int showTemplateReminder(@NotNull GroupEventLuaContext context, int reminderId, int[] timerInfo) {
+    public int showTemplateReminder(@NotNull GroupEventLuaContext context, int reminderId, @NotNull List<Integer> timerInfo) {
         return 0;
     }
 
@@ -109,7 +109,7 @@ public class MiscNotifyHandler extends BaseHandler implements org.anime_game_ser
     }
 
     @Override
-    public int revokePlayerShowTemplateReminder(@NotNull GroupEventLuaContext context, int reminderId, @NotNull List<Integer>  uidList) {
+    public int revokePlayerShowTemplateReminder(@NotNull GroupEventLuaContext context, int reminderId, @NotNull List<Integer> uidList) {
         return 0;
     }
 
@@ -128,7 +128,7 @@ public class MiscNotifyHandler extends BaseHandler implements org.anime_game_ser
     }
 
     @Override
-    public int showClientTutorial(@NotNull GroupEventLuaContext context, int tutorialId, @NotNull List<Integer>  uidList) {
+    public int showClientTutorial(@NotNull GroupEventLuaContext context, int tutorialId, @NotNull List<Integer> uidList) {
         return 0;
     }
 

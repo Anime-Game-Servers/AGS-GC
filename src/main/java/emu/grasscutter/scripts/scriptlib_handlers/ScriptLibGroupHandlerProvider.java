@@ -185,6 +185,7 @@ public class ScriptLibGroupHandlerProvider implements org.anime_game_servers.gi_
     public GroupMonsterHandler getGroupMonsterHandler() {
         return groupMonsterHandler;
     }
+
     @Override
     public GroupRegionHandler getGroupRegionHandler() {
         return groupRegionHandler;

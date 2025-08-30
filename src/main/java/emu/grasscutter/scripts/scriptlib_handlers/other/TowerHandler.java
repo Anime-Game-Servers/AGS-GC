@@ -21,7 +21,7 @@ public class TowerHandler extends BaseHandler implements org.anime_game_servers.
         logger.debug("[LUA] Call TowerMirrorTeamSetUp with {}", team);
 
         context.getSceneScriptManager().unloadCurrentMonsterTide();
-        context.getSceneScriptManager().getScene().getPlayers().get(0).getTowerManager().mirrorTeamSetUp(team-1);
+        context.getSceneScriptManager().getScene().getPlayers().get(0).getTowerManager().mirrorTeamSetUp(team - 1);
 
         return 0;
     }

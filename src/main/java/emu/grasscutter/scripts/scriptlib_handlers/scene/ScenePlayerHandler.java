@@ -1,10 +1,7 @@
-
 package emu.grasscutter.scripts.scriptlib_handlers.scene;
 
 import emu.grasscutter.Loggers;
 import emu.grasscutter.game.entity.EntityAvatar;
-import emu.grasscutter.game.entity.GameEntity;
-import emu.grasscutter.scripts.ScriptUtils;
 import emu.grasscutter.scripts.lua_engine.GroupEventLuaContext;
 import emu.grasscutter.scripts.scriptlib_handlers.BaseHandler;
 import emu.grasscutter.server.packet.send.PacketBeginCameraSceneLookNotify;
@@ -20,19 +17,15 @@ import org.anime_game_servers.gi_lua.models.constants.EntityType;
 import org.anime_game_servers.gi_lua.models.constants.VehicleType;
 import org.anime_game_servers.gi_lua.script_lib.handler.scene.BeginCameraSceneLookParams;
 import org.anime_game_servers.gi_lua.script_lib.handler.scene.BeginCameraSceneLookTemplateParams;
-import org.anime_game_servers.lua.engine.LuaTable;
 import org.anime_game_servers.multi_proto.gi.messages.scene.EnterType;
 import org.anime_game_servers.multi_proto.gi.messages.scene.camera.KeepRotType;
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.List;
 
 import static emu.grasscutter.game.props.EnterReason.Lua;
 import static emu.grasscutter.game.props.EnterReason.LuaSkipUi;
-import static org.anime_game_servers.gi_lua.utils.ScriptUtils.luaToPos;
 
 public class ScenePlayerHandler extends BaseHandler implements org.anime_game_servers.gi_lua.script_lib.handler.scene.ScenePlayerScriptHandler<GroupEventLuaContext> {
     @Getter
@@ -57,6 +50,7 @@ public class ScenePlayerHandler extends BaseHandler implements org.anime_game_se
         //TODO check
         return playerEntities.isEmpty();
     }
+
     @Override
     public VehicleType getPlayerVehicleType(@NotNull GroupEventLuaContext context, int uid) {
         handleUnimplemented(uid);
@@ -69,23 +63,24 @@ public class ScenePlayerHandler extends BaseHandler implements org.anime_game_se
     }
 
     @Override
-    public boolean isWidgetEquipped(GroupEventLuaContext context, int hostUid, int widgetId) {
+    public boolean isWidgetEquipped(@NotNull GroupEventLuaContext context, int hostUid, int widgetId) {
         return handleUnimplemented(hostUid, widgetId) == 0;
     }
+
     @Override
-    public int setWidgetClientDetectorCoolDown(GroupEventLuaContext context, int configId, boolean isSucc) {
+    public int setWidgetClientDetectorCoolDown(@NotNull GroupEventLuaContext context, int configId, boolean isSucc) {
         return handleUnimplemented(configId, isSucc);
     }
 
     @Override
-    public int movePlayerToPos(@NotNull GroupEventLuaContext context, int[] targetUIds, @NotNull Vector pos, @NotNull Vector rot, int radius, boolean isSkipUi) {
+    public int movePlayerToPos(@NotNull GroupEventLuaContext context, @NotNull List<Integer> targetUIds, @NotNull Vector pos, @NotNull Vector rot, int radius, boolean isSkipUi) {
         logger.warn("[LUA] Call unchecked MovePlayerToPos with {}, {}, {}, {}, {}", targetUIds, pos, rot, radius, isSkipUi);
         //TODO implement var1 contains int[] uid_list, Position pos, int radius, Position rot
         return transPlayerToPos(context, targetUIds, pos, rot, radius, isSkipUi, -1); // todo this is probably not a full scene reload
     }
 
     @Override
-    public int transPlayerToPos(@NotNull GroupEventLuaContext context, int[] targetUIds, @NotNull Vector pos, @NotNull Vector rot, int radius, boolean isSkipUi, int sceneId) {
+    public int transPlayerToPos(@NotNull GroupEventLuaContext context, @NotNull List<Integer> targetUIds, @NotNull Vector pos, @NotNull Vector rot, int radius, boolean isSkipUi, int sceneId) {
         logger.warn("[LUA] Call unchecked TransPlayerToPos with {}, {}, {}, {}, {}", targetUIds, pos, rot, radius, isSkipUi);
 
         var scriptManager = context.getSceneScriptManager();
@@ -95,7 +90,7 @@ public class ScenePlayerHandler extends BaseHandler implements org.anime_game_se
 
         var scene = scriptManager.getScene();
         val reason = isSkipUi ? LuaSkipUi : Lua;
-        scene.getPlayers().stream().filter(p -> ArrayUtils.contains(targetUIds, p.getUid())).forEach(p -> {
+        scene.getPlayers().stream().filter(p -> targetUIds.contains(p.getUid())).forEach(p -> {
             scene.removePlayer(p);
             scene.addPlayer(p);
             val playerPos = p.getPosition().set(pos);
@@ -133,10 +128,10 @@ public class ScenePlayerHandler extends BaseHandler implements org.anime_game_se
 
         val cameraParams = new PacketBeginCameraSceneLookNotify.CameraSceneLookNotify();
         var targetPos = luaLookPos != null ? new emu.grasscutter.utils.Position(luaLookPos) : new Position();
-        if(sceneLookParams.getLookConfigId() != 0){
+        if (sceneLookParams.getLookConfigId() != 0) {
             val groupId = context.getCurrentGroup().getGroupInfo().getId();
             val entity = scene.getEntityByConfigId(sceneLookParams.getLookConfigId(), groupId);
-            if(entity == null){
+            if (entity == null) {
                 logger.warn("[LUA] lookConfigId set but entity doesn't exist {}", sceneLookParams);
                 return 1;
             }
@@ -160,13 +155,13 @@ public class ScenePlayerHandler extends BaseHandler implements org.anime_game_se
         if (sceneLookParams.isSetFollowPos() && sceneLookParams.getFollowPos() != null) {
             cameraParams.setFollowPos(new Position(sceneLookParams.getFollowPos()));
         }
-        if(sceneLookParams.getOtherParams() != null) {
+        if (sceneLookParams.getOtherParams() != null) {
             cameraParams.setOtherParams(sceneLookParams.getOtherParams());
         }
         try {
             val keepRotType = KeepRotType.valueOf(sceneLookParams.getKeepRotType().name());
             cameraParams.setKeepRotType(keepRotType);
-        } catch (IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex) {
             logger.warn("[LUA] failed to convert keepRotType {}", sceneLookParams.getKeepRotType());
         }
         cameraParams.setCustomRadius(sceneLookParams.getCustomRadius());
@@ -180,9 +175,9 @@ public class ScenePlayerHandler extends BaseHandler implements org.anime_game_se
         // todo handle delay with timer
 
         val packet = new PacketBeginCameraSceneLookNotify(cameraParams);
-        if(sceneLookParams.isBroadcast())
+        if (sceneLookParams.isBroadcast())
             scene.broadcastPacket(packet);
-        else if(context.uid()!=0){
+        else if (context.uid() != 0) {
             scene.getPlayers().stream().filter(player -> player.getUid() == context.uid()).forEach(
                 player -> player.sendPacket(packet)
             );
@@ -194,7 +189,7 @@ public class ScenePlayerHandler extends BaseHandler implements org.anime_game_se
 
 
     @Override
-    public int setIsAllowUseSkill(GroupEventLuaContext context, int canUse) {
+    public int setIsAllowUseSkill(@NotNull GroupEventLuaContext context, int canUse) {
         logger.debug("[LUA] Call SetIsAllowUseSkill with {}",
             canUse);
 

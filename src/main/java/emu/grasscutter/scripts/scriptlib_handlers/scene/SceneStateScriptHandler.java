@@ -1,4 +1,3 @@
-
 package emu.grasscutter.scripts.scriptlib_handlers.scene;
 
 import emu.grasscutter.Loggers;
@@ -87,23 +86,23 @@ public class SceneStateScriptHandler extends BaseHandler implements org.anime_ga
     }
 
     @Override
-    public int getSceneOwnerUid(GroupEventLuaContext context) {
+    public int getSceneOwnerUid(@NotNull GroupEventLuaContext context) {
         return context.getSceneScriptManager().getScene().getWorld().getHost().getUid();
     }
 
     @Override
-    public int[] getSceneUidList(GroupEventLuaContext context) {
+    public List<Integer> getSceneUidList(@NotNull GroupEventLuaContext context) {
         logger.warn("[LUA] Call unchecked GetSceneUidList");
         //TODO check
         val scriptManager = context.getSceneScriptManager();
-        if(scriptManager == null){
-            return new int[0];
+        if (scriptManager == null) {
+            return List.of();
         }
-        return scriptManager.getScene().getPlayers().stream().mapToInt(Player::getUid).toArray();
+        return scriptManager.getScene().getPlayers().stream().mapToInt(Player::getUid).boxed().toList();
     }
 
     @Override
-    public boolean checkIsInMpMode(GroupEventLuaContext context) {
+    public boolean checkIsInMpMode(@NotNull GroupEventLuaContext context) {
         logger.debug("[LUA] Call CheckIsInMpMode");
         return context.getSceneScriptManager().getScene().getWorld().isMultiplayer();
     }

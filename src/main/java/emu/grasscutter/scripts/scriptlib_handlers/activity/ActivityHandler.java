@@ -16,17 +16,17 @@ public class ActivityHandler extends BaseHandler implements org.anime_game_serve
     private static final Logger logger = Loggers.getScriptSystem();
 
     @Override
-    public @Nullable ActivityOpenAndCloseTime getActivityOpenAndCloseTimeByScheduleId(@NotNull GroupEventLuaContext groupEventLuaContext, int scheduleId) {
+    public @Nullable ActivityOpenAndCloseTime getActivityOpenAndCloseTimeByScheduleId(@NotNull GroupEventLuaContext context, int scheduleId) {
         val activityConfig = ActivityManager.getScheduleActivityConfigMap().get(scheduleId);
 
-        if(activityConfig == null)
+        if (activityConfig == null)
             return null;
 
         return new ActivityOpenAndCloseTime(activityConfig.getBeginTime(), activityConfig.getEndTime());
     }
 
     @Override
-    public int tryRecordActivityPushTips(@NotNull GroupEventLuaContext groupEventLuaContext, int pushTipId) {
+    public int tryRecordActivityPushTips(@NotNull GroupEventLuaContext context, int pushTipId) {
         return handleUnimplemented(pushTipId);
     }
 }

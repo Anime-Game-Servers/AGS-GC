@@ -15,7 +15,7 @@ public class ChannelerSlabHandler extends BaseHandler implements org.anime_game_
     public int createChannellerSlabCampRewardGadget(GroupEventLuaContext context, int configId) {
         logger.warn("[LUA] Call unimplemented CreateChannellerSlabCampRewardGadget {}", configId);
         var group = context.getCurrentGroup();
-        if(group == null){
+        if (group == null) {
             return 1;
         }
         createGadget(context.getSceneScriptManager(), configId, group);

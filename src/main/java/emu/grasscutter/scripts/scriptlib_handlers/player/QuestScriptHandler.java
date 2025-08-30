@@ -17,11 +17,11 @@ public class QuestScriptHandler extends BaseHandler implements org.anime_game_se
 
 
     @Override
-    public int addQuestProgress(GroupEventLuaContext context, String eventNotifyName) {
+    public int addQuestProgress(GroupEventLuaContext context, @NotNull String eventNotifyName) {
         logger.debug("[LUA] Call AddQuestProgress with {}",
             eventNotifyName);
 
-        for(var player : context.getSceneScriptManager().getScene().getPlayers()){
+        for (var player : context.getSceneScriptManager().getScene().getPlayers()) {
             player.getQuestManager().queueEvent(QuestCond.QUEST_COND_LUA_NOTIFY, eventNotifyName);
             player.getQuestManager().queueEvent(QuestContent.QUEST_CONTENT_LUA_NOTIFY, eventNotifyName);
         }
@@ -34,7 +34,7 @@ public class QuestScriptHandler extends BaseHandler implements org.anime_game_se
         val player = context.getSceneScriptManager().getScene().getWorld().getHost();
 
         val quest = player.getQuestManager().getQuestById(questId);
-        if(quest == null){
+        if (quest == null) {
             return QuestState.QUEST_STATE_NONE;
         }
 
@@ -46,7 +46,7 @@ public class QuestScriptHandler extends BaseHandler implements org.anime_game_se
         val player = context.getSceneScriptManager().getScene().getWorld().getHost();
 
         val quest = player.getQuestManager().getQuestById(questId);
-        if(quest == null){
+        if (quest == null) {
             return QuestState.QUEST_STATE_NONE;
         }
 
@@ -59,12 +59,12 @@ public class QuestScriptHandler extends BaseHandler implements org.anime_game_se
             .filter(p -> p.getUid() == uid)
             .findFirst().orElse(null);
 
-        if(player == null){
+        if (player == null) {
             return QuestState.QUEST_STATE_UNKNOWN;
         }
 
         val quest = player.getQuestManager().getQuestById(questId);
-        if(quest == null){
+        if (quest == null) {
             return QuestState.QUEST_STATE_NONE;
         }
 

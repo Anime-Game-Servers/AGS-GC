@@ -14,13 +14,11 @@ import lombok.val;
 import org.anime_game_servers.core.gi.models.Vector;
 import org.anime_game_servers.gi_lua.script_lib.handler.entites.CreateGadgetParameters;
 import org.anime_game_servers.gi_lua.script_lib.handler.entites.RemainGadgetCountParameters;
-import org.anime_game_servers.lua.engine.LuaTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import javax.annotation.Nonnull;
-
 import java.util.List;
 import java.util.Map;
 
@@ -51,8 +49,8 @@ public class GroupGadgetHandler extends BaseHandler implements org.anime_game_se
     }
 
     @Override
-    public int executeGadgetLua(@Nonnull GroupEventLuaContext groupEventLuaContext, int groupId, int gadgetCfgId, int activityType, int var4, int var5) {
-        return handleUnimplemented(groupId, gadgetCfgId, activityType, var4, var5);
+    public int executeGadgetLua(@Nonnull GroupEventLuaContext groupEventLuaContext, int groupId, int gadgetCfgId, int param1, int param2, int param3) {
+        return handleUnimplemented(groupId, gadgetCfgId, param1, param2, param3);
     }
 
     @Override
@@ -164,7 +162,7 @@ public class GroupGadgetHandler extends BaseHandler implements org.anime_game_se
     }
 
     @Override
-    public int createGadgetWithGlobalValue(GroupEventLuaContext context, int configId, Map<String, ? extends Number> sgv) {
+    public int createGadgetWithGlobalValue(@NotNull GroupEventLuaContext context, int configId, @NotNull Map<String, ? extends Number> sgv) {
         return handleUnimplemented(configId, sgv);
         //TODO implement Sgv contains ["SGV_BDShootType"] or sometimes nothing.
     }
@@ -190,13 +188,13 @@ public class GroupGadgetHandler extends BaseHandler implements org.anime_game_se
     }
 
     @Override
-    public int setGadgetTalkByConfigId(@NotNull GroupEventLuaContext context, int i, int i1, int i2) {
-        return 0;
+    public int setGadgetTalkByConfigId(@NotNull GroupEventLuaContext context, int groupId, int configId, int talkId) {
+        return handleUnimplemented(groupId, configId, talkId);
     }
 
     @Override
-    public int setGadgetHp(@NotNull GroupEventLuaContext context, int i, int i1, int i2) {
-        return 0;
+    public int setGadgetHp(@NotNull GroupEventLuaContext context, int groupId, int configId, int hpPercent) {
+        return handleUnimplemented(groupId, configId, hpPercent);
     }
 
     @Override
@@ -272,8 +270,8 @@ public class GroupGadgetHandler extends BaseHandler implements org.anime_game_se
     }
 
     @Override
-    public int delWorktopOption(@NotNull GroupEventLuaContext context, int var1) {
-        logger.debug("[LUA] Call DelWorktopOption with {}", var1);
+    public int delWorktopOption(@NotNull GroupEventLuaContext context, int option) {
+        logger.debug("[LUA] Call DelWorktopOption with {}", option);
         val callParams = context.getArgs();
         val group = context.getCurrentGroup();
         val scene = context.getSceneScriptManager().getScene();
@@ -290,7 +288,7 @@ public class GroupGadgetHandler extends BaseHandler implements org.anime_game_se
             return 2;
         }
 
-        worktop.removeWorktopOption(callParams.getParam2());
+        worktop.removeWorktopOption(option);
 
         Grasscutter.getGameServer().getScheduler().scheduleDelayedTask(() -> {
             scene.broadcastPacket(new PacketWorktopOptionNotify(gadget));
@@ -308,11 +306,11 @@ public class GroupGadgetHandler extends BaseHandler implements org.anime_game_se
             .filter(g -> g instanceof EntityBaseGadget entityGadget && entityGadget.getGroupId() == actualGroupId)
             .map(g -> (EntityGadget) g);
 
-        if(parameters.getGadgetIds()!=null){
+        if (parameters.getGadgetIds() != null) {
             stream = stream.filter(entityGadget -> parameters.getGadgetIds().contains(entityGadget.getGadgetId()));
         }
 
         var count = stream.count();
-        return (int)count;
+        return (int) count;
     }
 }
