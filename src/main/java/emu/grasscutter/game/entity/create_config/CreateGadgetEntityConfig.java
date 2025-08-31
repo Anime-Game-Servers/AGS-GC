@@ -13,7 +13,6 @@ import emu.grasscutter.game.entity.gadget.platform.BaseRoute;
 import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.CampTargetType;
-import emu.grasscutter.game.props.EntityType;
 import emu.grasscutter.game.world.SpawnDataEntry;
 import emu.grasscutter.scripts.EntityControllerScriptManager;
 import emu.grasscutter.scripts.data.controller.EntityController;
@@ -63,6 +62,7 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
     private boolean shareItem = true;
     private EntityController luaController = null;
     private BossChestInfo bossChestInfo = null;
+    private GatherData gatherData = null;
 
 
     public CreateGadgetEntityConfig(int gadgetId){
@@ -130,17 +130,6 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
         initBaseData();
     }
 
-    public CreateGadgetEntityConfig(GameEntity<?> parent, GatherData gatherData){
-        super(parent);
-        this.gadgetId = gatherData.getGadgetId();
-        this.enableInteract = !gatherData.isInitDisableInteract();
-        this.forbidGuest = gatherData.isForbidGuest();
-        this.item = new GameItem(gatherData.getItemId(), 1);
-        this.pointType = gatherData.getPointType();
-
-        initBaseData();
-    }
-
     public CreateGadgetEntityConfig(AbilityModifier.AbilityModifierAction action, AbilityActionCreateGadget createGadgetInfo){
         super(action);
         this.gadgetId = action.gadgetID;
@@ -178,6 +167,7 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
 
     private void initBaseData(){
         handleInitialOverwrites();
+        initGather();
         initGadgetData(gadgetId);
         initController();
     }
@@ -188,14 +178,26 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
     private void handleInitialOverwrites(){
         // todo if gadgetData.getType() == EntityType.AmberWind replace based on WorldAreaLevelupConfig, when actionVec == WORLD_AREA_ACTION_ACTIVATE_ITEM and paramVec1==gadgetId
         // TODO blossom chest gadgets will be replaced under some conditions based with BlossomChestExcelConfigData.chestGadgetId
-        if(pointType != 0){
-            val gatherData = GameData.getGatherDataMap().get(pointType);
-            if(gatherData!=null){
-                this.gadgetId = gatherData.getGadgetId();
-            } else {
-                Grasscutter.getLogger().warn("Gather data for Point {} not found", pointType);
-            }
+    }
+
+    /**
+     * This initialises gather object info, when the pointType is set. This will overwrite the gadgetId with the one from
+     * gatherData, when pointType is set and gatherData for that point exists.
+     */
+    private void initGather(){
+        if(pointType == 0) {
+            return;
         }
+        this.gatherData = GameData.getGatherDataMap().get(pointType);
+        if(gatherData == null){
+            Grasscutter.getLogger().warn("Gather data for Point {} not found", pointType);
+            return;
+        }
+
+        this.gadgetId = gatherData.getGadgetId();
+        this.enableInteract = !gatherData.isInitDisableInteract();
+        this.forbidGuest = gatherData.isForbidGuest();
+        this.item = new GameItem(gatherData.getItemId(), 1);
     }
 
     private void initGadgetData(int gadgetId){

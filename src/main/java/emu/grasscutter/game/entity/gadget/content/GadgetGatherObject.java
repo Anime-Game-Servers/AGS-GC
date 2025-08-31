@@ -11,6 +11,7 @@ import emu.grasscutter.game.props.ActionReason;
 import emu.grasscutter.game.world.Scene;
 import emu.grasscutter.server.packet.send.PacketGadgetInteractRsp;
 import emu.grasscutter.utils.Utils;
+import lombok.Getter;
 import lombok.val;
 import org.anime_game_servers.gi_lua.models.ScriptArgs;
 import org.anime_game_servers.gi_lua.models.constants.EventType;
@@ -19,6 +20,7 @@ import org.anime_game_servers.multi_proto.gi.messages.gadget.InteractType;
 import org.anime_game_servers.multi_proto.gi.messages.scene.entity.GatherGadgetInfo;
 import org.anime_game_servers.multi_proto.gi.messages.scene.entity.SceneGadgetInfo;
 
+@Getter
 public class GadgetGatherObject extends GadgetContent {
     private int itemId;
     private boolean isForbidGuest;
@@ -27,16 +29,9 @@ public class GadgetGatherObject extends GadgetContent {
         super(gadget);
 
         val config = gadget.getSpawnConfig();
-        this.itemId = config.getItem().getItemId();
+        val item = config.getItem();
+        this.itemId = item!=null ? item.getItemId() : 0;
         this.isForbidGuest = config.isForbidGuest();
-    }
-
-    public int getItemId() {
-        return this.itemId;
-    }
-
-    public boolean isForbidGuest() {
-        return isForbidGuest;
     }
 
     public boolean onInteract(Player player, GadgetInteractReq req) {
@@ -49,9 +44,9 @@ public class GadgetGatherObject extends GadgetContent {
         GameItem item = new GameItem(itemData, 1);
         player.getInventory().addItem(item, ActionReason.Gather);
 
-        var ScriptArgs = new ScriptArgs(getGadget().getGroupId(), EventType.EVENT_GATHER, getGadget().getConfigId());
-        ScriptArgs.setEventSource(getGadget().getConfigId());
-        getGadget().getScene().getScriptManager().callEvent(ScriptArgs);
+        var scriptArgs = new ScriptArgs(getGadget().getGroupId(), EventType.EVENT_GATHER, getGadget().getConfigId());
+        scriptArgs.setEventSource(getGadget().getConfigId());
+        getGadget().getScene().getScriptManager().callEvent(scriptArgs);
 
         getGadget().getScene().broadcastPacket(new PacketGadgetInteractRsp(getGadget(), InteractType.INTERACT_GATHER));
 
