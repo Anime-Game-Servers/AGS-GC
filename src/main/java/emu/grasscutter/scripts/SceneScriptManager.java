@@ -354,7 +354,7 @@ public class SceneScriptManager {
     }
     public synchronized void deregisterRegion(SceneRegion region) {
         var instance = regions.values().stream()
-            .filter(r -> r.getConfigId() == region.getConfigId())
+            .filter(r -> r.getConfigId() == region.getConfigId() && r.getGroupId() == region.getGroupId())
             .findFirst();
         instance.ifPresent(entityRegion -> regions.remove(entityRegion.getId()));
     }
