@@ -94,7 +94,7 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
         this.gadgetId = gadget.getGadgetId();
         this.routeConfig = BaseRoute.fromSceneGadget(gadget);
         this.pointType = gadget.getPointType();
-        this.isPersistent = gadget.isPersistent();
+        this.isPersistent = gadget.getPersistent();
         this.draftId = gadget.getDraftId();
         this.enableInteract = gadget.isEnableInteract();
         this.interactId = gadget.getInteractId();
@@ -104,10 +104,10 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
             this.worktopIsPersistent = gadget.getWorktopConfig().isPersistent();
         }
         this.chestDropId = gadget.getChestDropId();
-        this.chestShowCutscene = gadget.isShowCutscene();
+        this.chestShowCutscene = gadget.getShowCutscene();
         this.bossChestInfo = BossChestInfo.fromSceneBossChest(gadget.getBossChest());
         this.arguments = gadget.getArguments();
-        this.isStartRoute = gadget.isStartRoute();
+        this.isStartRoute = gadget.getStartRoute();
 
         initBaseData();
     }

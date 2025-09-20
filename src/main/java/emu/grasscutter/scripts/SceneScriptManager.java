@@ -245,7 +245,7 @@ public class SceneScriptManager {
         if(prevSuiteIndex != 0) {
             prevSuiteData = group.getSuiteByIndex(prevSuiteIndex);
             if (prevSuiteData != null) {
-                if(prevSuiteData.isBanRefresh() && !suiteData.isBanRefresh()) {
+                if(prevSuiteData.getBanRefresh() && !suiteData.getBanRefresh()) {
                     waitForOne = true;
                 }
             }
@@ -269,7 +269,7 @@ public class SceneScriptManager {
 
         //Refesh variables here
         group.getVariables().forEach(variable -> {
-            if(!variable.isNoRefresh())
+            if(!variable.getNoRefresh())
                 groupInstance.getCachedVariables().put(variable.getName(), variable.getValue());
         });
 
@@ -403,12 +403,17 @@ public class SceneScriptManager {
         val visionLevel = switch (sceneObject.getType()){
             case GADGET -> {
                 val gadgetLevel = getGadgetVisionLevel(((SceneGadget)sceneObject).getGadgetId());
-                val scriptLevel = sceneObject.getVisionLevel();
+                val scriptLevel = ((SceneCreature)sceneObject).getVisionLevel();
                 if(gadgetLevel.getValue() > scriptLevel.getValue()) yield gadgetLevel;
                 else yield scriptLevel;
             }
             case REGION -> VisionLevelType.getDefault();
-            default -> sceneObject.getVisionLevel();
+            default -> {
+                if(sceneObject instanceof SceneCreature creature)
+                    yield creature.getVisionLevel();
+                else
+                    yield VisionLevelType.getDefault();
+            }
         };
         addGridPositionToMap(groupPositions.get(visionLevel.getValue()), group.getId(), visionLevel, sceneObject.getPos());
         return visionLevel;
@@ -630,7 +635,7 @@ public class SceneScriptManager {
         return suite.getSceneGadgets().stream()
             .filter(m -> {
                 val entity = scene.getEntityByConfigId(m.getConfigId(), groupId);
-                return (entity == null || entity.getGroupId()!=groupId) && (!m.isOneOff() || !m.isPersistent() || !groupInstance.getDeadEntities().contains(m.getConfigId()));
+                return (entity == null || entity.getGroupId()!=groupId) && (!m.isOneOff() || !m.getPersistent() || !groupInstance.getDeadEntities().contains(m.getConfigId()));
             })
             .map(g -> createGadget(g, groupInstance.getCachedGadgetState(g)))
             .filter(Objects::nonNull)
@@ -830,7 +835,7 @@ public class SceneScriptManager {
         }
         // always deregister on error, otherwise only if the count is reached
         if(callResult.isBoolean() && !callResult.asBoolean() || callResult.isInteger() && callResult.asInteger()!=0
-        || trigger.getTrigger_count() > INF_TRIGGERS && invocations >= trigger.getTrigger_count()) {
+        || trigger.getTriggerCount() > INF_TRIGGERS && invocations >= trigger.getTriggerCount()) {
             deregisterTrigger(trigger);
         }
     }

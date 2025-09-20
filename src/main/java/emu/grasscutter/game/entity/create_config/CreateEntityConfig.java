@@ -6,6 +6,7 @@ import emu.grasscutter.utils.Position;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.anime_game_servers.gi_lua.models.scene.group.SceneCreature;
 import org.anime_game_servers.gi_lua.models.scene.group.SceneObject;
 import org.anime_game_servers.multi_proto.gi.messages.general.entity.CreateEntityInfo;
 
@@ -44,7 +45,8 @@ public abstract class CreateEntityConfig<T extends CreateEntityConfig<T>> {
         this.blockId = object.getBlockId();
         this.configId = object.getConfigId();
         this.groupId = object.getGroupId();
-        this.level = object.getLevel();
+        if(object instanceof SceneCreature creature)
+            this.level = creature.getLevel();
         this.bornPos = object.getPos()!= null ? new Position(object.getPos()) : new Position();
         this.bornRot = object.getRot()!= null ? new Position(object.getRot()) : new Position();
         this.pos = bornPos.clone();
