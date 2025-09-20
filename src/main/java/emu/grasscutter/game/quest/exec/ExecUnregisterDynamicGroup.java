@@ -14,8 +14,12 @@ public class ExecUnregisterDynamicGroup extends QuestExecHandler {
 
     @Override
     public boolean execute(GameQuest quest, QuestExecParam condition, String... paramStr) {
+        if (paramStr.length < 2) {
+            Grasscutter.getLogger().error("Not enough parameters for UnregisterDynamicGroup in quest {}", quest.getSubQuestId());
+            return false;
+        }
         val groupId = Integer.parseInt(paramStr[0]);
-        val unknownParam = Integer.parseInt(paramStr[1]); //TODO: Goes from 0 to 1, maybe is a boolean. Investigate
+        val unknownParam = paramStr[1].isBlank()? 0 : Integer.parseInt(paramStr[1]); //TODO: Goes from 0 to 1, maybe is a boolean. Investigate
         val scene = quest.getOwner().getScene();
 
         QuestSystem.getLogger().info("Unregistering group {}", groupId);

@@ -875,6 +875,7 @@ public class SceneScriptManager {
         try{
             return GIScriptHandler.callGroupFunction(script, funcName, context, params);
         } catch (RuntimeException | ScriptException | NoSuchMethodException error){
+            //groups that end up here because of errors in the lua: 302001042
             logger.error("[LUA] call trigger failed in group {} with {},{}",group.getGroupInfo().getId(),funcName,params,error);
             return BooleanLuaValue.FALSE;
         }

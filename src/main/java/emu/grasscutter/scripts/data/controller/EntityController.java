@@ -53,7 +53,7 @@ public class EntityController {
         } catch (RuntimeException | ScriptException | NoSuchMethodException error) {
             if (error instanceof NoSuchMethodException) {
                 if(!funcName.equals("OnTimer")) {
-                    logger.error("[LUA] unknown func in gadget {} with {} {}",
+                    logger.debug("[LUA] unknown func in gadget {} with {} {}",
                         entity.getEntityTypeId(), funcName, Arrays.toString(args), error);
                 }
                 return IntLuaValue.ONE;
