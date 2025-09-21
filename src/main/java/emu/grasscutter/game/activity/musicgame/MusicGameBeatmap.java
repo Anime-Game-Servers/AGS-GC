@@ -3,11 +3,8 @@ package emu.grasscutter.game.activity.musicgame;
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 import emu.grasscutter.database.DatabaseHelper;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
-import lombok.val;
 import org.anime_game_servers.multi_proto.gi.messages.activity.user_generated_content.music_game.UgcMusicBriefInfo;
 import org.anime_game_servers.multi_proto.gi.messages.activity.user_generated_content.music_game.UgcMusicNote;
 import org.anime_game_servers.multi_proto.gi.messages.activity.user_generated_content.music_game.UgcMusicRecord;
@@ -19,6 +16,8 @@ import java.util.Random;
 @Entity("music_game_beatmaps")
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder(builderMethodName = "of")
 public class MusicGameBeatmap {
 
@@ -97,6 +96,8 @@ public class MusicGameBeatmap {
     @FieldDefaults(level = AccessLevel.PRIVATE)
     @Builder(builderMethodName = "of")
     @Entity
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class BeatmapNote{
         int startTime;
         int endTime;

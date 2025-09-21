@@ -1,23 +1,21 @@
 package emu.grasscutter.game.managers.cooking;
 
 import dev.morphia.annotations.Entity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 
-@Entity
+@Entity @AllArgsConstructor
 public class ActiveCookCompoundData {
-    private final int costTime;
     @Getter
-    private final int compoundId;
+    private int compoundId;
+    private int costTime;
     @Getter
     private int totalCount;
     private int startTime;
 
-    public ActiveCookCompoundData(int compoundId, int processTime, int count, int startTime) {
-        this.compoundId = compoundId;
-        this.costTime = processTime;
-        this.totalCount = count;
-        this.startTime = startTime;
+    @Deprecated // Do not use. Morphia only!
+    public ActiveCookCompoundData() {
     }
 
     public int getOutputCount(int currentTime) {

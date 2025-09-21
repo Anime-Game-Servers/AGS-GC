@@ -395,7 +395,7 @@ public class GachaSystem extends BaseGameSystem {
         if (this.watchService == null) {
             try {
                 this.watchService = FileSystems.getDefault().newWatchService();
-                FileUtils.getDataUserPath("").register(watchService, new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_MODIFY}, SensitivityWatchEventModifier.HIGH);
+                FileUtils.getDataUserPath("").register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
             } catch (Exception e) {
                 Grasscutter.getLogger().error("Unable to load the Gacha Manager Watch Service. If ServerOptions.watchGacha is true it will not auto-reload");
                 e.printStackTrace();

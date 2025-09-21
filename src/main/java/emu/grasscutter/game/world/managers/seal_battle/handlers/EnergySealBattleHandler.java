@@ -3,8 +3,8 @@ package emu.grasscutter.game.world.managers.seal_battle.handlers;
 import emu.grasscutter.game.entity.EntityMonster;
 import emu.grasscutter.game.world.managers.seal_battle.SealBattleManager;
 import lombok.val;
-import org.anime_game_servers.gi_lua.script_lib.EnergySealBattleParams;
-import org.anime_game_servers.gi_lua.script_lib.SealBattleParams;
+import org.anime_game_servers.gi_lua.script_lib.handler.scene.EnergySealBattleParams;
+import org.anime_game_servers.gi_lua.script_lib.handler.scene.SealBattleParams;
 
 public class EnergySealBattleHandler implements SealBattleManager.SealBattleHandler {
     @Override

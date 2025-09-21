@@ -16,6 +16,11 @@ public class ActionSetRandomOverrideMapValue extends AbilityActionHandler {
             return false;
         }
 
+        if(action.valueRangeMax == null || action.valueRangeMin == null) {
+            logger.warn("Tried setting value with null range: {} {}", action.valueRangeMin, action.valueRangeMax);
+            return true;
+        }
+
         float value = valueProto.getRandomValue();
         float valueRangeMin = action.valueRangeMin.get(ability);
         float valueRangeMax = action.valueRangeMax.get(ability);

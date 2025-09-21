@@ -14,6 +14,7 @@ import emu.grasscutter.Grasscutter.ServerDebugMode;
 import emu.grasscutter.server.game.GameSession.SessionState;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import lombok.val;
 
 import javax.annotation.Nullable;
 
@@ -80,7 +81,12 @@ public class GameServerPacketHandler {
     }
 
     public void handle(GameSession session, int opcode, byte[] header, byte[] payload) {
-        String packageName = session.getPackageIdProvider().getPacketName(opcode);
+        val provider = session.getPackageIdProvider();
+        if (provider == null) {
+            Grasscutter.getLogger().warn("No package id provider found for version {}", session.getVersion());
+            return;
+        }
+        String packageName = provider.getPacketName(opcode);
         PacketHandler handler = getHandler(packageName, opcode);
 
         if (handler != null) {
@@ -124,8 +130,8 @@ public class GameServerPacketHandler {
         }
 
         // Log unhandled packets
-        if (GAME_INFO.logPackets == ServerDebugMode.MISSING || GAME_INFO.logPackets == ServerDebugMode.ALL) {
-            Grasscutter.getLogger().warn("Unhandled packet (" + opcode + "): " + PacketOpcodesUtils.getOpcodeName(opcode, session));
+        if (DEBUG_MODE_INFO.logPackets == ServerDebugMode.MISSING || DEBUG_MODE_INFO.logPackets == ServerDebugMode.ALL) {
+            Grasscutter.getLogger().warn("Unhandled packet ({}): {}", opcode, PacketOpcodesUtils.getOpcodeName(opcode, session));
         }
     }
 }

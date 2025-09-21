@@ -1,6 +1,7 @@
 package emu.grasscutter.game.entity.gadget.content;
 
 import java.util.Arrays;
+import java.util.List;
 
 import emu.grasscutter.game.entity.EntityGadget;
 import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
@@ -34,11 +35,11 @@ public class GadgetWorktop extends GadgetContent {
         return worktopOptions;
     }
 
-    public void addWorktopOptions(int[] options) {
+    public void addWorktopOptions(List<Integer> options) {
         if (this.worktopOptions == null) {
             this.worktopOptions = new IntOpenHashSet();
         }
-        Arrays.stream(options).forEach(this.worktopOptions::add);
+        worktopOptions.addAll(options);
     }
 
     public void removeWorktopOption(int option) {

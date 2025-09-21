@@ -467,6 +467,13 @@ public class World implements Iterable<Player> {
     }
 
     /**
+     * Returns the current in game minutes of the hour
+     */
+    public int getGameTimeMinutes() {
+        return getGameTime() % 60 ;
+    }
+
+    /**
      * Returns the total number of in game days that got completed since the beginning of the game
      */
     public long getTotalGameTimeDays() {

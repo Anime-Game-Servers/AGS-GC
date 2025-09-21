@@ -62,6 +62,7 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
     private boolean shareItem = true;
     private EntityController luaController = null;
     private BossChestInfo bossChestInfo = null;
+    private GatherData gatherData = null;
 
 
     public CreateGadgetEntityConfig(int gadgetId){
@@ -93,7 +94,7 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
         this.gadgetId = gadget.getGadgetId();
         this.routeConfig = BaseRoute.fromSceneGadget(gadget);
         this.pointType = gadget.getPointType();
-        this.isPersistent = gadget.isPersistent();
+        this.isPersistent = gadget.getPersistent();
         this.draftId = gadget.getDraftId();
         this.enableInteract = gadget.isEnableInteract();
         this.interactId = gadget.getInteractId();
@@ -103,10 +104,11 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
             this.worktopIsPersistent = gadget.getWorktopConfig().isPersistent();
         }
         this.chestDropId = gadget.getChestDropId();
-        this.chestShowCutscene = gadget.isShowCutscene();
+        this.chestShowCutscene = gadget.getShowCutscene();
         this.bossChestInfo = BossChestInfo.fromSceneBossChest(gadget.getBossChest());
         this.arguments = gadget.getArguments();
-        this.isStartRoute = gadget.isStartRoute();
+        this.isStartRoute = gadget.getStartRoute();
+
         initBaseData();
     }
 
@@ -125,17 +127,6 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
         if(evtCreateGadgetNotify.getTargetEntityId() != 0){
             this.targetEntityId = evtCreateGadgetNotify.getTargetEntityId();
         }
-        initBaseData();
-    }
-
-    public CreateGadgetEntityConfig(GameEntity<?> parent, GatherData gatherData){
-        super(parent);
-        this.gadgetId = gatherData.getGadgetId();
-        this.enableInteract = !gatherData.isInitDisableInteract();
-        this.forbidGuest = gatherData.isForbidGuest();
-        this.item = new GameItem(gatherData.getItemId(), 1);
-        this.pointType = gatherData.getPointType();
-
         initBaseData();
     }
 
@@ -175,8 +166,38 @@ public class CreateGadgetEntityConfig extends CreateEntityConfig<CreateGadgetEnt
     }
 
     private void initBaseData(){
+        handleInitialOverwrites();
+        initGather();
         initGadgetData(gadgetId);
         initController();
+    }
+
+    /**
+     * Handles overwrites that need to be done before initial data gathering, based on initial data that got set by the creator
+     */
+    private void handleInitialOverwrites(){
+        // todo if gadgetData.getType() == EntityType.AmberWind replace based on WorldAreaLevelupConfig, when actionVec == WORLD_AREA_ACTION_ACTIVATE_ITEM and paramVec1==gadgetId
+        // TODO blossom chest gadgets will be replaced under some conditions based with BlossomChestExcelConfigData.chestGadgetId
+    }
+
+    /**
+     * This initialises gather object info, when the pointType is set. This will overwrite the gadgetId with the one from
+     * gatherData, when pointType is set and gatherData for that point exists.
+     */
+    private void initGather(){
+        if(pointType == 0) {
+            return;
+        }
+        this.gatherData = GameData.getGatherDataMap().get(pointType);
+        if(gatherData == null){
+            Grasscutter.getLogger().warn("Gather data for Point {} not found", pointType);
+            return;
+        }
+
+        this.gadgetId = gatherData.getGadgetId();
+        this.enableInteract = !gatherData.isInitDisableInteract();
+        this.forbidGuest = gatherData.isForbidGuest();
+        this.item = new GameItem(gatherData.getItemId(), 1);
     }
 
     private void initGadgetData(int gadgetId){

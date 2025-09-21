@@ -31,6 +31,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.val;
+import org.anime_game_servers.gi_lua.GIScriptHandler;
 import org.anime_game_servers.gi_lua.models.Position;
 import org.anime_game_servers.gi_lua.models.ScriptArgs;
 import org.anime_game_servers.gi_lua.models.constants.EventType;
@@ -226,10 +227,9 @@ public class SceneScriptManager {
         val groupId = groupInstance.getGroupId();
         SceneGroup group = meta.getGroups().get(groupId);
         if(suiteIndex == 0) {
-            if(excludePrevSuite) {
-                suiteIndex = group.findInitSuiteIndex(groupInstance.getActiveSuiteId());
-            } else
-                suiteIndex = group.findInitSuiteIndex(0);
+            val currentSuiteId = groupInstance.getActiveSuiteId();
+            val excludeIndex = excludePrevSuite ? currentSuiteId : 0;
+            suiteIndex = group.findInitSuiteIndex(currentSuiteId, excludeIndex);
         }
         if(suiteIndex == 0) return 0;
 
@@ -245,7 +245,7 @@ public class SceneScriptManager {
         if(prevSuiteIndex != 0) {
             prevSuiteData = group.getSuiteByIndex(prevSuiteIndex);
             if (prevSuiteData != null) {
-                if(prevSuiteData.isBanRefresh() && !suiteData.isBanRefresh()) {
+                if(prevSuiteData.getBanRefresh() && !suiteData.getBanRefresh()) {
                     waitForOne = true;
                 }
             }
@@ -269,12 +269,13 @@ public class SceneScriptManager {
 
         //Refesh variables here
         group.getVariables().forEach(variable -> {
-            if(!variable.isNoRefresh())
+            if(!variable.getNoRefresh())
                 groupInstance.getCachedVariables().put(variable.getName(), variable.getValue());
         });
 
         groupInstance.setActiveSuiteId(suiteIndex);
         groupInstance.setLastTimeRefreshed(getScene().getWorld().getGameTime());
+        callEvent(new ScriptArgs(groupId, EventType.EVENT_GROUP_REFRESH));
         return suiteIndex;
     }
 
@@ -353,7 +354,7 @@ public class SceneScriptManager {
     }
     public synchronized void deregisterRegion(SceneRegion region) {
         var instance = regions.values().stream()
-            .filter(r -> r.getConfigId() == region.getConfigId())
+            .filter(r -> r.getConfigId() == region.getConfigId() && r.getGroupId() == region.getGroupId())
             .findFirst();
         instance.ifPresent(entityRegion -> regions.remove(entityRegion.getId()));
     }
@@ -402,12 +403,17 @@ public class SceneScriptManager {
         val visionLevel = switch (sceneObject.getType()){
             case GADGET -> {
                 val gadgetLevel = getGadgetVisionLevel(((SceneGadget)sceneObject).getGadgetId());
-                val scriptLevel = sceneObject.getVisionLevel();
+                val scriptLevel = ((SceneCreature)sceneObject).getVisionLevel();
                 if(gadgetLevel.getValue() > scriptLevel.getValue()) yield gadgetLevel;
                 else yield scriptLevel;
             }
             case REGION -> VisionLevelType.getDefault();
-            default -> sceneObject.getVisionLevel();
+            default -> {
+                if(sceneObject instanceof SceneCreature creature)
+                    yield creature.getVisionLevel();
+                else
+                    yield VisionLevelType.getDefault();
+            }
         };
         addGridPositionToMap(groupPositions.get(visionLevel.getValue()), group.getId(), visionLevel, sceneObject.getPos());
         return visionLevel;
@@ -629,7 +635,7 @@ public class SceneScriptManager {
         return suite.getSceneGadgets().stream()
             .filter(m -> {
                 val entity = scene.getEntityByConfigId(m.getConfigId(), groupId);
-                return (entity == null || entity.getGroupId()!=groupId) && (!m.isOneOff() || !m.isPersistent() || !groupInstance.getDeadEntities().contains(m.getConfigId()));
+                return (entity == null || entity.getGroupId()!=groupId) && (!m.isOneOff() || !m.getPersistent() || !groupInstance.getDeadEntities().contains(m.getConfigId()));
             })
             .map(g -> createGadget(g, groupInstance.getCachedGadgetState(g)))
             .filter(Objects::nonNull)
@@ -695,9 +701,10 @@ public class SceneScriptManager {
         suite.getSceneRegions().forEach(this::deregisterRegion);
     }
 
-    public void startMonsterTideInGroup(int challengeIndex, SceneGroup group, Integer[] ordersConfigId, int tideCount, int sceneLimit) {
+    public void startMonsterTideInGroup(int challengeIndex, SceneGroup group, List<Integer> ordersConfigId, int tideSize, int spawnThreshold, int spawnLimit) {
+        unloadCurrentMonsterTide();
         this.scriptMonsterTideService =
-                new ScriptMonsterTideService(this, challengeIndex, group, tideCount, sceneLimit, ordersConfigId);
+                new ScriptMonsterTideService(this, challengeIndex, group, ordersConfigId, tideSize, spawnThreshold, spawnLimit);
 
     }
     public void unloadCurrentMonsterTide() {
@@ -828,7 +835,7 @@ public class SceneScriptManager {
         }
         // always deregister on error, otherwise only if the count is reached
         if(callResult.isBoolean() && !callResult.asBoolean() || callResult.isInteger() && callResult.asInteger()!=0
-        || trigger.getTrigger_count() > INF_TRIGGERS && invocations >= trigger.getTrigger_count()) {
+        || trigger.getTriggerCount() > INF_TRIGGERS && invocations >= trigger.getTriggerCount()) {
             deregisterTrigger(trigger);
         }
     }
@@ -847,21 +854,9 @@ public class SceneScriptManager {
             return false;
         }
 
-        if (funcName.isEmpty()) {
-            logger.warn("callScriptFunc funcName is empty");
-            return false;
-        }
-        if (!script.hasMethod(funcName)) {
-            logger.warn("callScriptFunc script has no method {}", funcName);
-            return false;
-        }
-
         val context = new GroupEventLuaContext(script.getEngine(), group, params, this);
-        try {
-            val luaArgs = new Object[args.length + 1];
-            luaArgs[0] = context;
-            System.arraycopy(args, 0, luaArgs, 1, args.length);
-            val result = script.callMethod(funcName, luaArgs);
+        try{
+            val result = GIScriptHandler.callGroupFunction(script, funcName, context, args);
             return true;
         } catch (RuntimeException | ScriptException | NoSuchMethodException error) {
             logger.error("[LUA] call trigger failed in group {} with {},{}", group.getGroupInfo().getId(), funcName, params, error);
@@ -876,21 +871,13 @@ public class SceneScriptManager {
             return BooleanLuaValue.FALSE;
         }
 
-        if(funcName.isEmpty()){
-            logger.warn("callScriptFunc funcName is empty");
-            return BooleanLuaValue.FALSE;
-        }
-        if(!script.hasMethod(funcName)){
-            logger.warn("callScriptFunc script has no method {}",funcName);
-            return BooleanLuaValue.FALSE;
-        }
-
         val context = new GroupEventLuaContext(script.getEngine(), group, params, this);
         try{
-            return script.callMethod(funcName, context, params);
+            return GIScriptHandler.callGroupFunction(script, funcName, context, params);
         } catch (RuntimeException | ScriptException | NoSuchMethodException error){
+            //groups that end up here because of errors in the lua: 302001042
             logger.error("[LUA] call trigger failed in group {} with {},{}",group.getGroupInfo().getId(),funcName,params,error);
-            return new BooleanLuaValue(false);
+            return BooleanLuaValue.FALSE;
         }
     }
 

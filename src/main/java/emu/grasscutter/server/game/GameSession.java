@@ -24,8 +24,7 @@ import java.io.File;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 
-import static emu.grasscutter.config.Configuration.GAME_INFO;
-import static emu.grasscutter.config.Configuration.SERVER;
+import static emu.grasscutter.config.Configuration.*;
 import static emu.grasscutter.utils.Language.translate;
 
 public class GameSession implements GameSessionManager.KcpChannel {
@@ -103,7 +102,7 @@ public class GameSession implements GameSessionManager.KcpChannel {
     }
 
     public void logPacket(String sendOrRecv, int opcode, byte[] payload) {
-        Grasscutter.getLogger().info(sendOrRecv + ": " + PacketOpcodesUtils.getOpcodeName(opcode, this) + " (" + opcode + ")");
+        Grasscutter.getLogger().info("{}: {} ({})", sendOrRecv, PacketOpcodesUtils.getOpcodeName(opcode, this), opcode);
         if (GAME_INFO.isShowPacketPayload)
             System.out.println(Utils.bytesToHex(payload));
     }
@@ -111,8 +110,8 @@ public class GameSession implements GameSessionManager.KcpChannel {
     public void send(BasePacket packet) {
         // Test
         val opcode = packet.getOpcode(this);
-        if (opcode <= 0) {
-            Grasscutter.getLogger().warn("Tried to send packet with missing cmd id!");
+        if (opcode <= 0 || opcode == 999999) {
+            Grasscutter.getLogger().warn("Tried to send packet with missing cmd id! {}", packet.getClass().getSimpleName());
             return;
         }
 
@@ -129,7 +128,7 @@ public class GameSession implements GameSessionManager.KcpChannel {
         }
 
         // Log
-        switch (GAME_INFO.logPackets) {
+        switch (DEBUG_MODE_INFO.logPackets) {
             case ALL -> {
                 if (!PacketOpcodesUtils.LOOP_PACKETS.contains(paketName) || GAME_INFO.isShowLoopPackets) {
                     logPacket("SEND", opcode, packet.getData(version));
@@ -179,7 +178,7 @@ public class GameSession implements GameSessionManager.KcpChannel {
         //logPacket(packet);
         // Handle
         try {
-            boolean allDebug = GAME_INFO.logPackets == ServerDebugMode.ALL;
+            boolean allDebug = DEBUG_MODE_INFO.logPackets == ServerDebugMode.ALL;
             while (packet.readableBytes() > 0) {
                 // Length
                 if (packet.readableBytes() < 12) {
@@ -226,7 +225,7 @@ public class GameSession implements GameSessionManager.KcpChannel {
                 val paketName = PacketOpcodesUtils.getOpcodeName(opcode, this);
 
                 // Log packet
-                switch (GAME_INFO.logPackets) {
+                switch (DEBUG_MODE_INFO.logPackets) {
                     case ALL -> {
                         if (!PacketOpcodesUtils.LOOP_PACKETS.contains(paketName) || GAME_INFO.isShowLoopPackets) {
                             logPacket("RECV", opcode, payload);

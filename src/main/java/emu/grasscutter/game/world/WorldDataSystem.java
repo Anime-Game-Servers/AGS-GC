@@ -141,9 +141,9 @@ public class WorldDataSystem extends BaseGameSystem {
 
         if ("Boss".equals(imd.getMonsterCategory())) {
             var bossChest = group.searchBossChestInGroup();
-            if (bossChest.isPresent()) {
-                builder.setResin(bossChest.get().getResin());
-                builder.setBossChestNum(bossChest.get().getTakeNum());
+            if (bossChest != null) {
+                builder.setResin(bossChest.getResin());
+                builder.setBossChestNum(bossChest.getTakeNum());
             }
         }
         return builder;

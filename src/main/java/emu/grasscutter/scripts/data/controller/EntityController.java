@@ -7,6 +7,7 @@ import emu.grasscutter.game.entity.GameEntity;
 import emu.grasscutter.game.props.ElementType;
 import emu.grasscutter.scripts.lua_engine.ControllerLuaContext;
 import lombok.val;
+import org.anime_game_servers.gi_lua.GIScriptHandler;
 import org.anime_game_servers.lua.engine.LuaScript;
 import org.anime_game_servers.lua.engine.LuaValue;
 import org.anime_game_servers.lua.models.IntLuaValue;
@@ -46,25 +47,21 @@ public class EntityController {
 
     // TODO actual execution should probably be handle by EntityControllerScriptManager
     private LuaValue callControllerScriptFunc(GameEntity entity, @Nonnull String funcName, Object... args) {
-
-        LuaValue ret = IntLuaValue.ONE;
-
-        if (entityController.hasMethod(funcName)) {
-            try {
-                val context = new ControllerLuaContext(entityController.getEngine(), (EntityGadget) entity);
-                Object[] newArgs = new Object[args.length + 1];
-                newArgs[0] = context;
-                System.arraycopy(args, 0, newArgs, 1, args.length);
-                return entityController.callMethod(funcName, newArgs);
-            } catch (RuntimeException | ScriptException | NoSuchMethodException error) {
-                logger.error("[LUA] call function failed in gadget {} with {} ,{}",
-                    entity.getEntityTypeId(), funcName, Arrays.toString(args), error);
-                ret = IntLuaValue.N_ONE;
+        try {
+            val context = new ControllerLuaContext(entityController.getEngine(), (EntityGadget) entity);
+            return GIScriptHandler.callControllerFunction(entityController, funcName, context, args);
+        } catch (RuntimeException | ScriptException | NoSuchMethodException error) {
+            if (error instanceof NoSuchMethodException) {
+                if(!funcName.equals("OnTimer")) {
+                    logger.debug("[LUA] unknown func in gadget {} with {} {}",
+                        entity.getEntityTypeId(), funcName, Arrays.toString(args), error);
+                }
+                return IntLuaValue.ONE;
             }
-        } else if (!funcName.equals("OnTimer")) {
-            logger.error("[LUA] unknown func in gadget {} with {} {}",
-                entity.getEntityTypeId(), funcName, Arrays.toString(args));
+
+            logger.error("[LUA] call function failed in gadget {} with {} ,{}",
+                entity.getEntityTypeId(), funcName, Arrays.toString(args), error);
+            return IntLuaValue.N_ONE;
         }
-        return ret;
     }
 }

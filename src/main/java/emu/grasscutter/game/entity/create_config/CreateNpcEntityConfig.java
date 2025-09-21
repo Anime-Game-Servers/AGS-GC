@@ -15,7 +15,7 @@ public class CreateNpcEntityConfig extends CreateEntityConfig<CreateNpcEntityCon
 
     public CreateNpcEntityConfig(SceneNPC npc){
         super(npc);
-        this.npcId = npc.getNpc_id();
+        this.npcId = npc.getNpcId();
     }
 
     public CreateNpcEntityConfig(CreateEntityInfo requestedConfig, int npcID){

@@ -843,8 +843,8 @@ public class ResourceLoader {
                 val sharedQuestParams = new ShardQuestScriptLoadParams(questId);
                 if(!ScriptSystem.getScriptLoader().loadData(sharedQuestParams, script -> {
                     // these are Map<String, class>
-                    val teleportDataMap = script.getGlobalVariableMap("quest_data", QuestData.class);
-                    val rewindDataMap = script.getGlobalVariableMap("rewind_data", RewindData.class);
+                    val teleportDataMap = script.getGlobalVariableMap("quest_data", String.class, QuestData.class);
+                    val rewindDataMap = script.getGlobalVariableMap("rewind_data", String.class, RewindData.class);
 
                     // convert them to Map<Integer, class> and cache
                     GameData.getTeleportDataMap().putAll(teleportDataMap.entrySet().stream().collect(Collectors.toMap(entry -> Integer.valueOf(entry.getKey()), Entry::getValue)));
@@ -996,7 +996,7 @@ public class ResourceLoader {
         val scriptParams = new SceneReplacementScriptLoadParams();
         if(!ScriptSystem.getScriptLoader().loadData(scriptParams, script -> {
             // these are Map<String, class>
-            var replacementsMap = script.getGlobalVariableMap("replacements", SceneGroupReplacement.class);
+            var replacementsMap = script.getGlobalVariableMap("replacements", String.class, SceneGroupReplacement.class);
             // convert them to Map<Integer, class> and cache
             GameData.getGroupReplacements().putAll(replacementsMap.entrySet().stream().collect(Collectors.toMap(entry -> Integer.valueOf(entry.getValue().getId()), Entry::getValue)));
         })) {
