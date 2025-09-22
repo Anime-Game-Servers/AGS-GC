@@ -41,8 +41,12 @@ public class HandlerSceneInitFinishReq extends TypedPacketHandler<SceneInitFinis
 		else //TODO: Remove old climate implementation, you can use areaId 0 and climate type none, but needs testing
 			session.send(new PacketSceneAreaWeatherNotify(session.getPlayer()));
 		session.send(new PacketScenePlayerInfoNotify(session.getPlayer().getWorld()));
-		session.send(new PacketSceneTeamUpdateNotify(session.getPlayer()));
 
+		// Refresh avatar abilities with level entity
+		session.getPlayer().setAvatarsAbilityForScene(session.getPlayer().getScene());
+
+		// Team info
+		session.send(new PacketSceneTeamUpdateNotify(session.getPlayer()));
 		session.send(new PacketSyncTeamEntityNotify(session.getPlayer()));
 		session.send(new PacketSyncScenePlayTeamEntityNotify(session.getPlayer()));
 
