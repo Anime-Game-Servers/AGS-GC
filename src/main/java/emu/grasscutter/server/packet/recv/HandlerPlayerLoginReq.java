@@ -7,6 +7,7 @@ import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.server.game.GameSession.SessionState;
 import emu.grasscutter.server.packet.send.PacketPlayerLoginRsp;
 import lombok.val;
+import org.anime_game_servers.multi_proto.gi.messages.player.DoSetPlayerBornDataNotify;
 import org.anime_game_servers.multi_proto.gi.messages.player.PlayerLoginReq;
 import org.anime_game_servers.multi_proto.gi.utils.VersionIdentify;
 
@@ -53,7 +54,7 @@ public class HandlerPlayerLoginReq extends TypedPacketHandler<PlayerLoginReq> {
         if (player.getAvatars().getAvatarCount() == 0) {
             // Pick character
             session.setState(SessionState.PICKING_CHARACTER);
-            session.send(new BasePacket(session.getPackageIdProvider().getPacketId("DoSetPlayerBornDataNotify")));
+            session.send(new BaseTypedPacket<>(new DoSetPlayerBornDataNotify()) {});
         } else {
             // Login done
             session.getPlayer().onLogin();
