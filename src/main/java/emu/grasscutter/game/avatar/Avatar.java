@@ -580,8 +580,8 @@ public class Avatar {
 
         // Packet
         if (getPlayer() != null && getPlayer().hasSentLoginPackets()) {
-            // Update stats for client
-            getPlayer().sendPacket(new PacketAvatarFightPropNotify(this));
+            // Update stats for client. TODO: maybe should sent only updated fight props
+            getPlayer().sendPacket(new PacketAvatarFightPropUpdateNotify(this));
             // Update client abilities
             EntityAvatar entity = this.getAsEntity();
             if (entity != null && (!this.getExtraAbilityEmbryos().equals(prevExtraAbilityEmbryos) || forceSendAbilityChange)) {
