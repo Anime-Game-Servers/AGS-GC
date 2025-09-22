@@ -18,7 +18,7 @@ public class PacketAvatarDataNotify extends BaseTypedPacket<AvatarDataNotify> {
         proto.setCurAvatarTeamId(player.getTeamManager().getCurrentTeamId());
                 //.setChooseAvatarGuid(player.getTeamManager().getCurrentCharacterGuid())
         proto.setOwnedFlycloakList(player.getFlyCloakList().stream().toList());
-        proto.setOwnedFlycloakList(player.getCostumeList().stream().toList());
+        proto.setOwnedCostumeList(player.getCostumeList().stream().toList());
 
         proto.setAvatarList(player.getAvatars().getAvatars().values().stream().map(Avatar::toProto).toList());
 
