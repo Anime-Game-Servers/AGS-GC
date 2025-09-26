@@ -115,8 +115,6 @@ public final class StartupArguments {
             .setLevel(loggerLevel);
         ((Logger) LoggerFactory.getLogger("org.mongodb.driver"))
             .setLevel(loggerLevel);
-        ((Logger) LoggerFactory.getLogger("emu.grasscutter.scripts"))
-            .setLevel(loggerLevel);
 
         return false;
     }
