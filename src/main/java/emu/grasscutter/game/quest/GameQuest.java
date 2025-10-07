@@ -13,7 +13,7 @@ import emu.grasscutter.game.props.ActionReason;
 import emu.grasscutter.game.quest.enums.QuestCond;
 import emu.grasscutter.game.quest.enums.QuestContent;
 import emu.grasscutter.server.packet.send.PacketChapterStateNotify;
-import emu.grasscutter.server.packet.send.PacketDelQuestNotify;
+import emu.grasscutter.server.packet.send.PacketQuestDelNotify;
 import emu.grasscutter.server.packet.send.PacketQuestListUpdateNotify;
 import emu.grasscutter.utils.Utils;
 import lombok.Getter;
@@ -173,7 +173,7 @@ public class GameQuest {
             return false;
         }
         if(notifyDelete) {
-            getOwner().sendPacket(new PacketDelQuestNotify(getSubQuestId()));
+            getOwner().sendPacket(new PacketQuestDelNotify(getSubQuestId()));
         }
         save();
         return true;

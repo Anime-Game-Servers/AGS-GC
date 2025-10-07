@@ -311,8 +311,8 @@ public class TeamManager extends BasePlayerDataManager {
         // This is one of the player's teams
         // Update entities
         if (teamId == getCurrentTeamId()) {
-            setCurrentCharacterIndex(guidList.indexOf(guid));
             updateTeamEntities(true);
+            setCurrentCharacterIndex(guidList.indexOf(guid));
         }
         return true;
     }

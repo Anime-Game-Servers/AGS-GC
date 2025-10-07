@@ -5,6 +5,7 @@ import emu.grasscutter.Grasscutter.ServerDebugMode;
 import emu.grasscutter.game.Account;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.net.packet.BasePacket;
+import emu.grasscutter.net.packet.BaseTypedPacket;
 import emu.grasscutter.net.packet.PacketOpcodesUtils;
 import emu.grasscutter.server.event.game.SendPacketEvent;
 import emu.grasscutter.utils.Crypto;
@@ -18,6 +19,7 @@ import lombok.val;
 import org.anime_game_servers.core.base.Version;
 import org.anime_game_servers.multi_proto.core.interfaces.PacketIdProvider;
 import org.anime_game_servers.multi_proto.gi.packet_id.PacketIds;
+import org.anime_game_servers.multi_proto.gi.messages.player.ServerDisconnectClientNotify;
 import org.anime_game_servers.multi_proto.gi.utils.VersionIdentify;
 
 import java.io.File;
@@ -267,7 +269,7 @@ public class GameSession implements GameSessionManager.KcpChannel {
             player.onLogout();
         }
         try {
-            send(new BasePacket(getPackageIdProvider().getPacketId("ServerDisconnectClientNotify")));
+            send(new BaseTypedPacket<>(new ServerDisconnectClientNotify()) {});
         } catch (Throwable ignore) {
             Grasscutter.getLogger().warn("closing {} error", getAddress().getAddress().getHostAddress());
         }

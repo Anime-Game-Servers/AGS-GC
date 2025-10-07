@@ -309,7 +309,6 @@ public class World implements Iterable<Player> {
 
         Scene newScene = this.getSceneById(teleportProperties.getSceneId());
         newScene.addPlayer(player);
-        player.setAvatarsAbilityForScene(newScene);
         // Dungeon
         // Dungeon system is handling this already
         // if(dungeonData!=null){

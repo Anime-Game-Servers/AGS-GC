@@ -9,8 +9,6 @@ public class HandlerPullPrivateChatReq extends TypedPacketHandler<PullPrivateCha
     @Override
     public void handle(GameSession session, byte[] header, PullPrivateChatReq req) throws Exception {
         session.getServer().getChatSystem().handlePullPrivateChatReq(session.getPlayer(), req.getTargetUid());
-
-        // session.send(new PacketPullPrivateChatRsp(req.getTargetUid()));
     }
 
 }

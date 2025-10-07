@@ -9,14 +9,17 @@ import java.util.Map;
 
 public class PacketAvatarFightPropUpdateNotify extends BaseTypedPacket<AvatarFightPropUpdateNotify> {
 
-	public PacketAvatarFightPropUpdateNotify(Avatar avatar, FightProperty prop) {
-        this(avatar, Map.of(prop.getId(), avatar.getFightProperty(prop)));
-	}
+    public PacketAvatarFightPropUpdateNotify(Avatar avatar) {
+        this(avatar, avatar.getFightProperties());
+    }
 
-	public PacketAvatarFightPropUpdateNotify(Avatar avatar, Map<Integer, Float> propUpdateList) {
+    public PacketAvatarFightPropUpdateNotify(Avatar avatar, FightProperty prop) {
+        this(avatar, Map.of(prop.getId(), avatar.getFightProperty(prop)));
+    }
+
+    public PacketAvatarFightPropUpdateNotify(Avatar avatar, Map<Integer, Float> propUpdateList) {
         super(new AvatarFightPropUpdateNotify());
         proto.setAvatarGuid(avatar.getGuid());
         proto.setFightPropMap(propUpdateList);
-
-	}
+    }
 }
