@@ -215,13 +215,16 @@ public class EntityAvatar extends GameEntity {
         avatarInfo.setWearingFlycloakId(avatar.getFlyCloak());
         avatarInfo.setCostumeId(avatar.getCostume());
         avatarInfo.setBornTime(avatar.getBornTime());
+        avatarInfo.setWeaponSkinId(avatar.getWeaponSkin());
 
         val reliquaryList = new ArrayList<SceneReliquaryInfo>();
         val equipList = new ArrayList<Integer>();
 
         for (GameItem item : avatar.getEquips().values()) {
             if (item.getItemData().getEquipType() == EquipType.EQUIP_WEAPON) {
-                avatarInfo.setWeapon(item.createSceneWeaponInfo());
+                var weapon = item.createSceneWeaponInfo();
+                weapon.setWeaponSkinId(avatar.getWeaponSkin());
+                avatarInfo.setWeapon(weapon);
             } else {
                 reliquaryList.add(item.createSceneReliquaryInfo());
             }
