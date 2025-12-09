@@ -3,7 +3,6 @@ package emu.grasscutter.server.packet.recv;
 import emu.grasscutter.net.packet.TypedPacketHandler;
 import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.server.packet.send.*;
-import emu.grasscutter.server.packet.send.scene.PacketAvatarChangeTraceEffectNotify;
 import org.anime_game_servers.multi_proto.gi.messages.team.avatar.cosmetic.AvatarWearWeaponSkinReq;
 
 public class HandlerAvatarWearWeaponSkinReq extends TypedPacketHandler<AvatarWearWeaponSkinReq> {
