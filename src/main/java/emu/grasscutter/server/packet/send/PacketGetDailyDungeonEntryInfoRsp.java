@@ -23,7 +23,7 @@ public class PacketGetDailyDungeonEntryInfoRsp extends BaseTypedPacket<GetDailyD
                 .filter(DungeonEntryData::isShowInAdvHandbook)
                 .filter(data -> isSatisfied(player, data.getCondComb(), data.getSatisfiedCond()))
                 .map(data -> getDungeonEntryInfo(player, data))
-                .filter(e -> e.getRecommendDungeonEntryInfo().getDungeonId() != 0)
+                .filter(e -> (e.getRecommendDungeonEntryInfo() != null) && e.getRecommendDungeonEntryInfo().getDungeonId() != 0)
                 .sorted(Comparator.comparing(DailyDungeonEntryInfo::getDungeonEntryConfigId))
                 .toList());
     }
