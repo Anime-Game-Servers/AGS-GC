@@ -30,21 +30,6 @@ public class GameServerPacketHandler {
         this.registerHandlers(handlerClass);
     }
 
-    public void registerPacketHandler(Class<? extends PacketHandler> handlerClass) {
-        try {
-            Opcodes opcode = handlerClass.getAnnotation(Opcodes.class);
-
-            if (opcode == null || opcode.disabled() || opcode.value() <= 0) {
-                return;
-            }
-
-            PacketHandler packetHandler = handlerClass.getDeclaredConstructor().newInstance();
-
-            this.handlers.put(opcode.value(), packetHandler);
-        } catch (Exception e) {
-            Grasscutter.getLogger().warn("exception while registering packet handler: {}", handlerClass.getName(), e);
-        }
-    }
     public void registerTypedPacketHandler(Class<TypedPacketHandler<?>> handlerClass) {
         try {
             Class<?> modelClass = TypedPacketHandler.getStaticClass(handlerClass);
@@ -65,8 +50,6 @@ public class GameServerPacketHandler {
         for (Class<? extends PacketHandler> obj : handlerClasses) {
             if(TypedPacketHandler.class.isAssignableFrom(obj)){
                 this.registerTypedPacketHandler((Class<TypedPacketHandler<?>>) obj);
-            } else {
-                this.registerPacketHandler(obj);
             }
         }
 

@@ -25,9 +25,6 @@ public final class StartupArguments {
 
     /* A map of parameter -> argument handler. */
     private static final Map<String, Function<String, Boolean>> argumentHandlers = Map.of(
-        "-dumppacketids", parameter -> {
-            PacketOpcodesUtils.dumpPacketIds(); return true;
-        },
         "-version", StartupArguments::printVersion,
         "-debug", StartupArguments::enableDebug,
         "-lang", parameter -> {
