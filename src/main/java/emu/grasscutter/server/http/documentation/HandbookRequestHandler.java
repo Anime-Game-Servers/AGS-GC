@@ -73,7 +73,10 @@ final class HandbookRequestHandler implements DocumentationHandler {
             for (int langIdx = 0; langIdx < NUM_LANGUAGES; langIdx++)
                 addTableRowString(sbs.get(langIdx), id, nameTextMapHashGetter.apply(data), langIdx);
         });
-        sbs.forEach(sb -> sb.setLength(sb.length()-1));  // Remove trailing \n
+        sbs.forEach(sb -> {
+            if(!sb.isEmpty())
+                sb.setLength(sb.length()-1);  // Remove trailing \n
+        });
     }
 
     private List<String> generateHandbookHtmls(String template) {

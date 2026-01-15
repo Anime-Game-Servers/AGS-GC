@@ -889,6 +889,38 @@ public class Scene {
         }
     }
 
+    /**
+     * Send packets to the scene/worlds owner
+     * */
+    public boolean sendPacketHost(BasePacket packet) {
+        val host = world.getHost();
+        if(!players.contains(host)){
+            return false;
+        }
+        world.getHost().sendPacket(packet);
+        return true;
+    }
+
+
+    /**
+     * Send packets to the players in targetUids
+     * */
+    public void sendPacketTargeted(BasePacket packet, List<Integer> targetUids) {
+        players.stream()
+            .filter(player -> targetUids.contains(player.getUid()))
+            .forEach(player -> player.sendPacket(packet));
+    }
+
+    /**
+     * Send packets to the players in targetUids
+     * */
+    public void sendPacketTargeted(BasePacket packet, int targetUid) {
+        players.stream()
+            .filter(player -> targetUid == player.getUid())
+            .findFirst()
+            .ifPresent(player -> player.sendPacket(packet));
+    }
+
     // Broadcasting
     /**
      * Send packets to all players in world
