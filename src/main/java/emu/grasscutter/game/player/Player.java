@@ -1409,7 +1409,10 @@ public class Player {
         session.send(new PacketLevelTagDataNotify(this));
         session.send(new PacketStoreWeightLimitNotify());
         session.send(new PacketPlayerStoreNotify(this));
+
+        // Avatar info
         session.send(new PacketAvatarDataNotify(this));
+        session.send(new PacketAvatarWeaponSkinDataNotify(this));
 
         this.getProgressManager().onPlayerLogin();
 

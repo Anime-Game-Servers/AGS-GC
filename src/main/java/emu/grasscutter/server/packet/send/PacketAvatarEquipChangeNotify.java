@@ -12,7 +12,9 @@ public class PacketAvatarEquipChangeNotify extends BaseTypedPacket<AvatarEquipCh
 		super(new AvatarEquipChangeNotify(avatar.getGuid(), item.getGuid(), item.getEquipSlot(), item.getItemId()));
 
 		if (item.getItemData().getEquipType() == EquipType.EQUIP_WEAPON) {
-			proto.setWeapon(item.createSceneWeaponInfo());
+			var weapon = item.createSceneWeaponInfo();
+			weapon.setWeaponSkinId(avatar.getWeaponSkin());
+			proto.setWeapon(weapon);
 		} else {
 			proto.setReliquary(item.createSceneReliquaryInfo());
 		}

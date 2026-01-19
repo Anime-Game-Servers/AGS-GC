@@ -72,6 +72,7 @@ public class Avatar {
     protected Set<Integer> talentIdList; // Constellation id list
     @Getter protected Set<Integer> proudSkillList; // Character passives
 
+    @Getter @Setter private int weaponSkin;
     @Getter @Setter private int flyCloak;
     @Getter @Setter private int costume;
     @Getter private int bornTime;
@@ -317,6 +318,19 @@ public class Avatar {
         lockedTalents.removeAll(this.getTalentIdList());
         // One below the lowest locked talent, or 6 if there are no locked talents.
         return lockedTalents.intStream().map(i -> i % 10).min().orElse(7) - 1;
+    }
+
+    // The logic is based entirely on speculations, but it works. Official may do something else.
+    public void changeWeaponSkin(int skinId) {
+        this.setWeaponSkin(skinId);
+        // if the avatar is on the active team, update weapon entity
+        if (this.getAsEntity() != null) {
+            var weapon = this.getWeapon();
+            weapon.setEquipCharacter(0);      // skip unequip logics
+            weapon.setWeaponEntity(null);     // force change entity id
+            this.equipItem(weapon, false);
+        }
+        this.save();
     }
 
     public boolean equipItem(GameItem item, boolean shouldRecalc) {
@@ -852,6 +866,7 @@ public class Avatar {
         avatarInfo.setWearingFlycloakId(this.getFlyCloak());
         avatarInfo.setCostumeId(this.getCostume());
         avatarInfo.setFocus(false);
+        avatarInfo.setWeaponSkinId(this.getWeaponSkin());
 
         avatarInfo.setFetterInfo(avatarFetter);
         if (this.getPlayer().getNameCardList().contains(this.getNameCardId())) {
