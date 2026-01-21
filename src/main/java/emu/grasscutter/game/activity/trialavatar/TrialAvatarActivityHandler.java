@@ -3,7 +3,6 @@ package emu.grasscutter.game.activity.trialavatar;
 import com.esotericsoftware.reflectasm.ConstructorAccess;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.excels.TrialAvatarActivityDataData;
 import emu.grasscutter.game.activity.ActivityWatcher;
 import emu.grasscutter.game.activity.DefaultWatcher;
 import emu.grasscutter.game.dungeons.settle_listeners.TrialAvatarDungeonSettleListener;
@@ -18,6 +17,7 @@ import emu.grasscutter.utils.JsonUtils;
 
 import java.util.*;
 import lombok.*;
+import org.anime_game_servers.game_data_models.gi.data.activity.trial.TrialAvatarActivityDataData;
 import org.anime_game_servers.game_data_models.gi.data.watcher.WatcherTriggerConfig;
 import org.anime_game_servers.multi_proto.gi.messages.activity.general.ActivityInfo;
 import org.anime_game_servers.game_data_models.gi.data.activity.ActivityType;
@@ -92,9 +92,7 @@ public class TrialAvatarActivityHandler extends ActivityHandler<TrialAvatarPlaye
     }
 
     public List<Integer> getBattleAvatarsList() {
-        return getActivityData(this.selectedTrialAvatarIndex).map(TrialAvatarActivityDataData::getBattleAvatarsList)
-            .filter(avatarStr -> !avatarStr.isBlank()).map(avatarStr -> avatarStr.split(",")).stream()
-            .flatMap(Arrays::stream).map(Integer::parseInt).toList();
+        return getActivityData(this.selectedTrialAvatarIndex).map(TrialAvatarActivityDataData::getBattleAvatarsList).get();
     }
 
     public boolean getReward(@NonNull Player player, int trialAvatarIndexId) {
