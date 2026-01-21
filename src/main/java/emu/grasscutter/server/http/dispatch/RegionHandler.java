@@ -1,5 +1,7 @@
 package emu.grasscutter.server.http.dispatch;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.Grasscutter.ServerRunMode;
 import emu.grasscutter.server.event.dispatch.QueryAllRegionsEvent;
@@ -7,6 +9,7 @@ import emu.grasscutter.server.event.dispatch.QueryCurrentRegionEvent;
 import emu.grasscutter.server.http.Router;
 import emu.grasscutter.server.http.objects.QueryCurRegionRspJson;
 import emu.grasscutter.utils.Crypto;
+import emu.grasscutter.utils.JsonUtils;
 import emu.grasscutter.utils.Utils;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -94,9 +97,28 @@ public final class RegionHandler implements Router {
             regions.put(region.Name, new RegionData(updatedQuery));
         });
 
+        var hiddenIcons = new JsonArray();
+        hiddenIcons.add(40);
+        var codeSwitch = new JsonArray();
+        codeSwitch.add(3628);
+        codeSwitch.add(3249);
+        /*for (int i = 0; i<=7000 ; i++)
+            codeSwitch.add(i);*/
+
         // Create a config object.
-        byte[] customConfig = "{\"sdkenv\":\"2\",\"checkdevice\":\"false\",\"loadPatch\":\"false\",\"showexception\":\"false\",\"regionConfig\":\"pm|fk|add\",\"downloadMode\":\"0\",\"debugmenu\":\"true\",\"debuglog\":\"true\"}".getBytes();
-        Crypto.xor(customConfig, Crypto.DISPATCH_KEY); // XOR the config with the key.
+        var customConfig = new JsonObject();
+        customConfig.addProperty("sdkenv", "2");
+        customConfig.addProperty("checkdevice", "false");
+        customConfig.addProperty("loadPatch", "false");
+        customConfig.addProperty("showexception", "true");
+        customConfig.addProperty("regionConfig", "pm|fk|add");
+        customConfig.addProperty("downloadMode", "0");
+        customConfig.addProperty("debugmenu", "true");
+        customConfig.addProperty("debuglog", "true");
+        customConfig.add("codeSwitch", codeSwitch);
+        customConfig.add("coverSwitch", hiddenIcons);
+        var encodedConfig = JsonUtils.encode(customConfig).getBytes();
+        Crypto.xor(encodedConfig, Crypto.DISPATCH_KEY); // XOR the config with the key.
 
         byte[] customConfigCn = "{\"sdkenv\":\"2\",\"checkdevice\":\"false\",\"loadPatch\":\"false\",\"showexception\":\"false\",\"regionConfig\":\"pm|fk|add\",\"downloadMode\":\"0\",\"debugmenu\":\"true\",\"debuglog\":\"true\"}".getBytes();
         Crypto.xor(customConfigCn, Crypto.DISPATCH_KEY); // XOR the config with the key.
@@ -108,7 +130,7 @@ public final class RegionHandler implements Router {
         updatedRegionList.setEnableLoginPc(true);
 
         // Set the region list response.
-        setRegionListResponses(RegionType.OS, customConfig, updatedRegionList);
+        setRegionListResponses(RegionType.OS, encodedConfig, updatedRegionList);
         setRegionListResponses(RegionType.CN, customConfigCn, updatedRegionList);
     }
 

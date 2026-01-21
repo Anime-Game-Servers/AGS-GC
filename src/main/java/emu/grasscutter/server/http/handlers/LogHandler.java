@@ -1,5 +1,6 @@
 package emu.grasscutter.server.http.handlers;
 
+import emu.grasscutter.Loggers;
 import emu.grasscutter.server.http.Router;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -13,9 +14,11 @@ public final class LogHandler implements Router {
         javalin.post("/log", LogHandler::log);
         // log-upload-os.mihoyo.com
         javalin.post("/crash/dataUpload", LogHandler::log);
+        javalin.post("/ys_custom/dataUpload", LogHandler::log);
     }
 
-    private static void log(Context ctx) {
+    public static void log(Context ctx) {
+        Loggers.getClientLogs().debug(ctx.body());
         // TODO: Figure out how to dump request body and log to file.
         ctx.result("{\"code\":0}");
     }

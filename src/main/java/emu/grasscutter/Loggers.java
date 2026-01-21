@@ -19,4 +19,6 @@ public final class Loggers {
     private static final Logger questSystem = (Logger) LoggerFactory.getLogger(gamePackges+".quest");
     @Getter
     private static final Logger resourceSystem = (Logger) LoggerFactory.getLogger(mainPackges+".data");
+    @Getter
+    private static final Logger clientLogs = (Logger) LoggerFactory.getLogger("gc.client");
 }
