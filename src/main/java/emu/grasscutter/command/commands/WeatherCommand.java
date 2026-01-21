@@ -3,8 +3,8 @@ package emu.grasscutter.command.commands;
 import emu.grasscutter.command.Command;
 import emu.grasscutter.command.CommandHandler;
 import emu.grasscutter.game.player.Player;
-import emu.grasscutter.game.props.ClimateType;
 import emu.grasscutter.game.world.WeatherArea;
+import org.anime_game_servers.game_data_models.gi.data.scene.weather.ClimateType;
 
 import java.util.List;
 

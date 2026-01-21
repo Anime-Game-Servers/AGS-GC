@@ -16,9 +16,6 @@ import emu.grasscutter.data.common.WeatherAreaPointData;
 import emu.grasscutter.data.common.quest.MainQuestData;
 import emu.grasscutter.data.common.quest.SubQuestData;
 import emu.grasscutter.data.custom.AvatarDataCache;
-import emu.grasscutter.data.custom.TrialAvatarActivityCustomData;
-import emu.grasscutter.data.custom.TrialAvatarCustomData;
-import emu.grasscutter.data.excels.TrialAvatarActivityDataData;
 import emu.grasscutter.data.server.DropSubfieldMapping;
 import emu.grasscutter.data.server.DropTableExcelConfigData;
 import emu.grasscutter.data.server.GadgetMapping;
@@ -50,6 +47,7 @@ import kotlinx.serialization.json.JsonKt;
 import lombok.val;
 
 import org.anime_game_servers.core.base.interfaces.IntKey;
+import org.anime_game_servers.core.base.interfaces.StringKey;
 import org.anime_game_servers.game_data_models.gi.GIDataModelRegistry;
 import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonType;
 import org.anime_game_servers.game_data_models.gi.helpers.TextHashUtilsKt;
@@ -68,6 +66,7 @@ import org.slf4j.Logger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -192,7 +191,6 @@ public class ResourceLoader {
         loadGadgetMappings();
         loadSubfieldMappings();
         loadMonsterMappings();
-        loadTrialAvatarCustomData();
         loadGlobalCombatConfig();
         EntityControllerScriptManager.load();
         logger.info(translate("messages.status.resources.finish"));
@@ -244,11 +242,23 @@ public class ResourceLoader {
             val map = (Int2ObjectMap<Object>) field.get(null);
             field.setAccessible(false);
             list.forEach(value -> map.put(value.getIntKey(), value));
-            logger.error("loaded {} entries for {}", map.size(), targetClass.getName());
+            logger.error("loaded {} IntKey entries for {}", map.size(), targetClass.getName());
         }
     }
 
-    private static void loadGenericMap(Field field){
+    private static void loadString2ObjectMap(Field field, Type valueType) throws IllegalAccessException {
+        val targetClass = (Class<? extends StringKey>) valueType;
+        val list = dataLoader.loadListBlocking(targetClass);
+        if(list != null){
+            field.setAccessible(true);
+            val map = (Map<String, Object>) field.get(null);
+            field.setAccessible(false);
+            list.forEach(value -> map.put(value.getStringKey(), value));
+            logger.error("loaded {} StringKey entries for {}", map.size(), targetClass.getName());
+        }
+    }
+
+    private static void loadGenericMap(Field field) throws IllegalAccessException{
         val genericType = field.getGenericType();
         if(!(genericType instanceof ParameterizedType)){
             return;
@@ -269,18 +279,23 @@ public class ResourceLoader {
             return;
         }
         if(keyType.equals(String.class)){
-            //TODO handle StringKey
+            loadString2ObjectMap(field, valueType);
         }
     }
 
     public static void initExcelCaches(){
         GameData.getTriggerExcelConfigDataMap().values().forEach(GameData::putQuestTriggerDataCache);
         initAvatarCaches();
+        initTrialActivityCaches();
     }
 
     public static void initAvatarCaches(){
         GameData.getAvatarCostumeDataMap().values().forEach(GameData::putAvatarCostumeDataCache);
         GameData.getAvatarDataMap().forEach((id, data) -> GameData.getAvatarInfoCacheMap().put(id, new AvatarDataCache(data)));
+    }
+
+    public static void initTrialActivityCaches(){
+        GameData.getTrialAvatarActivityDataDataMap().values().forEach(GameData::putTrialActivityDataCache);
     }
 
     public static void loadResources() {
@@ -1058,43 +1073,6 @@ public class ResourceLoader {
             logger.debug("Loaded {} monster mappings.", monsterMap.size());
         } catch (Exception e) {
             logger.error("Unable to load monster mappings.", e);
-        }
-    }
-
-    private static void loadTrialAvatarCustomData() {
-        try {
-            String pathName = "TrialAvatar/";
-            try {
-                JsonUtils.loadToList(
-                    getResourcePath(pathName + "TrialAvatarActivityDataExcelConfigData.json"),
-                    TrialAvatarActivityDataData.class).forEach(instance -> {
-                        instance.onLoad();
-                        GameData.getTrialAvatarActivityDataCustomData()
-                            .put(instance.getTrialAvatarIndexId(), instance);
-                    });
-            } catch (IOException | NullPointerException ignored) {}
-            logger.debug("Loaded trial activity custom data.");
-            try {
-                JsonUtils.loadToList(
-                    getResourcePath(pathName + "TrialAvatarActivityExcelConfigData.json"),
-                    TrialAvatarActivityCustomData.class).forEach(instance -> {
-                        instance.onLoad();
-                        GameData.getTrialAvatarActivityCustomData()
-                            .put(instance.getScheduleId(), instance);
-                    });
-            } catch (IOException | NullPointerException ignored) {}
-            logger.debug("Loaded trial activity schedule custom data.");
-            try {
-                JsonUtils.loadToList(
-                    getResourcePath(pathName + "TrialAvatarCustomConfigData.json"),
-                    TrialAvatarCustomData.class).forEach(instance -> {
-                        GameData.getTrialAvatarCustomData()
-                            .put(instance.getTrialAvatarId(), instance);
-                    });
-            } catch (IOException | NullPointerException ignored) {}
-            logger.debug("Loaded trial avatar custom data.");
-        } catch (Exception e) {
-            logger.error("Unable to load trial avatar custom data.", e);
         }
     }
 

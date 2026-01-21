@@ -11,8 +11,6 @@ import emu.grasscutter.data.common.ScenePointArrayData;
 import emu.grasscutter.data.common.WeatherAreaPointData;
 import emu.grasscutter.data.common.quest.MainQuestData;
 import emu.grasscutter.data.common.quest.SubQuestData;
-import emu.grasscutter.data.custom.TrialAvatarActivityCustomData;
-import emu.grasscutter.data.custom.TrialAvatarCustomData;
 import emu.grasscutter.data.excels.*;
 import emu.grasscutter.data.server.*;
 import emu.grasscutter.data.custom.*;
@@ -31,9 +29,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import org.anime_game_servers.game_data_models.gi.custom.activity.ActivityExtraInfo;
+import org.anime_game_servers.game_data_models.gi.custom.trial.TrialAvatarCustomData;
 import org.anime_game_servers.game_data_models.gi.custom.weather.WeatherMapping;
 import org.anime_game_servers.game_data_models.gi.data.activity.*;
 import org.anime_game_servers.game_data_models.gi.data.activity.aster.*;
+import org.anime_game_servers.game_data_models.gi.data.activity.trial.TrialAvatarActivityDataData;
+import org.anime_game_servers.game_data_models.gi.data.activity.trial.TrialAvatarActivityData;
 import org.anime_game_servers.game_data_models.gi.data.activity.dragonspine.DragonspineEnhanceData;
 import org.anime_game_servers.game_data_models.gi.data.activity.dragonspine.DragonspineMissionData;
 import org.anime_game_servers.game_data_models.gi.data.activity.dragonspine.DragonspineStageData;
@@ -52,6 +53,10 @@ import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopPointData;
 import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopRewardData;
 import org.anime_game_servers.game_data_models.gi.data.scene.level_tag.LevelTagData;
 import org.anime_game_servers.game_data_models.gi.data.scene.level_tag.LevelTagGroupsData;
+import org.anime_game_servers.game_data_models.gi.data.trial.TrialAvatarData;
+import org.anime_game_servers.game_data_models.gi.data.trial.TrialAvatarTemplateData;
+import org.anime_game_servers.game_data_models.gi.data.trial.TrialAvatarFetterData;
+import org.anime_game_servers.game_data_models.gi.data.trial.TrialReliquaryData;
 import org.anime_game_servers.gi_lua.models.quest.QuestData;
 import org.anime_game_servers.gi_lua.models.quest.RewindData;
 import org.anime_game_servers.gi_lua.models.scene.DummyPoint;
@@ -63,11 +68,14 @@ import org.anime_game_servers.game_data_models.gi.data.rewards.TowerRewardData;
 import org.anime_game_servers.game_data_models.gi.data.scene.SceneData;
 import org.anime_game_servers.game_data_models.gi.data.scene.scene_tag.SceneTagConfigData;
 import org.anime_game_servers.game_data_models.gi.data.scene.WorldAreaConfigData;
+import org.anime_game_servers.game_data_models.gi.data.scene.weather.WeatherData;
+import org.anime_game_servers.game_data_models.gi.data.scene.weather.WeatherTemplateData;
 import org.anime_game_servers.game_data_models.gi.data.shop.ShopGoodsData;
 import org.anime_game_servers.game_data_models.gi.data.talks.TalkData;
 import org.anime_game_servers.game_data_models.gi.data.watcher.ActivityWatcherData;
 import org.anime_game_servers.game_data_models.gi.data.world.WorldLevelData;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -195,11 +203,11 @@ public class GameData {
     @Getter private static final Int2ObjectMap<TowerLevelData> towerLevelDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource private static final Int2ObjectMap<TowerRewardData> towerRewardDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<TowerScheduleData> towerScheduleDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<TrialAvatarData> trialAvatarDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<TrialAvatarActivityData> trialAvatarActivityDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<TrialAvatarActivityDataData> trialAvatarActivityDataDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<TrialAvatarTemplateData> trialAvatarTemplateDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<TrialReliquaryData> trialReliquaryDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<TrialAvatarData> trialAvatarDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<TrialAvatarActivityData> trialAvatarActivityDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<TrialAvatarActivityDataData> trialAvatarActivityDataDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<TrialAvatarTemplateData> trialAvatarTemplateDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<TrialReliquaryData> trialReliquaryDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<TriggerData> triggerExcelConfigDataMap = new Int2ObjectOpenHashMap<>();
     @QuickAccessCache @Getter private static final Map<String, TriggerData> triggerDataByNameMap = new HashMap<>();
     @Getter private static final Int2ObjectMap<WeaponCurveData> weaponCurveDataMap = new Int2ObjectOpenHashMap<>();
@@ -242,6 +250,8 @@ public class GameData {
     @AutoResource @Getter private static final Int2ObjectMap<DragonspineEnhanceData> dragonspineEnhanceMap = new Int2ObjectLinkedOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<DragonspineMissionData> dragonspineMissionMap = new Int2ObjectLinkedOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<DragonspineStageData> dragonspineStageMap = new Int2ObjectLinkedOpenHashMap<>();
+
+
     // from scripts
     @Getter private static final Int2ObjectMap<SceneGroupReplacement> groupReplacements = new Int2ObjectOpenHashMap<>();
 
@@ -270,9 +280,8 @@ public class GameData {
     @Getter private static final Map<String, List<SubQuestData>> beginCondQuestMap = new HashMap<>(); // cache filled by QuestData
     @Getter private static final Map<Integer, Integer> questTalkMap = new HashMap<>();
     @Getter private static final Int2ObjectMap<TrialAvatarCustomData> trialAvatarCustomData = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Map<Integer, TrialAvatarActivityCustomData> trialAvatarActivityCustomData = new HashMap<>();
     @Getter private static final Map<Integer, TrialAvatarActivityDataData> trialAvatarActivityDataCustomData = new HashMap<>();
-    @Getter private static final Int2IntMap trialAvatarIndexIdTrialActivityDataDataMap = new Int2IntOpenHashMap();
+    @QuickAccessCache @Getter private static final Int2IntMap trialAvatarIndexIdTrialActivityDataDataMap = new Int2IntOpenHashMap();
     @Getter private static final Map<Integer, List<WeatherAreaPointData>> weatherAreaPointData = new HashMap<>();
     @Getter private static final Map<Integer, List<ScenePointArrayData>> scenePointArrayData = new HashMap<>();
 
@@ -322,12 +331,15 @@ public class GameData {
 
 
     // Generic getter
+    @Nullable
     public static Int2ObjectMap<?> getMapByResourceDef(Class<?> resourceDefinition) {
         Int2ObjectMap<?> map = null;
 
         try {
             Field field = GameData.class.getDeclaredField(Utils.lowerCaseFirstChar(resourceDefinition.getSimpleName()) + "Map");
-
+            if(field.getType() != Int2ObjectMap.class){
+                return null;
+            }
             field.setAccessible(true);
             map = (Int2ObjectMap<?>) field.get(null);
             field.setAccessible(false);
@@ -385,11 +397,12 @@ public class GameData {
     }
 
     @Nullable
-    public static TrialAvatarActivityDataData getTrialAvatarActivityDataByAvatarIndex(int trialAvatarIndexId){
+    public static org.anime_game_servers.game_data_models.gi.data.activity.trial.TrialAvatarActivityDataData getTrialAvatarActivityDataByAvatarIndex(int trialAvatarIndexId){
         // prefer custom data over official data
         val dataId = trialAvatarIndexIdTrialActivityDataDataMap.get(trialAvatarIndexId);
-        val datamap = GameData.getTrialAvatarActivityDataCustomData().isEmpty() ? GameData.getTrialAvatarActivityDataDataMap()
-            : GameData.getTrialAvatarActivityDataCustomData();
+        //val datamap = GameData.getTrialAvatarActivityDataCustomData().isEmpty() ? GameData.getTrialAvatarActivityDataDataMap()
+        //    : GameData.getTrialAvatarActivityDataCustomData();
+        val datamap = GameData.getTrialAvatarActivityDataDataMap();
         return datamap.get(dataId);
     }
 
@@ -407,6 +420,10 @@ public class GameData {
 
     public static void putAvatarCostumeDataCache(AvatarCostumeData data){
         avatarCostumeDataItemIdMap.put(data.getItemId(), data);
+    }
+
+    public static void putTrialActivityDataCache(TrialAvatarActivityDataData data){
+        trialAvatarIndexIdTrialActivityDataDataMap.put(data.getTrialAvatarIndexId(), data.getId());
     }
 
     public static CodexViewpointData getViewCodexByGroupdCfg(int groupId, int cfgId) {
