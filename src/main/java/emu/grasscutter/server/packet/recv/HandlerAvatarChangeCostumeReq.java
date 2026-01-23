@@ -1,22 +1,26 @@
 package emu.grasscutter.server.packet.recv;
 
-import emu.grasscutter.net.packet.TypedPacketHandler;
+import emu.grasscutter.net.packet.TypedPacketPairHandler;
 import emu.grasscutter.server.game.GameSession;
-import emu.grasscutter.server.packet.send.PacketAvatarChangeCostumeRsp;
+import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
 import org.anime_game_servers.multi_proto.gi.messages.team.avatar.cosmetic.AvatarChangeCostumeReq;
+import org.anime_game_servers.multi_proto.gi.messages.team.avatar.cosmetic.AvatarChangeCostumeRsp;
 
-public class HandlerAvatarChangeCostumeReq extends TypedPacketHandler<AvatarChangeCostumeReq> {
+public class HandlerAvatarChangeCostumeReq extends TypedPacketPairHandler<AvatarChangeCostumeReq, AvatarChangeCostumeRsp> {
 
 	@Override
-	public void handle(GameSession session, byte[] header, AvatarChangeCostumeReq req) throws Exception {
+	public boolean handle(GameSession session, byte[] header, AvatarChangeCostumeReq req, AvatarChangeCostumeRsp rsp) {
 
 		boolean success = session.getPlayer().getAvatars().changeCostume(req.getAvatarGuid(), req.getCostumeId());
 
-		if (success) {
-			session.getPlayer().sendPacket(new PacketAvatarChangeCostumeRsp(req.getAvatarGuid(), req.getCostumeId()));
+		if (!success) {
+            rsp.setRetcode(Retcode.RET_SVR_ERROR);
 		} else {
-			session.getPlayer().sendPacket(new PacketAvatarChangeCostumeRsp());
+            rsp.setAvatarGuid(req.getAvatarGuid());
+            rsp.setCostumeId(req.getCostumeId());
+            rsp.setRetcode(Retcode.RET_SUCC);
 		}
+        return true;
 	}
 
 }

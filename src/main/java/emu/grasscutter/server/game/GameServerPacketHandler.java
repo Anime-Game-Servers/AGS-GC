@@ -14,6 +14,7 @@ import emu.grasscutter.Grasscutter.ServerDebugMode;
 import emu.grasscutter.server.game.GameSession.SessionState;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import kotlin.Pair;
 import lombok.val;
 
 import javax.annotation.Nullable;
@@ -44,12 +45,30 @@ public class GameServerPacketHandler {
         }
     }
 
+    public void registerTypedPairPacketHandler(Class<TypedPacketPairHandler<?,?>> handlerClass) {
+        try {
+            Pair<Class<?>,Class<?>> modelClassPairs = TypedPacketPairHandler.getStaticClasses(handlerClass);
+            if(modelClassPairs == null){
+                return;
+            }
+            val modelClass = modelClassPairs.getFirst();
+            PacketHandler packetHandler = handlerClass.getDeclaredConstructor().newInstance();
+
+            this.versionHandlers.put(modelClass.getSimpleName(), packetHandler);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void registerHandlers(Class<? extends PacketHandler> handlerClass) {
         Set<Class<? extends PacketHandler>> handlerClasses = (Set<Class<? extends PacketHandler>>)(Set<?>) Grasscutter.reflector.getSubTypesOf(handlerClass);
 
         for (Class<? extends PacketHandler> obj : handlerClasses) {
             if(TypedPacketHandler.class.isAssignableFrom(obj)){
                 this.registerTypedPacketHandler((Class<TypedPacketHandler<?>>) obj);
+            }
+            if(TypedPacketPairHandler.class.isAssignableFrom(obj)){
+                this.registerTypedPairPacketHandler((Class<TypedPacketPairHandler<?,?>>) obj);
             }
         }
 
