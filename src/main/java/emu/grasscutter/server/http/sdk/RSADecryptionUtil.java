@@ -1,17 +1,15 @@
-package emu.grasscutter.server.http.dispatch;
+package emu.grasscutter.server.http.sdk;
 
 
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.utils.FileUtils;
 
 import javax.crypto.Cipher;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 public class RSADecryptionUtil {
@@ -35,11 +33,10 @@ public class RSADecryptionUtil {
             privateKey = keyFactory.generatePrivate(spec);
 
             Grasscutter.getLogger().info("Loaded RSA priv key");
-            Grasscutter.getLogger().info("Format: " + privateKey.getFormat());
+            Grasscutter.getLogger().info("Format: {}", privateKey.getFormat());
 
         } catch (Exception e) {
             Grasscutter.getLogger().error("Unable to load RSA priv key", e);
-            e.printStackTrace();
             throw new RuntimeException("Unable to load RSA priv key", e);
         }
     }

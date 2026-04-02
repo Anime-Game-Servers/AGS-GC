@@ -29,7 +29,7 @@ public abstract class TypedPacketPairHandler<REQ extends ProtoModel, RSP extends
             return null;
         }
         Type superClassType = handlerClass.getGenericSuperclass();
-        if(superClassType == null || !(superClassType instanceof ParameterizedType superClass)){
+        if(!(superClassType instanceof ParameterizedType superClass)){
             return null;
         }
 

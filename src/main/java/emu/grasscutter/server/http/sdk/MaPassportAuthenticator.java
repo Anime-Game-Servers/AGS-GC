@@ -1,14 +1,17 @@
-package emu.grasscutter.server.http.dispatch;
+package emu.grasscutter.server.http.sdk;
 
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.Account;
 import emu.grasscutter.server.http.objects.*;
-import emu.grasscutter.server.http.dispatch.RSADecryptionUtil;
 
 import java.util.ArrayList;
 
 public class MaPassportAuthenticator {
+    private MaPassportAuthenticator() {
+        /* This utility class should not be instantiated */
+    }
+
     public static LoginByPasswordResponseJson appLoginByPassword(LoginByPasswordRequestJson request) {
         Grasscutter.getLogger().info("ma-passport login req detected");
 
@@ -28,7 +31,7 @@ public class MaPassportAuthenticator {
             try {
                 username = RSADecryptionUtil.decrypt(request.account);
             } catch (Exception e) {
-                Grasscutter.getLogger().error("Unable to decrypt account", e);
+                Grasscutter.getLogger().error("Unable to decrypt account ", e);
                 return createLoginErrorResponse(-10, "Unable to decrypt account");
             }
 
@@ -37,14 +40,14 @@ public class MaPassportAuthenticator {
             try {
                 password = RSADecryptionUtil.decrypt(request.password);
             } catch (Exception e) {
-                Grasscutter.getLogger().error("Unable to decrypt account", e);
-                return createLoginErrorResponse(-10, "Unable to decrypt account");
+                Grasscutter.getLogger().error("Unable to decrypt password", e);
+                return createLoginErrorResponse(-10, "Unable to decrypt password");
             }
 
             Account account = DatabaseHelper.getAccountByName(username);
 
             if (account == null) {
-                Grasscutter.getLogger().info("Account not found: " + username);
+                Grasscutter.getLogger().info("Account not found: {}", username);
                 return createLoginErrorResponse(-101, "Account or password error");
             }
 
@@ -57,41 +60,39 @@ public class MaPassportAuthenticator {
             Grasscutter.getLogger().info("Generating session key");
             String sessionKey = account.getSessionKey();
             if (sessionKey == null || !sessionKey.startsWith("v2_")) {
-                sessionKey = account.generateV2SessionKey();
+                account.generateV2SessionKey();
             } else {
                 Grasscutter.getLogger().info("Using existing key");
             }
 
-            Grasscutter.getLogger().info("User " + username + " has successfully logged in");
+            Grasscutter.getLogger().info("User {} has successfully logged in", username);
             return createLoginSuccessResponse(account);
 
         } catch (Exception e) {
-            Grasscutter.getLogger().error("Exception: " + e.getClass().getName());
-            Grasscutter.getLogger().error("Message: " + e.getMessage());
-            e.printStackTrace();
+            Grasscutter.getLogger().error("Exception: ", e);
             return createLoginErrorResponse(-1, "Internal server error: " + e.getMessage());
         }
     }
 
     public static VerifySTokenResponseJson verifySToken(VerifySTokenRequestJson request) {
         try {
-            Grasscutter.getLogger().debug("Ma-passport token verification for mid: " + request.mid);
+            Grasscutter.getLogger().debug("Ma-passport token verification for mid: {}", request.mid);
 
             // get acc by id in db
             Account account = DatabaseHelper.getAccountById(request.mid);
             if (account == null) {
-                Grasscutter.getLogger().info("Account not found for mid: " + request.mid);
+                Grasscutter.getLogger().info("Account not found for mid: {}", request.mid);
                 return createTokenErrorResponse(-101, "For account safety, please log in again");
             }
 
             // Check if the session key matches the provided stoken
             String accountSessionKey = account.getSessionKey();
             if (accountSessionKey == null || !accountSessionKey.equals(request.stoken)) {
-                Grasscutter.getLogger().info("Invalid session token for account: " + account.getUsername());
+                Grasscutter.getLogger().info("Invalid session token for account: {}", account.getUsername());
                 return createTokenErrorResponse(-101, "For account safety, please log in again");
             }
 
-            Grasscutter.getLogger().info("Ma-Passport token verification successful for: " + account.getUsername());
+            Grasscutter.getLogger().info("Ma-Passport token verification successful for: {}", account.getUsername());
             return createTokenSuccessResponse(account);
 
         } catch (Exception e) {
