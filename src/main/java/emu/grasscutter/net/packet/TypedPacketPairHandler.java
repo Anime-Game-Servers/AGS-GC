@@ -1,5 +1,7 @@
 package emu.grasscutter.net.packet;
 
+import emu.grasscutter.Grasscutter;
+import emu.grasscutter.Loggers;
 import emu.grasscutter.server.game.GameSession;
 import kotlin.Pair;
 import lombok.val;
@@ -8,6 +10,8 @@ import org.anime_game_servers.multi_proto.core.interfaces.ProtoModel;
 import org.anime_game_servers.multi_proto.gi.messages.packet_head.PacketHead;
 
 import javax.annotation.Nullable;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -21,7 +25,9 @@ import java.lang.reflect.Type;
  */
 public abstract class TypedPacketPairHandler<REQ extends ProtoModel, RSP extends ProtoModel> extends PacketHandler {
     private final Method parseReqMethod;
+    final private MethodHandle parseReqMethodHandle;
     private final Constructor<RSP> rspConstructor;
+    final private MethodHandle rspConstructorHandle;
 
     @Nullable
     public static Pair<Class<?>,Class<?>> getStaticClasses(Class<? extends TypedPacketPairHandler> handlerClass) {
@@ -44,18 +50,25 @@ public abstract class TypedPacketPairHandler<REQ extends ProtoModel, RSP extends
         if(modelClassPair == null){
             throw new RuntimeException("Could not find model class for " + getClass().getName());
         }
+        MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
             val reqClass = modelClassPair.getFirst();
             parseReqMethod = reqClass.getMethod("parseBy", byte[].class, Version.class);
             if(!parseReqMethod.getReturnType().isAssignableFrom(reqClass))
                 throw new RuntimeException("parseBy method does not return " + reqClass.getName());
-        } catch (NoSuchMethodException e) {
+            val originalParseReqMethodHandle = lookup.unreflect(parseReqMethod);
+            val newParseReqMethodType = originalParseReqMethodHandle.type().changeReturnType(ProtoModel.class);
+            parseReqMethodHandle = originalParseReqMethodHandle.asType(newParseReqMethodType);
+        } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
         try {
             val rspClass = modelClassPair.getSecond();
             rspConstructor = rspClass.getConstructor();
-        } catch (NoSuchMethodException e) {
+            val originalRspConstructorHandle = lookup.unreflectConstructor(rspConstructor);
+            val newParseReqMethodType = originalRspConstructorHandle.type().changeReturnType(ProtoModel.class);
+            rspConstructorHandle = originalRspConstructorHandle.asType(newParseReqMethodType);
+        } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
 
@@ -63,11 +76,23 @@ public abstract class TypedPacketPairHandler<REQ extends ProtoModel, RSP extends
 
     @Override
     public void handle(GameSession session, byte[] header, byte[] payload) throws Exception {
-        val req = (REQ) parseReqMethod.invoke(null, payload, session.getVersion());
-        val rsp = rspConstructor.newInstance();
-        val shouldSend = handle(session, header, req, rsp);
-        if(shouldSend)
-            sendRsp(session, rsp);
+        REQ req;
+        RSP rsp;
+
+        try {
+            req = (REQ) parseReqMethodHandle.invokeExact(payload, session.getVersion());
+            rsp = (RSP) rspConstructorHandle.invokeExact();
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            val shouldSend = handle(session, header, req, rsp);
+            if (shouldSend)
+                sendRsp(session, rsp);
+        } catch (Throwable ex){
+            Loggers.getDefaultLogger().error("Unhandled exception in TypedPacketPairHandler of type {}\n\tReq data: {}",
+                this.getClass().getSimpleName(), req.toString(), ex);
+        }
     }
 
     /**
