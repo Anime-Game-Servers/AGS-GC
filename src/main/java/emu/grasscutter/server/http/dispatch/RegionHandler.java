@@ -101,16 +101,13 @@ public final class RegionHandler implements Router {
         hiddenIcons.add(40);
         var codeSwitch = new JsonArray();
         codeSwitch.add(3628);
-        codeSwitch.add(3249);
-        /*for (int i = 0; i<=7000 ; i++)
-            codeSwitch.add(i);*/
 
         // Create a config object.
         var customConfig = new JsonObject();
         customConfig.addProperty("sdkenv", "2");
         customConfig.addProperty("checkdevice", "false");
         customConfig.addProperty("loadPatch", "false");
-        customConfig.addProperty("showexception", "true");
+        customConfig.addProperty("showexception", "false"); // todo make it a setting
         customConfig.addProperty("regionConfig", "pm|fk|add");
         customConfig.addProperty("downloadMode", "0");
         customConfig.addProperty("debugmenu", "true");
@@ -120,8 +117,10 @@ public final class RegionHandler implements Router {
         var encodedConfig = JsonUtils.encode(customConfig).getBytes();
         Crypto.xor(encodedConfig, Crypto.DISPATCH_KEY); // XOR the config with the key.
 
-        byte[] customConfigCn = "{\"sdkenv\":\"2\",\"checkdevice\":\"false\",\"loadPatch\":\"false\",\"showexception\":\"false\",\"regionConfig\":\"pm|fk|add\",\"downloadMode\":\"0\",\"debugmenu\":\"true\",\"debuglog\":\"true\"}".getBytes();
-        Crypto.xor(customConfigCn, Crypto.DISPATCH_KEY); // XOR the config with the key.
+        // CN config
+        customConfig.addProperty("sdkenv", "0");
+        var encodedConfigCn = JsonUtils.encode(customConfig).getBytes();
+        Crypto.xor(encodedConfigCn, Crypto.DISPATCH_KEY); // XOR the config with the key.
 
         // Create an updated region list.
         val updatedRegionList = new QueryRegionListHttpRsp();
@@ -131,7 +130,7 @@ public final class RegionHandler implements Router {
 
         // Set the region list response.
         setRegionListResponses(RegionType.OS, encodedConfig, updatedRegionList);
-        setRegionListResponses(RegionType.CN, customConfigCn, updatedRegionList);
+        setRegionListResponses(RegionType.CN, encodedConfigCn, updatedRegionList);
     }
 
     /**
