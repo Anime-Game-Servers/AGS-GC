@@ -117,6 +117,11 @@ public abstract class ActivityHandler<PLAYER_DETAIL_DATA> {
         return playerActivityData;
     }
 
+    public boolean isBannerCondMeet(PlayerActivityData playerActivityData, int scheduleId){
+        // todo check for activity condition with action of ACTIVITY_ACTION_ACTIVITY_BANNER_NOTIFY and if meet show
+        return false;
+    }
+
     public ActivityInfo toProto(PlayerActivityData playerActivityData, ActivityConditionExecutor conditionExecutor){
         val proto = new ActivityInfo();
         proto.setActivityId(activityConfigItem.getActivityId());
@@ -126,6 +131,8 @@ public abstract class ActivityHandler<PLAYER_DETAIL_DATA> {
         proto.setFirstDayStartTime(DateHelper.getUnixTime(activityConfigItem.getBeginTime()));
         proto.setEndTime(DateHelper.getUnixTime(activityConfigItem.getEndTime()));
         proto.setMeetCondList(getMeetConditions(conditionExecutor));
+        proto.setPlayOpenAnim(true);
+        proto.setBannerCleared(playerActivityData.isBannerCleared(activityConfigItem.getScheduleId()));
 
         if (playerActivityData != null){
             proto.setWatcherInfoList(playerActivityData.getAllWatcherInfoList());

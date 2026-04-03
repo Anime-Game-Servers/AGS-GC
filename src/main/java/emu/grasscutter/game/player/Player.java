@@ -1454,6 +1454,8 @@ public class Player {
         session.send(new PacketPlayerEnterSceneNotify(this)); // Enter game world
         session.send(new PacketPlayerLevelRewardUpdateNotify(rewardedLevels));
 
+        activityManager.onLogin();
+
         // First notify packets sent
         this.hasSentLoginPackets = true;
 
