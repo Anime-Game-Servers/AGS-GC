@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import emu.grasscutter.Loggers;
 import emu.grasscutter.net.packet.*;
 import emu.grasscutter.server.event.game.ReceivePacketEvent;
 
@@ -41,7 +42,7 @@ public class GameServerPacketHandler {
 
             this.versionHandlers.put(modelClass.getSimpleName(), packetHandler);
         } catch (Exception e) {
-            e.printStackTrace();
+            Loggers.getDefaultLogger().error("Exception during TypedPacketHandler creation:", e);
         }
     }
 
@@ -56,7 +57,7 @@ public class GameServerPacketHandler {
 
             this.versionHandlers.put(modelClass.getSimpleName(), packetHandler);
         } catch (Exception e) {
-            e.printStackTrace();
+            Loggers.getDefaultLogger().error("Exception during TypedPacketPairHandler creation:", e);
         }
     }
 

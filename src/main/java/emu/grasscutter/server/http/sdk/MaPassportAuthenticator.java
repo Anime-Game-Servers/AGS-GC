@@ -4,6 +4,8 @@ import emu.grasscutter.Grasscutter;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.Account;
 import emu.grasscutter.server.http.objects.*;
+import emu.grasscutter.server.http.objects.BaseLoginResponseData.*;
+import lombok.val;
 
 import java.util.ArrayList;
 
@@ -25,25 +27,25 @@ public class MaPassportAuthenticator {
             return createLoginErrorResponse(-1, "Missing credentials");
         }
 
+        // decrypt acc
+        String username;
         try {
-            // decrypt acc
-            String username;
-            try {
-                username = RSADecryptionUtil.decrypt(request.account);
-            } catch (Exception e) {
-                Grasscutter.getLogger().error("Unable to decrypt account ", e);
-                return createLoginErrorResponse(-10, "Unable to decrypt account");
-            }
+            username = RSADecryptionUtil.decrypt(request.account);
+        } catch (Exception e) {
+            Grasscutter.getLogger().error("Unable to decrypt account ", e);
+            return createLoginErrorResponse(-10, "Unable to decrypt account");
+        }
 
-            // decrypt password next
-            String password;
-            try {
-                password = RSADecryptionUtil.decrypt(request.password);
-            } catch (Exception e) {
-                Grasscutter.getLogger().error("Unable to decrypt password", e);
-                return createLoginErrorResponse(-10, "Unable to decrypt password");
-            }
+        // decrypt password next
+        String password;
+        try {
+            password = RSADecryptionUtil.decrypt(request.password);
+        } catch (Exception e) {
+            Grasscutter.getLogger().error("Unable to decrypt password", e);
+            return createLoginErrorResponse(-10, "Unable to decrypt password");
+        }
 
+        try {
             Account account = DatabaseHelper.getAccountByName(username);
 
             if (account == null) {
@@ -105,40 +107,14 @@ public class MaPassportAuthenticator {
         LoginByPasswordResponseJson response = new LoginByPasswordResponseJson();
         response.retcode = 0;
         response.message = "OK";
-        response.data = new LoginByPasswordResponseJson.LoginData();
 
-        response.data.token = new LoginByPasswordResponseJson.TokenData();
-        response.data.token.token_type = 1;
-        response.data.token.token = account.getSessionKey(); // the new v2_ or whatever
+        val tokenData = new TokenData(1, account.getSessionKey());
+        val userInfo = UserInfoData.fromAccount(account);
 
-        response.data.user_info = new LoginByPasswordResponseJson.UserInfoData();
-        response.data.user_info.aid = account.getId();
-        response.data.user_info.mid = account.getId();
-        response.data.user_info.account_name = "";
-        response.data.user_info.email = account.getUsername();
-        response.data.user_info.is_email_verify = 0;
-        response.data.user_info.area_code = "**";
-        response.data.user_info.mobile = "";
-        response.data.user_info.safe_area_code = "";
-        response.data.user_info.safe_mobile = "";
-        response.data.user_info.realname = "";
-        response.data.user_info.identity_code = "";
-        response.data.user_info.rebind_area_code = "";
-        response.data.user_info.rebind_mobile = "";
-        response.data.user_info.rebind_mobile_time = "315532800";
-        response.data.user_info.links = new ArrayList<>();
-        response.data.user_info.country = "US";
-        response.data.user_info.password_time = "1762297200";
-        response.data.user_info.is_adult = 0;
-        response.data.user_info.unmasked_email = "";
-        response.data.user_info.unmasked_email_type = 0;
+        val extUserInfoData = new ExtUserInfoData("", "0");
 
-        response.data.ext_user_info = new LoginByPasswordResponseJson.ExtUserInfoData();
-        response.data.ext_user_info.guardian_email = "";
-        response.data.ext_user_info.birth = "0";
-
-        response.data.reactivate_action_ticket = "";
-        response.data.bind_email_action_ticket = "";
+        response.data = new LoginByPasswordResponseJson.LoginData(tokenData, userInfo, extUserInfoData,
+            "","");
 
         return response;
     }
@@ -155,39 +131,15 @@ public class MaPassportAuthenticator {
         VerifySTokenResponseJson response = new VerifySTokenResponseJson();
         response.retcode = 0;
         response.message = "OK";
-        response.data = new VerifySTokenResponseJson.VerifyData();
 
-        response.data.user_info = new VerifySTokenResponseJson.UserInfoData();
-        response.data.user_info.aid = account.getId();
-        response.data.user_info.mid = account.getId();
-        response.data.user_info.account_name = "";
-        response.data.user_info.email = account.getUsername();
-        response.data.user_info.is_email_verify = 0;
-        response.data.user_info.area_code = "**";
-        response.data.user_info.mobile = "";
-        response.data.user_info.safe_area_code = "";
-        response.data.user_info.safe_mobile = "";
-        response.data.user_info.realname = "";
-        response.data.user_info.identity_code = "";
-        response.data.user_info.rebind_area_code = "";
-        response.data.user_info.rebind_mobile = "";
-        response.data.user_info.rebind_mobile_time = "315532800";
-        response.data.user_info.links = new ArrayList<>();
-        response.data.user_info.country = "US";
-        response.data.user_info.password_time = "1762297200";
-        response.data.user_info.is_adult = 0;
-        response.data.user_info.unmasked_email = "";
-        response.data.user_info.unmasked_email_type = 0;
+        val tokens = new ArrayList<TokenData>();
+        val tokenData = new TokenData(1, account.getSessionKey());
+        tokens.add(tokenData);
+        val userInfo = UserInfoData.fromAccount(account);
 
-        response.data.tokens = new ArrayList<>();
-        VerifySTokenResponseJson.TokenData tokenData = new VerifySTokenResponseJson.TokenData();
-        tokenData.token_type = 1;
-        tokenData.token = account.getSessionKey();
-        response.data.tokens.add(tokenData);
+        val extUserInfoData = new ExtUserInfoData("", "0");
 
-        response.data.ext_user_info = new VerifySTokenResponseJson.ExtUserInfoData();
-        response.data.ext_user_info.guardian_email = "";
-        response.data.ext_user_info.birth = "0";
+        response.data = new VerifySTokenResponseJson.VerifyData(userInfo, tokens, extUserInfoData);
 
         return response;
     }
