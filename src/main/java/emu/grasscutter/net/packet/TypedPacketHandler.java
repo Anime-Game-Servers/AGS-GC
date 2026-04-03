@@ -14,8 +14,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 public abstract class TypedPacketHandler<T extends ProtoModel> extends PacketHandler {
-    final private Method parseMethod;
-    final private MethodHandle parseMethodHandle;
+    private final Method parseMethod;
+    private final MethodHandle parseMethodHandle;
 
     @Nullable
     public static Class<?> getStaticClass(Class<? extends TypedPacketHandler> handlerClass) {
@@ -34,7 +34,7 @@ public abstract class TypedPacketHandler<T extends ProtoModel> extends PacketHan
         return (Class<?>) superClass.getActualTypeArguments()[0];
     }
 
-    public TypedPacketHandler() {
+    protected TypedPacketHandler() {
         Class<?> modelClass = getStaticClass(getClass());
         if(modelClass == null){
             throw new RuntimeException("Could not find model class for " + getClass().getName());

@@ -25,9 +25,9 @@ import java.lang.reflect.Type;
  */
 public abstract class TypedPacketPairHandler<REQ extends ProtoModel, RSP extends ProtoModel> extends PacketHandler {
     private final Method parseReqMethod;
-    final private MethodHandle parseReqMethodHandle;
+    private final MethodHandle parseReqMethodHandle;
     private final Constructor<RSP> rspConstructor;
-    final private MethodHandle rspConstructorHandle;
+    private final MethodHandle rspConstructorHandle;
 
     @Nullable
     public static Pair<Class<?>,Class<?>> getStaticClasses(Class<? extends TypedPacketPairHandler> handlerClass) {
@@ -45,7 +45,7 @@ public abstract class TypedPacketPairHandler<REQ extends ProtoModel, RSP extends
         return new Pair<>((Class<?>) superClass.getActualTypeArguments()[0],(Class<?>) superClass.getActualTypeArguments()[1]);
     }
 
-    public TypedPacketPairHandler() {
+    protected TypedPacketPairHandler() {
         Pair<Class<REQ>, Class<RSP>> modelClassPair = (Pair<Class<REQ>, Class<RSP>>) (Pair<?,?>)getStaticClasses(getClass());
         if(modelClassPair == null){
             throw new RuntimeException("Could not find model class for " + getClass().getName());
