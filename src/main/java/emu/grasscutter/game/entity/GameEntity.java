@@ -34,7 +34,6 @@ import java.util.*;
 public abstract class GameEntity<T extends CreateEntityConfig<?>> {
     @Getter private final Scene scene;
     @Getter protected int id;
-    @Getter @Setter private SpawnDataEntry spawnEntry;
     @Getter @Setter private T spawnConfig;
 
     @Getter @Setter private int blockId;
@@ -70,6 +69,13 @@ public abstract class GameEntity<T extends CreateEntityConfig<?>> {
         this.groupId = createConfig.getGroupId();
         this.blockId = createConfig.getBlockId();
         this.level = createConfig.getLevel();
+    }
+
+    public SpawnDataEntry getSpawnEntry() {
+        if (spawnConfig != null && spawnConfig.getInitDataSource() instanceof SpawnDataEntry spawnEntry) {
+            return spawnEntry;
+        }
+        return null;
     }
 
     public EntityType getEntityType() {
