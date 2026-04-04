@@ -3,7 +3,6 @@ package emu.grasscutter.game.entity;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
-import emu.grasscutter.game.entity.gadget.content.GadgetViewPoint;
 import emu.grasscutter.game.entity.gadget.content.*;
 import emu.grasscutter.game.entity.gadget.platform.BaseRoute;
 import emu.grasscutter.game.entity.gadget.platform.ConfigRoute;
@@ -14,7 +13,6 @@ import emu.grasscutter.game.props.EntityIdType;
 import emu.grasscutter.game.props.PlayerProperty;
 import emu.grasscutter.game.world.Scene;
 import emu.grasscutter.game.world.SceneGroupInstance;
-import emu.grasscutter.game.world.SpawnDataEntry;
 import emu.grasscutter.server.packet.send.PacketGadgetStateNotify;
 import emu.grasscutter.server.packet.send.PacketPlatformStartRouteNotify;
 import emu.grasscutter.server.packet.send.PacketPlatformStopRouteNotify;
@@ -143,8 +141,8 @@ public class EntityGadget extends EntityBaseGadget implements ConfigAbilityDataA
     public void onDeath(int killerId) {
         super.onDeath(killerId); // Invoke super class's onDeath() method.
 
-        if (this.getSpawnConfig() != null && this.getSpawnConfig().getInitDataSource() instanceof SpawnDataEntry spawnEntry) {
-            this.getScene().getDeadSpawnedEntities().add(spawnEntry);
+        if (this.getSpawnEntry() != null) {
+            this.getScene().getDeadSpawnedEntities().add(this.getSpawnEntry());
         }
         getScene().getScriptManager().callEvent(new ScriptArgs(this.getGroupId(), EventType.EVENT_ANY_GADGET_DIE, this.getConfigId()));
 
