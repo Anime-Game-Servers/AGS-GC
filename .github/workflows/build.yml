@@ -5,9 +5,8 @@ on:
     paths:
       - "**.java"
     branches:
+      - "main"
       - "stable"
-      - "development"
-      - "quests"
   pull_request:
     paths:
       - "**.java"

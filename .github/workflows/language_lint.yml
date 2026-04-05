@@ -8,8 +8,8 @@ on:
       - "**.json"
       - "manage_languages.py"
     branches:
+      - "main"
       - "stable"
-      - "development"
   pull_request:
     paths:
       - ".github/workflows/**"
