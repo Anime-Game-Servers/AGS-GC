@@ -1,5 +1,6 @@
 package emu.grasscutter.server.http.sdk;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.Account;
@@ -8,6 +9,8 @@ import emu.grasscutter.server.http.objects.BaseLoginResponseData.*;
 import lombok.val;
 
 import java.util.ArrayList;
+
+import static emu.grasscutter.config.Configuration.ACCOUNT;
 
 public class MaPassportAuthenticator {
     private MaPassportAuthenticator() {
@@ -47,6 +50,19 @@ public class MaPassportAuthenticator {
 
         try {
             Account account = DatabaseHelper.getAccountByName(username);
+
+            if (account == null && ACCOUNT.autoCreate) { // This account has been created AUTOMATICALLY. There will be no permissions added.
+                if (password.length() >= 8) {
+                    account = DatabaseHelper.createAccountWithUid(username, 0);
+
+                    if (account != null) {
+                        account.setPassword(BCrypt.withDefaults().hashToString(12, password.toCharArray()));
+                        account.save();
+                        // Log the creation.
+                        Grasscutter.getLogger().info("Account {} created", username);
+                    }
+                }
+            }
 
             if (account == null) {
                 Grasscutter.getLogger().info("Account not found: {}", username);
