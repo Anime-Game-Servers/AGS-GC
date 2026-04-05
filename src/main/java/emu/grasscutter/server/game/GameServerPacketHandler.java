@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import emu.grasscutter.Loggers;
 import emu.grasscutter.net.packet.*;
 import emu.grasscutter.server.event.game.ReceivePacketEvent;
 
@@ -14,6 +15,7 @@ import emu.grasscutter.Grasscutter.ServerDebugMode;
 import emu.grasscutter.server.game.GameSession.SessionState;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import kotlin.Pair;
 import lombok.val;
 
 import javax.annotation.Nullable;
@@ -40,7 +42,22 @@ public class GameServerPacketHandler {
 
             this.versionHandlers.put(modelClass.getSimpleName(), packetHandler);
         } catch (Exception e) {
-            e.printStackTrace();
+            Loggers.getDefaultLogger().error("Exception during TypedPacketHandler creation:", e);
+        }
+    }
+
+    public void registerTypedPairPacketHandler(Class<TypedPacketPairHandler<?,?>> handlerClass) {
+        try {
+            Pair<Class<?>,Class<?>> modelClassPairs = TypedPacketPairHandler.getStaticClasses(handlerClass);
+            if(modelClassPairs == null){
+                return;
+            }
+            val modelClass = modelClassPairs.getFirst();
+            PacketHandler packetHandler = handlerClass.getDeclaredConstructor().newInstance();
+
+            this.versionHandlers.put(modelClass.getSimpleName(), packetHandler);
+        } catch (Exception e) {
+            Loggers.getDefaultLogger().error("Exception during TypedPacketPairHandler creation:", e);
         }
     }
 
@@ -50,6 +67,9 @@ public class GameServerPacketHandler {
         for (Class<? extends PacketHandler> obj : handlerClasses) {
             if(TypedPacketHandler.class.isAssignableFrom(obj)){
                 this.registerTypedPacketHandler((Class<TypedPacketHandler<?>>) obj);
+            }
+            if(TypedPacketPairHandler.class.isAssignableFrom(obj)){
+                this.registerTypedPairPacketHandler((Class<TypedPacketPairHandler<?,?>>) obj);
             }
         }
 

@@ -37,6 +37,7 @@ public class PacketPlayerLoginRsp extends BaseTypedPacket<PlayerLoginRsp> {
 
                     val regionCache = new QueryCurrRegionHttpRsp();
                     regionCache.setRegionInfo(serverRegion);
+                    regionCache.setClientSecretKey(Crypto.DISPATCH_SEED);
                     PacketPlayerLoginRsp.regionCache = regionCache;
                 } catch (Exception e) {
                     Grasscutter.getLogger().error("Error while initializing region cache!", e);

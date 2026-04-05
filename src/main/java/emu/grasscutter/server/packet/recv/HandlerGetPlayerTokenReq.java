@@ -5,17 +5,18 @@ import emu.grasscutter.Grasscutter;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.Account;
 import emu.grasscutter.game.player.Player;
-import emu.grasscutter.net.packet.TypedPacketHandler;
+import emu.grasscutter.net.packet.BaseTypedPacket;
+import emu.grasscutter.net.packet.TypedPacketPairHandler;
 import emu.grasscutter.server.event.game.PlayerCreationEvent;
 import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.server.game.GameSession.SessionState;
-import emu.grasscutter.server.packet.send.PacketGetPlayerTokenRsp;
 import emu.grasscutter.utils.ByteHelper;
 import emu.grasscutter.utils.Crypto;
 import emu.grasscutter.utils.Utils;
 import lombok.val;
 import org.anime_game_servers.multi_proto.gi.messages.general.Retcode;
 import org.anime_game_servers.multi_proto.gi.messages.player.GetPlayerTokenReq;
+import org.anime_game_servers.multi_proto.gi.messages.player.GetPlayerTokenRsp;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.util.StringContentProvider;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -24,10 +25,11 @@ import javax.crypto.Cipher;
 
 import static emu.grasscutter.config.Configuration.ACCOUNT;
 
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.security.Signature;
 
-public class HandlerGetPlayerTokenReq extends TypedPacketHandler<GetPlayerTokenReq> {
+public class HandlerGetPlayerTokenReq extends TypedPacketPairHandler<GetPlayerTokenReq, GetPlayerTokenRsp> {
 
     public static class VerifyResult {
         public int retcode;
@@ -44,7 +46,7 @@ public class HandlerGetPlayerTokenReq extends TypedPacketHandler<GetPlayerTokenR
     }
 
     @Override
-    public void handle(GameSession session, byte[] header, GetPlayerTokenReq req) throws Exception {
+    public boolean handle(GameSession session, byte[] header, GetPlayerTokenReq req, GetPlayerTokenRsp rsp) {
 
         // Authenticate
         String accountId = null;
@@ -55,26 +57,31 @@ public class HandlerGetPlayerTokenReq extends TypedPacketHandler<GetPlayerTokenR
             // TODO - implement verify of combo toke from sdk server
             SslContextFactory.Client sslContextFactory = new SslContextFactory.Client();
             HttpClient httpclient = new HttpClient(sslContextFactory);
-            httpclient.start();
-            val request = httpclient.POST(sdkServer);
-            request.content(new StringContentProvider("{\"combo_token\": \""+req.getAccountToken()+"\", \"open_id\": \""+req.getAccountUid()+"\"}"));
+            try {
+                httpclient.start();
+                val request = httpclient.POST(sdkServer);
+                request.content(new StringContentProvider("{\"combo_token\": \"" + req.getAccountToken() + "\", \"open_id\": \"" + req.getAccountUid() + "\"}"));
 
-            val response = request.send();
-            val body = response.getContentAsString();
-            val gson = new GsonBuilder().create();
-            val comboTokenResJson = gson.fromJson(body, VerifyResult.class);
-            if(comboTokenResJson.retcode != 0){
+                val response = request.send();
+                val body = response.getContentAsString();
+                val gson = new GsonBuilder().create();
+                val comboTokenResJson = gson.fromJson(body, VerifyResult.class);
+                if (comboTokenResJson.retcode != 0) {
+                    session.close();
+                    return false;
+                }
+                accountId = Integer.toString(comboTokenResJson.data.account_uid);
+            } catch (Exception ex){
                 session.close();
-                return;
+                return false;
             }
-            accountId = Integer.toString(comboTokenResJson.data.account_uid);
         } else {
             Account account = DatabaseHelper.getAccountById(req.getAccountUid());
             // Set account
             session.setAccount(account);
             if (account == null || !account.getToken().equals(req.getAccountToken())) {
                 session.close();
-                return;
+                return false;
             }
             accountId = account.getId();
             isAccountBanned = account.isBanned();
@@ -82,7 +89,8 @@ public class HandlerGetPlayerTokenReq extends TypedPacketHandler<GetPlayerTokenR
         }
 
         if(accountId == null || !accountId.equals(req.getAccountUid())){
-            return;
+            // TODO, we should close the session or inform the client about an error
+            return false;
         }
         session.setAccountId(accountId);
         session.setSessionToken(req.getAccountToken());
@@ -109,7 +117,7 @@ public class HandlerGetPlayerTokenReq extends TypedPacketHandler<GetPlayerTokenR
             // Max players limit
             if (ACCOUNT.maxPlayer > -1 && Grasscutter.getGameServer().getPlayers().size() >= ACCOUNT.maxPlayer) {
                 session.close();
-                return;
+                return false;
             }
         }
 
@@ -124,7 +132,12 @@ public class HandlerGetPlayerTokenReq extends TypedPacketHandler<GetPlayerTokenR
             int nextPlayerUid = DatabaseHelper.getNextPlayerId(reservedUid);
 
             // Create player instance from event.
-            player = event.getPlayerClass().getDeclaredConstructor(GameSession.class).newInstance(session);
+            try {
+                player = event.getPlayerClass().getDeclaredConstructor(GameSession.class).newInstance(session);
+            } catch (Exception e) {
+                session.close();
+                throw new RuntimeException(e);
+            }
 
             // Save to db
             DatabaseHelper.generatePlayerUid(player, nextPlayerUid);
@@ -133,11 +146,19 @@ public class HandlerGetPlayerTokenReq extends TypedPacketHandler<GetPlayerTokenR
         // Set player object for session
         session.setPlayer(player);
 
+        rsp.setUid(player.getUid());
+        rsp.setProficientPlayer(player.getAvatars().getAvatarCount() > 0);
+        rsp.setRegPlatform(3);
+        rsp.setCountryCode("US");
+        rsp.setClientIpStr(session.getAddress().getAddress().getHostAddress());
+
         // Checks if the player is banned
         if (isAccountBanned) {
             session.setState(SessionState.ACCOUNT_BANNED);
-            session.send(new PacketGetPlayerTokenRsp(session, Retcode.RET_BLACK_UID, "FORBID_CHEATING_PLUGINS", session.getAccount().getBanEndTime()));
-            return;
+            rsp.setRetCode(Retcode.RET_BLACK_UID);
+            rsp.setMsg("FORBID_CHEATING_PLUGINS");
+            rsp.setBlackUidEndTime(session.getAccount().getBanEndTime());
+            return true;
         }
 
         // Load player from database
@@ -146,6 +167,14 @@ public class HandlerGetPlayerTokenReq extends TypedPacketHandler<GetPlayerTokenR
         // Set session state
         session.setUseSecretKey(true);
         session.setState(SessionState.WAITING_FOR_LOGIN);
+
+        rsp.setToken(session.getSessionToken());
+        rsp.setAccountType(1);
+        rsp.setSecretKeySeed(Crypto.ENCRYPT_SEED);
+        rsp.setSecurityCmdBuffer(Crypto.ENCRYPT_SEED_BUFFER);
+        rsp.setPlatformType(3);
+        rsp.setChannelId(1);
+        rsp.setClientVersionRandomKey("c25-314dd05b0b5f");
 
         // Only >= 2.7.50 has this
         if (req.getKeyId() > 0) {
@@ -168,7 +197,8 @@ public class HandlerGetPlayerTokenReq extends TypedPacketHandler<GetPlayerTokenR
                 privateSignature.initSign(Crypto.CUR_SIGNING_KEY);
                 privateSignature.update(seed_bytes);
 
-                session.send(new PacketGetPlayerTokenRsp(session, Utils.base64Encode(seed_encrypted), Utils.base64Encode(privateSignature.sign())));
+                rsp.setServerRandKey(Utils.base64Encode(seed_encrypted));
+                rsp.setSign(Utils.base64Encode(privateSignature.sign()));
             } catch (Exception ignore) {
                 // Only UA Patch users will have exception
                 byte[] clientBytes = Utils.base64Decode(req.getClientRandKey());
@@ -177,11 +207,17 @@ public class HandlerGetPlayerTokenReq extends TypedPacketHandler<GetPlayerTokenR
 
                 String base64str = Utils.base64Encode(clientBytes);
 
-                session.send(new PacketGetPlayerTokenRsp(session, base64str, "bm90aGluZyBoZXJl"));
+                rsp.setServerRandKey(base64str);
+                rsp.setSign("bm90aGluZyBoZXJl");
             }
-        } else {
-            // Send packet
-            session.send(new PacketGetPlayerTokenRsp(session));
         }
+        return true;
+    }
+
+    @Override
+    public void sendRsp(GameSession session, GetPlayerTokenRsp response) {
+        val packet = new BaseTypedPacket<>(response, true) {};
+        packet.setUseDispatchKey(true);
+        session.send(packet);
     }
 }

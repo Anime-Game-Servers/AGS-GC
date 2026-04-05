@@ -10,6 +10,7 @@ import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.ActivityType;
 import emu.grasscutter.game.props.WatcherTriggerType;
 import emu.grasscutter.game.world.Scene;
+import emu.grasscutter.server.packet.activity.PacketActivityBannerNotify;
 import emu.grasscutter.server.packet.send.PacketActivityScheduleInfoNotify;
 import lombok.Getter;
 import lombok.val;
@@ -104,6 +105,13 @@ public class ActivityManager extends BasePlayerManager {
             GameData.getActivityCondExcelConfigDataMap(),
             PlayerActivityDataMappingBuilder.buildPlayerActivityDataByActivityCondId(playerActivityDataMap),
             AllActivityConditionBuilder.buildActivityConditions());
+
+    }
+
+    public void onLogin(){
+        activityConfigItemMap.values().forEach(item ->
+            checkAndNotifyActivityBanner(item.getActivityId(), item.getScheduleId())
+        );
     }
 
     /**
@@ -165,6 +173,26 @@ public class ActivityManager extends BasePlayerManager {
         }
         var now = new Date();
         return now.after(activityConfig.getCloseTime());
+    }
+
+    public boolean setBannerCleared(int activityId, int scheduleId){
+        var activityData = playerActivityDataMap.get(activityId);
+
+        if(activityData.isBannerCleared(scheduleId)){
+            return false;
+        }
+        activityData.setBannerCleared(scheduleId);
+        activityData.save();
+
+        return true;
+    }
+
+    public void checkAndNotifyActivityBanner(int activityId, int scheduleId){
+        var activityHandler = activityConfigItemMap.get(activityId).getActivityHandler();
+        var activityData = playerActivityDataMap.get(activityId);
+        if(activityHandler.isBannerCondMeet(activityData, scheduleId) && !activityData.isBannerCleared(scheduleId)){
+            player.sendPacket(new PacketActivityBannerNotify(activityId, scheduleId));
+        }
     }
 
     public boolean meetsCondition(int activityCondId) {

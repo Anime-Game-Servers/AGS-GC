@@ -237,4 +237,17 @@ public class Account {
             this.locale = LANGUAGE;
         }
     }
+
+    public String generateV2SessionKey() {
+        this.sessionKey = "v2_" + Utils.bytesToHex(Crypto.createSessionKey(32));
+        this.save();
+        return this.sessionKey;
+    }
+
+    public boolean verifyPassword(String password) {
+        if (this.password == null || this.password.isEmpty()) {
+            return true;
+        }
+        return this.password.equals(password);
+    }
 }

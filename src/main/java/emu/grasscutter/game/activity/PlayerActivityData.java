@@ -17,10 +17,7 @@ import lombok.experimental.FieldDefaults;
 import org.anime_game_servers.multi_proto.gi.messages.activity.general.ActivityWatcherInfo;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Entity("activities")
 @Data
@@ -34,6 +31,7 @@ public class PlayerActivityData {
     int uid;
     int activityId;
     Map<Integer, WatcherInfo> watcherInfoMap;
+    private Set<Integer> clearedBanners = new HashSet<>();
     /**
      * the detail data of each type of activity (Json format)
      */
@@ -95,6 +93,14 @@ public class PlayerActivityData {
         player.getInventory().addItems(rewards, ActionReason.ActivityWatcher);
         watcher.setTakenReward(true);
         save();
+    }
+
+    public boolean isBannerCleared(int scheduleId){
+        return clearedBanners.contains(scheduleId);
+    }
+
+    public void setBannerCleared(int scheduleId){
+        clearedBanners.add(scheduleId);
     }
 
     @Nullable

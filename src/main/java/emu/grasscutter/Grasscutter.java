@@ -7,16 +7,8 @@ import emu.grasscutter.command.CommandMap;
 import emu.grasscutter.command.DefaultPermissionHandler;
 import emu.grasscutter.command.PermissionHandler;
 import emu.grasscutter.config.ConfigContainer;
-import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.ResourceLoader;
-import emu.grasscutter.data.excels.AvatarData;
-import emu.grasscutter.data.excels.AvatarSkillDepotData;
-import emu.grasscutter.data.excels.TowerFloorData;
-import emu.grasscutter.data.excels.TowerLevelData;
 import emu.grasscutter.database.DatabaseManager;
-import emu.grasscutter.game.avatar.Avatar;
-import emu.grasscutter.game.avatar.TowerAvatar;
-import emu.grasscutter.game.dungeons.dungeon_entry.PlayerDungeonExitInfo;
 import emu.grasscutter.plugin.PluginManager;
 import emu.grasscutter.plugin.api.ServerHook;
 import emu.grasscutter.server.game.GameServer;
@@ -28,6 +20,7 @@ import emu.grasscutter.server.http.handlers.AnnouncementsHandler;
 import emu.grasscutter.server.http.handlers.GachaHandler;
 import emu.grasscutter.server.http.handlers.GenericHandler;
 import emu.grasscutter.server.http.handlers.LogHandler;
+import emu.grasscutter.server.http.sdk.AuthHandler;
 import emu.grasscutter.tools.Tools;
 import emu.grasscutter.utils.Crypto;
 import emu.grasscutter.utils.JsonUtils;
@@ -50,7 +43,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.io.*;
 import java.util.Calendar;
-import java.util.Optional;
 
 import static emu.grasscutter.config.Configuration.SERVER;
 import static emu.grasscutter.utils.Language.translate;
@@ -143,12 +135,14 @@ public final class Grasscutter {
         httpServer.addRouter(HttpServer.UnhandledRequestRouter.class);
         httpServer.addRouter(HttpServer.DefaultRequestRouter.class);
         httpServer.addRouter(RegionHandler.class);
+        httpServer.addRouter(DispatchHandler.class);
         httpServer.addRouter(LogHandler.class);
         httpServer.addRouter(GenericHandler.class);
         httpServer.addRouter(AnnouncementsHandler.class);
-        httpServer.addRouter(DispatchHandler.class);
         httpServer.addRouter(GachaHandler.class);
         httpServer.addRouter(DocumentationServerHandler.class);
+        //sdk
+        httpServer.addRouter(AuthHandler.class);
 
         // Start servers.
         var runMode = Grasscutter.getRunMode();
