@@ -1,12 +1,5 @@
 package emu.grasscutter.data;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-
-import emu.grasscutter.Grasscutter;
 import emu.grasscutter.Loggers;
 import emu.grasscutter.data.excels.ReliquaryAffixData;
 import emu.grasscutter.data.excels.ReliquaryMainPropData;
@@ -18,6 +11,10 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class GameDepot {
     public static final int[] BLOCK_SIZE = new int[]{50,500};//Scales
 
@@ -25,7 +22,6 @@ public class GameDepot {
     private static Int2ObjectMap<List<ReliquaryMainPropData>> relicMainPropDepot = new Int2ObjectOpenHashMap<>();
     private static Int2ObjectMap<List<ReliquaryAffixData>> relicAffixDepot = new Int2ObjectOpenHashMap<>();
 
-    @Getter @Setter private static Map<String, ResourceLoader.AbilityGroup> playerAbilities = new HashMap<>();
     @Getter private static HashMap<SpawnDataEntry.GridBlockId, ArrayList<SpawnDataEntry>> spawnLists = new HashMap<>();
     @Getter @Setter private static BlossomConfig blossomConfig;
 

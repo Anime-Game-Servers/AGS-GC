@@ -19,6 +19,7 @@ import emu.grasscutter.data.custom.activity.ActivityExtraInfo;
 import emu.grasscutter.data.excels.TrialAvatarActivityDataData;
 import emu.grasscutter.data.server.*;
 import emu.grasscutter.game.ability.Ability;
+import emu.grasscutter.game.ability.AbilitySystem;
 import emu.grasscutter.game.dungeons.DungeonDrop;
 import emu.grasscutter.game.dungeons.dungeon_entry.DungeonEntries;
 import emu.grasscutter.game.dungeons.enums.DungeonType;
@@ -118,6 +119,7 @@ public class ResourceLoader {
         loadTalents();
         loadOpenConfig();
         loadAbilityModifiers();
+        loadAbilityGroups();
         // Load resources
         loadResources(true);
         // Process into depots
@@ -397,12 +399,6 @@ public class ResourceLoader {
             });
 
             embryoList = l;
-
-            try {
-                GameDepot.setPlayerAbilities(JsonUtils.loadToMap(getResourcePath("BinOutput/AbilityGroup/AbilityGroup_Other_PlayerElementAbility.json"), String.class, AbilityGroup.class));
-            } catch (IOException e) {
-                logger.error("Error loading player abilities:", e);
-            }
         }
 
         if (embryoList.isEmpty()) {
@@ -462,6 +458,22 @@ public class ResourceLoader {
         });
 
         GameData.getAbilityModifiers().put(name, modifierEntry);
+    }
+
+    private static void loadAbilityGroups() {
+        try (val stream = Files.newDirectoryStream(getResourcePath("BinOutput/AbilityGroup/"), "*.json")) {
+            for (var path : stream) {
+                try {
+                    var map = JsonUtils.loadToMap(path, String.class, AbilityGroup.class);
+                    AbilitySystem.getAbilityGroupMap().putAll(map);
+                } catch (Exception e) {
+                    logger.error("Error loading ability groups at path: {}", path, e);
+                }
+            }
+        }
+        catch (IOException ex) {
+            logger.error("Error loading ability groups", ex);
+        }
     }
 
     private static void loadTalents() {
@@ -1001,23 +1013,6 @@ public class ResourceLoader {
             GameData.getGroupReplacements().putAll(replacementsMap.entrySet().stream().collect(Collectors.toMap(entry -> Integer.valueOf(entry.getValue().getId()), Entry::getValue)));
         })) {
             logger.error("Error while loading Group Replacements");
-        }
-    }
-
-    // BinOutput configs
-
-    public static class AbilityGroup {
-        String abilityGroupSourceType; // todo probably enum?
-        String abilityGroupTargetType; // todo probably enum?
-
-        @SerializedName(value="abilities", alternate={"targetAbilities"})
-        public List<AvatarConfigAbility> targetAbilities;
-    }
-
-    public static class AvatarConfigAbility {
-        public String abilityName;
-        public String toString() {
-            return abilityName;
         }
     }
 

@@ -1,17 +1,20 @@
 package emu.grasscutter.data.excels;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.IntStream;
-
-import emu.grasscutter.data.*;
+import emu.grasscutter.data.GameData;
+import emu.grasscutter.data.GameResource;
+import emu.grasscutter.data.ResourceType;
 import emu.grasscutter.data.ResourceType.LoadPriority;
 import emu.grasscutter.data.binout.AbilityEmbryoEntry;
+import emu.grasscutter.game.ability.AbilitySystem;
 import emu.grasscutter.game.props.ElementType;
 import emu.grasscutter.utils.Utils;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import lombok.Getter;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.IntStream;
 
 @ResourceType(name = "AvatarSkillDepotExcelConfigData.json", loadPriority = LoadPriority.HIGH)
 @Getter
@@ -54,7 +57,7 @@ public class AvatarSkillDepotData extends GameResource {
         }
         // Set embryo abilities (if player skill depot)
         if (getSkillDepotAbilityGroup() != null && getSkillDepotAbilityGroup().length() > 0) {
-            ResourceLoader.AbilityGroup config = GameDepot.getPlayerAbilities().get(getSkillDepotAbilityGroup());
+            var config = AbilitySystem.getAbilityGroupMap().get(getSkillDepotAbilityGroup());
 
             if (config != null) {
                 this.setAbilities(new AbilityEmbryoEntry(getSkillDepotAbilityGroup(), config.targetAbilities.stream().map(Object::toString).toArray(String[]::new)));
