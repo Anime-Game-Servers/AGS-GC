@@ -191,7 +191,7 @@ public class ActivityManager extends BasePlayerManager {
     public void checkAndNotifyActivityBanner(int activityId, int scheduleId){
         var activityHandler = activityConfigItemMap.get(activityId).getActivityHandler();
         var activityData = playerActivityDataMap.get(activityId);
-        if(activityHandler.isBannerCondMeet(activityData, scheduleId) && !activityData.isBannerCleared(scheduleId)){
+        if(activityHandler.isBannerCondMeet(activityData, scheduleId, conditionExecutor) && !activityData.isBannerCleared(scheduleId)){
             player.sendPacket(new PacketActivityBannerNotify(activityId, scheduleId));
         }
     }

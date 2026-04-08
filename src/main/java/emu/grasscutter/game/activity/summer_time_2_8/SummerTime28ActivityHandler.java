@@ -3,6 +3,7 @@ package emu.grasscutter.game.activity.summer_time_2_8;
 import emu.grasscutter.game.activity.ActivityHandler;
 import emu.grasscutter.game.activity.GameActivity;
 import emu.grasscutter.game.activity.PlayerActivityData;
+import emu.grasscutter.game.activity.condition.ActivityConditionExecutor;
 import emu.grasscutter.game.inventory.Inventory;
 import emu.grasscutter.server.packet.activity.PacketActivityCoinInfoNotify;
 import lombok.val;
@@ -126,10 +127,5 @@ public class SummerTime28ActivityHandler extends ActivityHandler<SummerTime28Pla
         val scheduleId = getActivityConfigItem().getScheduleId();
         val coinMap = Map.of(141, detailData.getStratagemShard());
         playerActivityData.getPlayer().sendPacket(new PacketActivityCoinInfoNotify(activityId, scheduleId, coinMap));
-    }
-
-    @Override
-    public boolean isBannerCondMeet(PlayerActivityData playerActivityData, int scheduleId) {
-        return true;
     }
 }
