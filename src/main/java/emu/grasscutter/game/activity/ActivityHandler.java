@@ -127,9 +127,12 @@ public abstract class ActivityHandler<PLAYER_DETAIL_DATA> {
         return playerActivityData;
     }
 
-    public boolean isBannerCondMeet(PlayerActivityData playerActivityData, int scheduleId){
-        // todo check for activity condition with action of ACTIVITY_ACTION_ACTIVITY_BANNER_NOTIFY and if meet show
-        return false;
+    public boolean isBannerCondMeet(PlayerActivityData playerActivityData, int scheduleId, ActivityConditionExecutor conditionExecutor){
+        val activityExtraInfo = GameData.getActivityExtraInfoMap().get(activityConfigItem.getActivityId());
+        if(activityExtraInfo == null || !activityExtraInfo.hasBannerConditionId()){
+            return false;
+        }
+        return getMeetConditions(conditionExecutor).contains(activityExtraInfo.getBannerConditionId());
     }
 
     public ActivityInfo toProto(PlayerActivityData playerActivityData, ActivityConditionExecutor conditionExecutor){
