@@ -13,6 +13,7 @@ import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.EntityType;
 import emu.grasscutter.game.props.FightProperty;
 import emu.grasscutter.game.world.Scene;
+import emu.grasscutter.server.packet.scene.entity.PacketMarkEntityInMinMapNotify;
 import emu.grasscutter.utils.Position;
 import lombok.Setter;
 import lombok.val;
@@ -47,7 +48,8 @@ public final class SpawnCommand implements CommandHandler {
         Map.entry(hpRegex, SpawnParameters::setHp),
         Map.entry(defRegex, SpawnParameters::setDef),
         Map.entry(atkRegex, SpawnParameters::setAtk),
-        Map.entry(aiRegex, SpawnParameters::setAi)
+        Map.entry(aiRegex, SpawnParameters::setAi),
+        Map.entry(markRegex, SpawnParameters::setMark)
     );
 
     @Override
@@ -139,9 +141,13 @@ public final class SpawnCommand implements CommandHandler {
     private EntityMonster createMonster(MonsterData monsterData, SpawnParameters param, Position pos) {
         val config = new CreateMonsterEntityConfig(monsterData)
             .setBornPos(pos)
+            .setRot(new Position())
             .setLevel(param.lvl);
         if (param.ai != -1) {
             config.setAiId(param.ai);
+        }
+        if(param.mark != -1){
+            config.setMarkMonster(param.mark != 0);
         }
         var entity = new EntityMonster(param.scene, config);
         return entity;
@@ -214,6 +220,7 @@ public final class SpawnCommand implements CommandHandler {
         @Setter public int atk = -1;
         @Setter public int def = -1;
         @Setter public int ai = -1;
+        @Setter public int mark = -1;
         @Setter public Position pos = null;
         public Scene scene = null;
     }

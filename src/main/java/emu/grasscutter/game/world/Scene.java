@@ -281,17 +281,17 @@ public class Scene {
         teamManager.getActiveTeam().stream().map(EntityAvatar::getAvatar).forEach(Avatar::sendSkillExtraChargeMap);
     }
 
-    private void addEntityDirectly(GameEntity entity) {
+    private void addEntityDirectly(GameEntity<?> entity) {
         this.entities.put(entity.getId(), entity);
         entity.onCreate(); // Call entity create event
     }
 
-    public synchronized void addEntity(GameEntity entity) {
+    public synchronized void addEntity(GameEntity<?> entity) {
         addEntityDirectly(entity);
         broadcastPacket(new PacketSceneEntityAppearNotify(entity));
         entity.afterCreate(this.players);
     }
-    public synchronized void addEntity(CreateEntityConfig config) {
+    public synchronized void addEntity(CreateEntityConfig<?> config) {
         GameEntity<?> entity = null;
         if(config.getClass() == CreateMonsterEntityConfig.class) {
             entity = new EntityMonster(this, (CreateMonsterEntityConfig) config);

@@ -18,6 +18,8 @@ import emu.grasscutter.game.quest.enums.QuestContent;
 import emu.grasscutter.game.world.Scene;
 import emu.grasscutter.game.world.SceneGroupInstance;
 import emu.grasscutter.server.event.entity.EntityDamageEvent;
+import emu.grasscutter.server.packet.scene.entity.PacketMarkEntityInMinMapNotify;
+import emu.grasscutter.server.packet.scene.entity.PacketUnmarkEntityInMinMapNotify;
 import emu.grasscutter.utils.Position;
 import emu.grasscutter.utils.ProtoHelper;
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
@@ -60,6 +62,7 @@ public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> impleme
     private final int titleId;
     private final int specialNameId;
     private int weaponId;
+    private final boolean isMarkedMoster;
 
     private List<Player> playerOnBattle;
 
@@ -89,6 +92,7 @@ public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> impleme
         this.poseId = config.getPoseId();
         this.titleId = config.getTitleId();
         this.specialNameId = config.getSpecialNameId();
+        this.isMarkedMoster = config.isMarkMonster();
 
         this.recalcStats();
 
@@ -247,6 +251,14 @@ public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> impleme
     }
 
     @Override
+    public void afterCreate(List<Player> players) {
+        super.afterCreate(players);
+        if(isMarkedMoster) {
+            getScene().broadcastPacket(new PacketMarkEntityInMinMapNotify(id, position.toProto(), getMonsterId()));
+        }
+    }
+
+    @Override
     public void onDeath(int killerId) {
         super.onDeath(killerId); // Invoke super class's onDeath() method.
         var scene = this.getScene();
@@ -285,6 +297,10 @@ public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> impleme
         scene.triggerDungeonEvent(DungeonPassConditionType.DUNGEON_COND_KILL_MONSTER, this.getMonsterId());
 
         scene.getSealBattleManager().onKill(this);
+
+        if(isMarkedMoster){
+            scene.broadcastPacket(new PacketUnmarkEntityInMinMapNotify(id));
+        }
     }
 
     public void recalcStats() {
