@@ -7,7 +7,6 @@ import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.binout.config.ConfigLevelEntity;
 import emu.grasscutter.data.binout.config.fields.ConfigAbilityData;
 import emu.grasscutter.data.excels.PlayerLevelData;
-import emu.grasscutter.data.excels.WeatherData;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.Account;
 import emu.grasscutter.game.CoopRequest;
@@ -50,7 +49,6 @@ import emu.grasscutter.game.managers.mapmark.MapMark;
 import emu.grasscutter.game.managers.mapmark.MapMarksManager;
 import emu.grasscutter.game.managers.stamina.StaminaManager;
 import emu.grasscutter.game.props.ActionReason;
-import emu.grasscutter.game.props.ClimateType;
 import emu.grasscutter.game.props.PlayerProperty;
 import emu.grasscutter.game.props.WatcherTriggerType;
 import emu.grasscutter.game.quest.QuestManager;
@@ -78,6 +76,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopTaskCondType;
+import org.anime_game_servers.game_data_models.gi.data.scene.weather.ClimateType;
 import org.anime_game_servers.multi_proto.gi.messages.ability.AbilityInvokeEntry;
 import org.anime_game_servers.multi_proto.gi.messages.battle.CombatInvokeEntry;
 import org.anime_game_servers.multi_proto.gi.messages.battle.event.AttackResult;
@@ -448,7 +447,7 @@ public class Player {
     synchronized public void setWeather(int weatherId, ClimateType climate) {
         // Lookup default climate for this weather
         if (climate == ClimateType.CLIMATE_NONE) {
-            WeatherData w = GameData.getWeatherDataMap().get(weatherId);
+            val w = GameData.getWeatherDataMap().get(weatherId);
             if (w != null) {
                 climate = w.getDefaultClimate();
             }
