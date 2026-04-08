@@ -26,6 +26,7 @@ public class CreateMonsterEntityConfig extends CreateEntityConfig<CreateMonsterE
     private int specialNameId = 0;
     private int weaponId = 0;
     private int killScore = 0;
+    private boolean markMonster = false;
     //TODO
 
     public CreateMonsterEntityConfig(int monsterId){

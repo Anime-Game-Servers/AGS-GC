@@ -27,6 +27,7 @@ public class CommandHelpers {
     public static final Pattern suiteRegex = Pattern.compile("suite(\\d+)");
     public static final Pattern mainQuestRegex = Pattern.compile("m(\\d+)");
     public static final Pattern subQuestRegex = Pattern.compile("s(\\d+)");
+    public static final Pattern markRegex = Pattern.compile("mark(\\d+)");
 
     public static int matchIntOrNeg(Pattern pattern, String arg) {
         Matcher match = pattern.matcher(arg);
