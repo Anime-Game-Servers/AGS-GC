@@ -419,6 +419,7 @@ public final class Language {
                 // Try loading from cache
                 Grasscutter.getLogger().info("Loading cached TextMaps");
                 textMapStrings = loadTextMapsCache();
+                scannedTextmaps = true;
                 return;
             }
         } catch (Exception e) {
