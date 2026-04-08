@@ -1,10 +1,8 @@
 package emu.grasscutter.game.world;
 
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.excels.WeatherData;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.player.Player.SceneLoadState;
-import emu.grasscutter.game.props.ClimateType;
 import emu.grasscutter.server.packet.send.PacketSceneAreaWeatherNotify;
 import lombok.Getter;
 import lombok.val;
@@ -14,6 +12,9 @@ import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.mongodb.lang.Nullable;
+import org.anime_game_servers.game_data_models.gi.data.scene.weather.ClimateType;
+import org.anime_game_servers.game_data_models.gi.data.scene.weather.WeatherData;
+import org.anime_game_servers.game_data_models.gi.data.scene.weather.WeatherTemplateData;
 
 public class WeatherArea {
     @Getter private final Scene scene;
@@ -97,20 +98,31 @@ public class WeatherArea {
     }
 
     public ClimateType randWeather(ClimateType initClimateType) {
+        String template = null;
+
         val mapping = GameData.getWeatherMappingMap().get(config.getAreaID());
-        if(mapping == null) return ClimateType.CLIMATE_SUNNY;
+        if(mapping != null){
+            template = mapping.getTemplate();
+        }
+        if(template == null && config.hasTemplateName()){
+            template = config.getTemplateName();
+        }
+
+        if(template == null){
+            return ClimateType.CLIMATE_SUNNY;
+        }
 
         var searchType = climateType;
-        if(searchType == ClimateType.CLIMATE_NONE) searchType = config.getDefaultClimate();
-        val templateData = GameData.getWeatherTemplateDataByNameMap().get(mapping.getTemplate()+searchType.getValue());
+        if(searchType == ClimateType.CLIMATE_NONE && config.hasDefaultClimate()) searchType = config.getDefaultClimate();
+        val templateData = GameData.getWeatherTemplateData(template, searchType);
         if(templateData == null) return ClimateType.CLIMATE_SUNNY;
 
-        float maxNumber = templateData.getSunnyProb() +
-                          templateData.getCloudyProb() +
-                          templateData.getRainProb() +
-                          templateData.getThunderstormProb() +
-                          templateData.getSnowProb() +
-                          templateData.getMistProb();
+        float maxNumber = templateData.sunnyProb() +
+                          templateData.cloudyProb() +
+                          templateData.rainProb() +
+                          templateData.thunderstormProb() +
+                          templateData.snowProb() +
+                          templateData.mistProb();
         if(maxNumber == 0.0) return config.getDefaultClimate();
         float randomNumber = (float)Math.random() * maxNumber;
         if(randomNumber < templateData.getSunnyProb())
@@ -134,7 +146,7 @@ public class WeatherArea {
     }
 
     public void refresh(WeatherRefreshType type) {
-        if(config.isDefaultValid()) {
+        if(config.getIsDefaultValid()) {
             //Easy part
 
             setClimateType(config.getDefaultClimate());
@@ -165,11 +177,11 @@ public class WeatherArea {
                 for(int i = forcastList.size(); i < WeatherForcastNum; i++) {
                     int forcastId = 0;
                     if(forcastList.isEmpty()) {
-                        forcastId = climateType.getValue();
+                        forcastId = climateType.getId();
                     } else {
                         forcastId = forcastList.get(forcastList.size() - 1);
                     }
-                    int newForcastId = randWeather(ClimateType.getTypeByValue(forcastId)).getValue();
+                    int newForcastId = randWeather(ClimateType.getTypeByValue(forcastId)).getId();
                     forcastList.add(newForcastId);
                 }
                 if(oldClimateType != climateType) {

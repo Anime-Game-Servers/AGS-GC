@@ -53,6 +53,7 @@ import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopPointData;
 import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopRewardData;
 import org.anime_game_servers.game_data_models.gi.data.scene.level_tag.LevelTagData;
 import org.anime_game_servers.game_data_models.gi.data.scene.level_tag.LevelTagGroupsData;
+import org.anime_game_servers.game_data_models.gi.data.scene.weather.ClimateType;
 import org.anime_game_servers.game_data_models.gi.data.trial.TrialAvatarData;
 import org.anime_game_servers.game_data_models.gi.data.trial.TrialAvatarTemplateData;
 import org.anime_game_servers.game_data_models.gi.data.trial.TrialAvatarFetterData;
@@ -213,9 +214,8 @@ public class GameData {
     @Getter private static final Int2ObjectMap<WeaponCurveData> weaponCurveDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<WeaponLevelData> weaponLevelDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<WeaponPromoteData> weaponPromoteDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<WeatherData> weatherDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<WeatherTemplateData> weatherTemplateDataMap = new Int2ObjectOpenHashMap<>(); //Unused
-    @Getter private static final Map<String, WeatherTemplateData> weatherTemplateDataByNameMap = new HashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<WeatherData> weatherDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Map<String, WeatherTemplateData> weatherTemplateDataMap = new HashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<WorldAreaConfigData> worldAreaDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<WorldLevelData> worldLevelDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<AvatarPromoteData> avatarPromoteDataMap = new Int2ObjectOpenHashMap<>();
@@ -428,5 +428,9 @@ public class GameData {
 
     public static CodexViewpointData getViewCodexByGroupdCfg(int groupId, int cfgId) {
         return codexViewpointDataIdMap.get(CodexViewpointData.getViewpointId(groupId, cfgId));
+    }
+
+    public static WeatherTemplateData getWeatherTemplateData(@Nonnull String templateName, @Nonnull ClimateType climateType){
+        return weatherTemplateDataMap.get(WeatherTemplateData.getKey(templateName, climateType));
     }
 }
