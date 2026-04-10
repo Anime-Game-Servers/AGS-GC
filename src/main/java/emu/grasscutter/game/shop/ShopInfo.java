@@ -1,6 +1,11 @@
 package emu.grasscutter.game.shop;
 
 import emu.grasscutter.data.common.ItemParamData;
+import kotlin.time.Instant;
+import kotlinx.datetime.LocalDateTime;
+import kotlinx.datetime.OverloadMarker;
+import kotlinx.datetime.TimeZone;
+import kotlinx.datetime.TimeZoneKt;
 import lombok.Getter;
 import lombok.Setter;
 import org.anime_game_servers.game_data_models.gi.data.shop.ShopGoodsData;
@@ -45,6 +50,12 @@ public class ShopInfo {
     private long getOrDefault(long value){
         return getOrDefault(value, 0);
     }
+    private long getEpochOrDefault(LocalDateTime value, int defaultValue){
+        return value != null ? TimeZoneKt.toInstant(value, TimeZone.Companion.currentSystemDefault(), OverloadMarker.Companion.getINSTANCE$kotlinx_datetime()).getEpochSeconds() : defaultValue;
+    }
+    private long getEpochOrDefault(LocalDateTime value){
+        return getEpochOrDefault(value, 0);
+    }
 
     public ShopInfo(ShopGoodsData sgd) {
         this.goodsId = sgd.getGoodsId();
@@ -54,8 +65,8 @@ public class ShopInfo {
         this.hcoin = getOrDefault(sgd.getCostHcoin());
         this.buyLimit = getOrDefault(sgd.getBuyLimit());
 
-        this.beginTime = (int) getOrDefault(sgd.getBeginTimestamp());
-        this.endTime = (int) getOrDefault(sgd.getEndTimestamp(), 1924992000);
+        this.beginTime = (int) getEpochOrDefault(sgd.getBeginTime());
+        this.endTime = (int) getEpochOrDefault(sgd.getEndTime(), 1924992000);
 
         this.minLevel = getOrDefault(sgd.getMinPlayerLevel());
         this.maxLevel = getOrDefault(sgd.getMaxPlayerLevel(), 61);
