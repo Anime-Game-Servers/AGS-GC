@@ -1,6 +1,6 @@
 package emu.grasscutter.game.dungeons.challenge.factory;
 
-import emu.grasscutter.game.dungeons.challenge.enums.ChallengeType;
+import org.anime_game_servers.game_data_models.gi.data.scene.challenge.ChallengeType;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
