@@ -51,6 +51,7 @@ import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopCgData;
 import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopChapterData;
 import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopPointData;
 import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopRewardData;
+import org.anime_game_servers.game_data_models.gi.data.scene.challenge.ChallengeData;
 import org.anime_game_servers.game_data_models.gi.data.scene.level_tag.LevelTagData;
 import org.anime_game_servers.game_data_models.gi.data.scene.level_tag.LevelTagGroupsData;
 import org.anime_game_servers.game_data_models.gi.data.scene.weather.ClimateType;
@@ -106,7 +107,7 @@ public class GameData {
     // ExcelConfigs
     @AutoResource @Getter private static final Int2ObjectMap<ActivityCondData> activityCondExcelConfigDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<DungeonPassData> dungeonPassConfigDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<DungeonChallengeConfigData> dungeonChallengeConfigDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<ChallengeData> dungeonChallengeConfigDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<Int2ObjectMap<Route>> sceneRouteData = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<LevelTagData> levelTagDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<LevelTagGroupsData> levelTagGroupsDataMap = new Int2ObjectOpenHashMap<>();
