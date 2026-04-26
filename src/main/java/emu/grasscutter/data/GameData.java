@@ -46,11 +46,13 @@ import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonPassData;
 import org.anime_game_servers.game_data_models.gi.data.entities.avatar.*;
 import org.anime_game_servers.game_data_models.gi.data.entities.avatar.AvatarCurveData;
 import org.anime_game_servers.game_data_models.gi.data.entities.avatar.AvatarData;
+import org.anime_game_servers.game_data_models.gi.data.entities.avatar.AvatarReplaceCostumeData;
 import org.anime_game_servers.game_data_models.gi.data.entities.avatar.AvatarWeaponSkinData;
 import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopCgData;
 import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopChapterData;
 import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopPointData;
 import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopRewardData;
+import org.anime_game_servers.game_data_models.gi.data.quest.ChapterData;
 import org.anime_game_servers.game_data_models.gi.data.scene.challenge.ChallengeData;
 import org.anime_game_servers.game_data_models.gi.data.scene.level_tag.LevelTagData;
 import org.anime_game_servers.game_data_models.gi.data.scene.level_tag.LevelTagGroupsData;
@@ -79,7 +81,6 @@ import org.anime_game_servers.game_data_models.gi.data.world.WorldLevelData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.lang.reflect.Field;
 import java.util.*;
 
 public class GameData {
@@ -103,15 +104,14 @@ public class GameData {
     @Getter private static final Map<String, AbilityEmbryoEntry> abilityEmbryos = new HashMap<>();
     @QuickAccessCache @Getter private static final Map<Long, String> textHashMap = new HashMap<>();
     @Getter private static final Map<String, AbilityGroup> abilityGroupMap = new HashMap<>();
+    @Getter private static final Int2ObjectMap<Int2ObjectMap<Route>> sceneRouteData = new Int2ObjectOpenHashMap<>();
 
     // ExcelConfigs
     @AutoResource @Getter private static final Int2ObjectMap<ActivityCondData> activityCondExcelConfigDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<DungeonPassData> dungeonPassConfigDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<ChallengeData> dungeonChallengeConfigDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<Int2ObjectMap<Route>> sceneRouteData = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<LevelTagData> levelTagDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<LevelTagGroupsData> levelTagGroupsDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final ArrayList<CodexReliquaryData> codexReliquaryArrayList = new ArrayList<>();
     @AutoResource @Getter private static final Int2ObjectMap<ActivityData> activityDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<ActivityShopOverallData> activityShopDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<ActivityShopSheetData> activityShopSheetDataMap = new Int2ObjectOpenHashMap<>();
@@ -119,7 +119,7 @@ public class GameData {
     @QuickAccessCache @Getter private static final Int2ObjectMap<AvatarCostumeData> avatarCostumeDataItemIdMap = new Int2ObjectLinkedOpenHashMap<>();
     @QuickAccessCache @Getter private static final Int2ObjectMap<AvatarDataCache> avatarInfoCacheMap = new Int2ObjectLinkedOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<AvatarCostumeData> avatarCostumeDataMap = new Int2ObjectLinkedOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<AvatarReplaceCostumeData> avatarReplaceCostumeDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<AvatarReplaceCostumeData> avatarReplaceCostumeDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<AvatarCurveData> avatarCurveDataMap = new Int2ObjectLinkedOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<AvatarData> avatarDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<AvatarFettersLevelData> avatarFetterLevelDataMap = new Int2ObjectOpenHashMap<>();
@@ -142,6 +142,7 @@ public class GameData {
     @AutoResource @Getter private static final Int2ObjectMap<CityData> cityDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<CityLevelUpData> cityLevelUpDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<CityTaskOpenData> cityTaskOpenDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final ArrayList<CodexReliquaryData> codexReliquaryArrayList = new ArrayList<>();
     @Getter private static final Int2ObjectMap<CodexAnimalData> codexAnimalDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<CodexMaterialData> codexMaterialDataIdMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<CodexQuestData> codexQuestDataIdMap = new Int2ObjectOpenHashMap<>();
@@ -285,6 +286,8 @@ public class GameData {
     @QuickAccessCache @Getter private static final Int2IntMap trialAvatarIndexIdTrialActivityDataDataMap = new Int2IntOpenHashMap();
     @Getter private static final Map<Integer, List<WeatherAreaPointData>> weatherAreaPointData = new HashMap<>();
     @Getter private static final Map<Integer, List<ScenePointArrayData>> scenePointArrayData = new HashMap<>();
+    @QuickAccessCache @Getter private static final Map<Integer, ChapterData> beginQuestChapterMap = new HashMap<>();
+    @QuickAccessCache @Getter private static final Map<Integer, ChapterData> endQuestChapterMap = new HashMap<>();
 
     // Getters with different names that stay for now
     public static Int2ObjectMap<QuestEncryptionKey> getMainQuestEncryptionMap() {return questsKeys;}

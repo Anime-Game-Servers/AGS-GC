@@ -287,6 +287,7 @@ public class ResourceLoader {
         GameData.getTriggerExcelConfigDataMap().values().forEach(GameData::putQuestTriggerDataCache);
         initAvatarCaches();
         initTrialActivityCaches();
+        initChaptersCache();
     }
 
     public static void initAvatarCaches(){
@@ -296,6 +297,14 @@ public class ResourceLoader {
 
     public static void initTrialActivityCaches(){
         GameData.getTrialAvatarActivityDataDataMap().values().forEach(GameData::putTrialActivityDataCache);
+    }
+
+    public static void initChaptersCache(){
+        GameData.getChapterDataMap().forEach( (id, data ) ->{
+                GameData.getBeginQuestChapterMap().put(data.getBeginQuestId(), data);
+                GameData.getEndQuestChapterMap().put(data.getEndQuestId(), data);
+            }
+        );
     }
 
     public static void loadResources() {
