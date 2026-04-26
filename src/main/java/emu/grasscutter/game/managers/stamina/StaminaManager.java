@@ -103,7 +103,6 @@ public class StaminaManager extends BasePlayerManager {
                 MotionState.MOTION_LAND_SPEED,
                 MotionState.MOTION_MOVE_FAIL_ACK,
                 MotionState.MOTION_NONE,
-                MotionState.MOTION_NUM,
                 MotionState.MOTION_QUEST_FORCE_DRAG,
                 MotionState.MOTION_RESET,
                 MotionState.MOTION_STANDBY_TO_LADDER,
