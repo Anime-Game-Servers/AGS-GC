@@ -5,7 +5,6 @@ import emu.grasscutter.data.GameResource;
 import emu.grasscutter.data.ResourceType;
 import emu.grasscutter.data.ResourceType.LoadPriority;
 import emu.grasscutter.data.binout.AbilityEmbryoEntry;
-import emu.grasscutter.game.ability.AbilitySystem;
 import emu.grasscutter.game.props.ElementType;
 import emu.grasscutter.utils.Utils;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -57,7 +56,7 @@ public class AvatarSkillDepotData extends GameResource {
         }
         // Set embryo abilities (if player skill depot)
         if (getSkillDepotAbilityGroup() != null && getSkillDepotAbilityGroup().length() > 0) {
-            var config = AbilitySystem.getAbilityGroupMap().get(getSkillDepotAbilityGroup());
+            var config = GameData.getAbilityGroupMap().get(getSkillDepotAbilityGroup());
 
             if (config != null) {
                 this.setAbilities(new AbilityEmbryoEntry(getSkillDepotAbilityGroup(), config.targetAbilities.stream().map(Object::toString).toArray(String[]::new)));

@@ -19,7 +19,6 @@ import emu.grasscutter.data.custom.activity.ActivityExtraInfo;
 import emu.grasscutter.data.excels.TrialAvatarActivityDataData;
 import emu.grasscutter.data.server.*;
 import emu.grasscutter.game.ability.Ability;
-import emu.grasscutter.game.ability.AbilitySystem;
 import emu.grasscutter.game.dungeons.DungeonDrop;
 import emu.grasscutter.game.dungeons.dungeon_entry.DungeonEntries;
 import emu.grasscutter.game.dungeons.enums.DungeonType;
@@ -465,7 +464,7 @@ public class ResourceLoader {
             for (var path : stream) {
                 try {
                     var map = JsonUtils.loadToMap(path, String.class, AbilityGroup.class);
-                    AbilitySystem.getAbilityGroupMap().putAll(map);
+                    GameData.getAbilityGroupMap().putAll(map);
                 } catch (Exception e) {
                     logger.error("Error loading ability groups at path: {}", path, e);
                 }

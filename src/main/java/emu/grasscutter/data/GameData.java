@@ -51,6 +51,7 @@ public class GameData {
     private static final Int2ObjectMap<QuestEncryptionKey> questsKeys = new Int2ObjectOpenHashMap<>();
     private static final Int2ObjectMap<SceneNpcBornData> npcBornData = new Int2ObjectOpenHashMap<>();
     private static final Map<String, AbilityEmbryoEntry> abilityEmbryos = new HashMap<>();
+    @Getter private static final Map<String, AbilityGroup> abilityGroupMap = new HashMap<>();
 
     // ExcelConfigs
     @Getter private static final Int2ObjectMap<ActivityCondExcelConfigData> activityCondExcelConfigDataMap = new Int2ObjectOpenHashMap<>();
