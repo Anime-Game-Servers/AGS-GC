@@ -5,7 +5,6 @@ import dev.morphia.annotations.Transient;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.common.quest.SubQuestData;
-import emu.grasscutter.data.excels.ChapterData;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.ActionReason;
 import emu.grasscutter.game.quest.enums.QuestCond;
@@ -101,9 +100,9 @@ public class GameQuest {
 
         getOwner().sendPacket(new PacketQuestListUpdateNotify(this));
 
-        if (ChapterData.beginQuestChapterMap.containsKey(subQuestId)) {
+        if (GameData.getBeginQuestChapterMap().containsKey(subQuestId)) {
             getOwner().sendPacket(new PacketChapterStateNotify(
-                ChapterData.beginQuestChapterMap.get(subQuestId).getId(),
+                GameData.getBeginQuestChapterMap().get(subQuestId).getId(),
                 ChapterState.CHAPTER_STATE_BEGIN
             ));
         }
@@ -203,9 +202,9 @@ public class GameQuest {
 
         getOwner().getProgressManager().tryUnlockOpenStates();
 
-        if (ChapterData.endQuestChapterMap.containsKey(subQuestId)) {
+        if (GameData.getEndQuestChapterMap().containsKey(subQuestId)) {
             mainQuest.getOwner().sendPacket(new PacketChapterStateNotify(
-                ChapterData.endQuestChapterMap.get(subQuestId).getId(),
+                GameData.getEndQuestChapterMap().get(subQuestId).getId(),
                 ChapterState.CHAPTER_STATE_END
             ));
         }
