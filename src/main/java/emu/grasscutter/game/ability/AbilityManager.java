@@ -152,6 +152,7 @@ public final class AbilityManager extends BasePlayerManager {
             case ABILITY_META_GLOBAL_FLOAT_VALUE -> this.handleGlobalFloatValue(invoke);
             case ABILITY_META_MODIFIER_DURABILITY_CHANGE -> this.handleModifierDurabilityChange(invoke);
             case ABILITY_META_ADD_NEW_ABILITY -> this.handleAddNewAbility(invoke);
+            case ABILITY_META_REMOVE_ABILITY -> this.handleRemoveAbility(invoke);
             case ABILITY_META_TRIGGER_ELEMENT_REACTION -> this.handleTriggerElementReaction(invoke);
             default -> {}
         }
@@ -484,19 +485,58 @@ public final class AbilityManager extends BasePlayerManager {
             return;
         }
 
-        var addAbility = AbilityMetaAddAbility.parseBy(invoke.getAbilityData(), player.getSession().getVersion());
+        var addAbility = AbilityMetaAddAbility
+            .parseBy(invoke.getAbilityData(), player.getSession().getVersion())
+            .getAbility();
 
-        var abilityName = Ability.getAbilityName(addAbility.getAbility().getAbilityName());
-
-        var ability = GameData.getAbilityData(abilityName);
-        if(ability == null) {
-            logger.info("handleAddNewAbility ability not found: {}", abilityName);
+        if (addAbility == null) {
+            logger.debug("handleAddNewAbility no ability to add");
             return;
         }
 
-        entity.getInstancedAbilities().add(new Ability(ability, entity, player));
+        var instancedId = addAbility.getInstancedAbilityId();
+        if (instancedId <= 0) {
+            logger.info("handleAddNewAbility invalid instancedAbilityId: {}", instancedId);
+            return;
+        }
 
-        logger.debug("Ability added to entity {} at index {}", entity.getId(), entity.getInstancedAbilities().size());
+        // avoid crash when ability_name is not present
+        var abilityName = Optional.ofNullable(addAbility.getAbilityName())
+            .map(Ability::getAbilityName)
+            .orElse(null);
+
+        var abilityData = GameData.getAbilityData(abilityName);
+        if (abilityData == null) {
+            logger.info("handleAddNewAbility ability not found: {}", abilityName);
+        }
+        else {
+            // Gracefully add ability, ensure instancedAbilityId is synced between client and server
+            // instancedId is 1-indexed
+            while (instancedId > entity.getInstancedAbilities().size()) {
+                entity.getInstancedAbilities().add(null);
+            }
+            var ability = new Ability(abilityData, entity, this.player);
+            entity.getInstancedAbilities().set(instancedId-1, ability);
+            logger.debug("Ability added to entity {} at index {}", entity.getId(), instancedId);
+        }
+    }
+
+    private void handleRemoveAbility(AbilityInvokeEntry invoke) {
+        var entity = this.player.getScene().getEntityById(invoke.getEntityId());
+        if(entity == null) {
+            logger.info("handleRemoveAbility entity not found: {}", invoke.getEntityId());
+            return;
+        }
+        // instancedId is 1-indexed
+        var instancedId = Optional.ofNullable(invoke.getHead())
+            .map(it -> it.getInstancedAbilityId())
+            .orElse(0);
+
+        if (instancedId <= 0) {
+            logger.info("handleRemoveAbility invalid id: {}", instancedId);
+            return;
+        }
+        entity.getInstancedAbilities().remove(instancedId-1);
     }
 
     /**
@@ -523,8 +563,14 @@ public final class AbilityManager extends BasePlayerManager {
     }
 
     public void addAbilityToEntity(GameEntity entity, AbilityData abilityData) {
+        var instancedAbilities = entity.getInstancedAbilities();
+        if (abilityData == null) {
+            // add null as placeholder for missing abilities
+            instancedAbilities.add(null);
+            return;
+        }
         Ability ability = new Ability(abilityData, entity, this.player);
-        entity.getInstancedAbilities().add(ability); //This are in order
+        instancedAbilities.add(ability); //This are in order
     }
 }
 
