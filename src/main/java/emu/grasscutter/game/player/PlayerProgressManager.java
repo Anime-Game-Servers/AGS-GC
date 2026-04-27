@@ -47,6 +47,7 @@ public class PlayerProgressManager extends BasePlayerDataManager {
         // add replacement costumes if necessary
         this.addReplaceCostumes();
 
+        player.getSession().send(new PacketPlayerInvestigationAllInfoNotify(this.player));
     }
 
     /******************************************************************************************************************
