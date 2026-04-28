@@ -13,6 +13,7 @@ import org.anime_game_servers.game_data_models.gi.data.general.LogicType;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,8 @@ public class BasicActivityConditionExecutor implements ActivityConditionExecutor
 
     private final Int2ObjectMap<PlayerActivityData> playerActivityDataByActivityCondId;
     private final Map<ActivityCondition, ActivityConditionBaseHandler> activityConditionsHandlers;
+    private final Set<Integer> forceActiveOverwrites;
+    private final Set<Integer> forceDisabledOverwrites;
 
     private static final UnknownActivityConditionHandler UNKNOWN_CONDITION_HANDLER = new UnknownActivityConditionHandler();
 
@@ -34,13 +37,21 @@ public class BasicActivityConditionExecutor implements ActivityConditionExecutor
         this.activityConditions = activityConditions;
         this.playerActivityDataByActivityCondId = playerActivityDataByActivityCondId;
         this.activityConditionsHandlers = activityConditionsHandlers;
+        
+        // get and merge all condition force overwrites, since the cond check itself is not activity aware
+        this.forceActiveOverwrites = activityConfigItemMap.values().stream()
+            .flatMap((activityConfigItem -> activityConfigItem.getCondForceActiveList().stream()))
+            .collect(Collectors.toSet());
+        this.forceDisabledOverwrites = activityConfigItemMap.values().stream()
+            .flatMap((activityConfigItem -> activityConfigItem.getCondForceDisabledList().stream()))
+            .collect(Collectors.toSet());
     }
 
     @Override
     public List<Integer> getMeetActivitiesConditions(List<Integer> condIds) {
         return condIds.stream()
             .filter(this::meetsCondition)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @Override
@@ -49,6 +60,14 @@ public class BasicActivityConditionExecutor implements ActivityConditionExecutor
 
         if (condData == null) {
             Grasscutter.getLogger().error("Could not find condition for activity with id = {}", activityCondId);
+            return false;
+        }
+
+        // apply config overwrites, if set
+        if(forceActiveOverwrites.contains(activityCondId)){
+            return true;
+        }
+        if(forceDisabledOverwrites.contains(activityCondId)){
             return false;
         }
 

@@ -136,9 +136,12 @@ public abstract class ActivityHandler<PLAYER_DETAIL_DATA> {
     }
 
     public ActivityInfo toProto(PlayerActivityData playerActivityData, ActivityConditionExecutor conditionExecutor){
+        val activityId = activityConfigItem.getActivityId();
+        val typeId = activityData.getActivityType() != null ? activityData.getActivityType().getId() : 0;
+
         val proto = new ActivityInfo();
-        proto.setActivityId(activityConfigItem.getActivityId());
-        proto.setActivityType(activityConfigItem.getActivityType());
+        proto.setActivityId(activityId);
+        proto.setActivityType(typeId);
         proto.setScheduleId(activityConfigItem.getScheduleId());
         proto.setBeginTime(DateHelper.getUnixTime(activityConfigItem.getBeginTime()));
         proto.setFirstDayStartTime(DateHelper.getUnixTime(activityConfigItem.getBeginTime()));
