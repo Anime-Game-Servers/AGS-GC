@@ -2,11 +2,8 @@ package emu.grasscutter.game.activity;
 
 import com.esotericsoftware.reflectasm.ConstructorAccess;
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.excels.ActivityData;
-import emu.grasscutter.data.server.ActivityCondGroup;
 import emu.grasscutter.game.activity.condition.ActivityConditionExecutor;
 import emu.grasscutter.game.player.Player;
-import emu.grasscutter.game.props.WatcherTriggerType;
 import emu.grasscutter.game.quest.enums.QuestCond;
 import emu.grasscutter.game.world.Scene;
 import emu.grasscutter.utils.DateHelper;
@@ -16,6 +13,9 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import org.anime_game_servers.multi_proto.gi.messages.activity.general.ActivityInfo;
+import org.anime_game_servers.game_data_models.gi.data.activity.ActivityCondGroupData;
+import org.anime_game_servers.game_data_models.gi.data.activity.ActivityData;
+import org.anime_game_servers.game_data_models.gi.data.watcher.WatcherTriggerType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,7 +40,7 @@ public abstract class ActivityHandler<PLAYER_DETAIL_DATA> {
         }
         val activityId = activityInfo.getActivityId();
 
-        val activityExtraInfo = GameData.getActivityExtraMap().get(activityId);
+        val activityExtraInfo = GameData.getActivityExtraInfoMap().get(activityId);
         if(activityExtraInfo == null || !activityExtraInfo.hasDefaultGroups()){
             return;
         }
@@ -51,9 +51,19 @@ public abstract class ActivityHandler<PLAYER_DETAIL_DATA> {
     public void initWatchers(Map<WatcherTriggerType, ConstructorAccess<?>> activityWatcherTypeMap){
         activityData = GameData.getActivityDataMap().get(activityConfigItem.getActivityId());
 
+        if(activityData == null || activityData.getWatcherIds() == null){
+            return;
+        }
+
         // add watcher to map by id
-        activityData.getWatcherDataList().forEach(watcherData -> {
-            var watcherType = activityWatcherTypeMap.get(watcherData.getTriggerConfig().getWatcherTriggerType());
+        activityData.getWatcherIds().forEach(watcherId -> {
+            val watcherData = GameData.getActivityWatcherDataMap().get(watcherId.intValue());
+            if(watcherData == null || watcherData.getTriggerConfig() == null || watcherData.getTriggerConfig().getTriggerType() == null){
+                // todo log
+                return;
+            }
+            val triggerType = watcherData.getTriggerConfig().getTriggerType();
+            var watcherType = activityWatcherTypeMap.get(triggerType);
             ActivityWatcher watcher;
             if(watcherType != null){
                 watcher = (ActivityWatcher) watcherType.newInstance();
@@ -64,19 +74,19 @@ public abstract class ActivityHandler<PLAYER_DETAIL_DATA> {
             watcher.setWatcherId(watcherData.getId());
             watcher.setActivityHandler(this);
             watcher.setActivityWatcherData(watcherData);
-            watchersMap.computeIfAbsent(watcherData.getTriggerConfig().getWatcherTriggerType(), k -> new ArrayList<>());
-            watchersMap.get(watcherData.getTriggerConfig().getWatcherTriggerType()).add(watcher);
+            watchersMap.computeIfAbsent(triggerType, k -> new ArrayList<>());
+            watchersMap.get(triggerType).add(watcher);
         });
     }
 
     public void initCurrencyHandlers(PlayerActivityData playerActivityData){}
 
     protected void triggerCondEvents(Player player){
-        if(activityData == null){
+        if(activityData == null || activityData.getCondGroupIds() == null){
             return;
         }
         val questManager = player.getQuestManager();
-        activityData.getCondGroupId().forEach(condGroupId -> {
+        activityData.getCondGroupIds().forEach(condGroupId -> {
             val condGroup = GameData.getActivityCondGroupMap().get((int)condGroupId);
             if(condGroup != null)
                 condGroup.getCondIds().forEach(condID -> questManager.queueEvent(QuestCond.QUEST_COND_ACTIVITY_COND, condID));
@@ -84,12 +94,12 @@ public abstract class ActivityHandler<PLAYER_DETAIL_DATA> {
     }
 
     private List<Integer> getActivityConditions(){
-        if(activityData == null){
+        if(activityData == null || activityData.getCondGroupIds() == null){
             return new ArrayList<>();
         }
-        return activityData.getCondGroupId().stream().map(condGroupId -> GameData.getActivityCondGroupMap().get((int)condGroupId))
+        return activityData.getCondGroupIds().stream().map(condGroupId -> GameData.getActivityCondGroupMap().get((int)condGroupId))
             .filter(Objects::nonNull)
-            .map(ActivityCondGroup::getCondIds)
+            .map(ActivityCondGroupData::getCondIds)
             .flatMap(Collection::stream)
             .toList();
     }
@@ -117,15 +127,21 @@ public abstract class ActivityHandler<PLAYER_DETAIL_DATA> {
         return playerActivityData;
     }
 
-    public boolean isBannerCondMeet(PlayerActivityData playerActivityData, int scheduleId){
-        // todo check for activity condition with action of ACTIVITY_ACTION_ACTIVITY_BANNER_NOTIFY and if meet show
-        return false;
+    public boolean isBannerCondMeet(PlayerActivityData playerActivityData, int scheduleId, ActivityConditionExecutor conditionExecutor){
+        val activityExtraInfo = GameData.getActivityExtraInfoMap().get(activityConfigItem.getActivityId());
+        if(activityExtraInfo == null || !activityExtraInfo.hasBannerConditionId()){
+            return false;
+        }
+        return getMeetConditions(conditionExecutor).contains(activityExtraInfo.getBannerConditionId());
     }
 
     public ActivityInfo toProto(PlayerActivityData playerActivityData, ActivityConditionExecutor conditionExecutor){
+        val activityId = activityConfigItem.getActivityId();
+        val typeId = activityData.getActivityType() != null ? activityData.getActivityType().getId() : 0;
+
         val proto = new ActivityInfo();
-        proto.setActivityId(activityConfigItem.getActivityId());
-        proto.setActivityType(activityConfigItem.getActivityType());
+        proto.setActivityId(activityId);
+        proto.setActivityType(typeId);
         proto.setScheduleId(activityConfigItem.getScheduleId());
         proto.setBeginTime(DateHelper.getUnixTime(activityConfigItem.getBeginTime()));
         proto.setFirstDayStartTime(DateHelper.getUnixTime(activityConfigItem.getBeginTime()));

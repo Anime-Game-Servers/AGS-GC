@@ -7,19 +7,18 @@ import emu.grasscutter.data.GameData;
 import emu.grasscutter.game.activity.condition.*;
 import emu.grasscutter.game.player.BasePlayerManager;
 import emu.grasscutter.game.player.Player;
-import emu.grasscutter.game.props.ActivityType;
-import emu.grasscutter.game.props.WatcherTriggerType;
 import emu.grasscutter.game.world.Scene;
 import emu.grasscutter.server.packet.activity.PacketActivityBannerNotify;
 import emu.grasscutter.server.packet.send.PacketActivityScheduleInfoNotify;
 import lombok.Getter;
 import lombok.val;
 import org.anime_game_servers.multi_proto.gi.messages.activity.general.ActivityInfo;
-import org.reflections.Reflections;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import org.anime_game_servers.game_data_models.gi.data.activity.ActivityType;
+import org.anime_game_servers.game_data_models.gi.data.watcher.WatcherTriggerType;
 
 @Getter
 public class ActivityManager extends BasePlayerManager {
@@ -39,7 +38,7 @@ public class ActivityManager extends BasePlayerManager {
         // scan activity type handler & watcher type
         var activityHandlerTypeMap = new HashMap<ActivityType, ConstructorAccess<?>>();
         var activityWatcherTypeMap = new HashMap<WatcherTriggerType, ConstructorAccess<?>>();
-        var reflections = new Reflections(ActivityManager.class.getPackage().getName());
+        var reflections = Grasscutter.reflector;
 
         reflections.getSubTypesOf(ActivityHandler.class).forEach(item -> {
             var typeName = item.getAnnotation(GameActivity.class);
@@ -53,12 +52,14 @@ public class ActivityManager extends BasePlayerManager {
         try {
             DataLoader.loadList("ActivityConfig.json", ActivityConfigItem.class).forEach(item -> {
                 item.onLoad();
-                var activityData = GameData.getActivityDataMap().get(item.getActivityId());
+                val activityData = GameData.getActivityDataMap().get(item.getActivityId());
                 if (activityData == null) {
                     Grasscutter.getLogger().warn("activity {} not exist.", item.getActivityId());
                     return;
                 }
-                var activityHandlerType = activityHandlerTypeMap.get(ActivityType.getTypeByName(activityData.getActivityType()));
+
+                // todo handle exception
+                val activityHandlerType = activityHandlerTypeMap.get(activityData.getActivityType());
                 ActivityHandler activityHandler;
 
                 if (activityHandlerType != null) {
@@ -190,7 +191,7 @@ public class ActivityManager extends BasePlayerManager {
     public void checkAndNotifyActivityBanner(int activityId, int scheduleId){
         var activityHandler = activityConfigItemMap.get(activityId).getActivityHandler();
         var activityData = playerActivityDataMap.get(activityId);
-        if(activityHandler.isBannerCondMeet(activityData, scheduleId) && !activityData.isBannerCleared(scheduleId)){
+        if(activityHandler.isBannerCondMeet(activityData, scheduleId, conditionExecutor) && !activityData.isBannerCleared(scheduleId)){
             player.sendPacket(new PacketActivityBannerNotify(activityId, scheduleId));
         }
     }

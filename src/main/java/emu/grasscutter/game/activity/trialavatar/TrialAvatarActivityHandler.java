@@ -3,25 +3,25 @@ package emu.grasscutter.game.activity.trialavatar;
 import com.esotericsoftware.reflectasm.ConstructorAccess;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.excels.ActivityWatcherData;
-import emu.grasscutter.data.excels.TrialAvatarActivityDataData;
 import emu.grasscutter.game.activity.ActivityWatcher;
 import emu.grasscutter.game.activity.DefaultWatcher;
 import emu.grasscutter.game.dungeons.settle_listeners.TrialAvatarDungeonSettleListener;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.ActionReason;
-import emu.grasscutter.game.props.WatcherTriggerType;
 import emu.grasscutter.game.activity.ActivityHandler;
 import emu.grasscutter.game.activity.GameActivity;
 import emu.grasscutter.game.activity.PlayerActivityData;
-import emu.grasscutter.game.props.ActivityType;
 import emu.grasscutter.server.packet.send.PacketActivityInfoNotify;
 import emu.grasscutter.server.packet.send.PacketScenePlayerLocationNotify;
 import emu.grasscutter.utils.JsonUtils;
 
 import java.util.*;
 import lombok.*;
+import org.anime_game_servers.game_data_models.gi.data.activity.trial.TrialAvatarActivityDataData;
+import org.anime_game_servers.game_data_models.gi.data.watcher.WatcherTriggerConfig;
 import org.anime_game_servers.multi_proto.gi.messages.activity.general.ActivityInfo;
+import org.anime_game_servers.game_data_models.gi.data.activity.ActivityType;
+import org.anime_game_servers.game_data_models.gi.data.watcher.WatcherTriggerType;
 
 @GameActivity(ActivityType.NEW_ACTIVITY_TRIAL_AVATAR)
 public class TrialAvatarActivityHandler extends ActivityHandler<TrialAvatarPlayerData> {
@@ -74,7 +74,7 @@ public class TrialAvatarActivityHandler extends ActivityHandler<TrialAvatarPlaye
 
     public List<String> getTriggerParamList() {
         return getActivityData(this.selectedTrialAvatarIndex).map(TrialAvatarActivityDataData::getTriggerConfig)
-            .map(ActivityWatcherData.WatcherTrigger::getParamList).orElse(List.of());
+            .map(WatcherTriggerConfig::getParamList).orElse(List.of());
     }
 
     public boolean enterTrialDungeon(@NonNull Player player, int trialAvatarIndexId, int enterPointId) {
@@ -92,9 +92,7 @@ public class TrialAvatarActivityHandler extends ActivityHandler<TrialAvatarPlaye
     }
 
     public List<Integer> getBattleAvatarsList() {
-        return getActivityData(this.selectedTrialAvatarIndex).map(TrialAvatarActivityDataData::getBattleAvatarsList)
-            .filter(avatarStr -> !avatarStr.isBlank()).map(avatarStr -> avatarStr.split(",")).stream()
-            .flatMap(Arrays::stream).map(Integer::parseInt).toList();
+        return getActivityData(this.selectedTrialAvatarIndex).map(TrialAvatarActivityDataData::getBattleAvatarsList).get();
     }
 
     public boolean getReward(@NonNull Player player, int trialAvatarIndexId) {
@@ -110,7 +108,7 @@ public class TrialAvatarActivityHandler extends ActivityHandler<TrialAvatarPlaye
         val rewardParam = GameData.getRewardDataMap().get(rewardInfo.getRewardId());
         if (rewardParam == null) return false;
 
-        player.getInventory().addItemParamDatas(rewardParam.getRewardItemList(), ActionReason.TrialAvatarActivityFirstPassReward);
+        player.getInventory().addRewardData(rewardParam, ActionReason.TrialAvatarActivityFirstPassReward);
         rewardInfo.setReceivedReward(true);
         playerActivityData.get().setDetail(trialAvatarPlayerData);
         playerActivityData.get().save();

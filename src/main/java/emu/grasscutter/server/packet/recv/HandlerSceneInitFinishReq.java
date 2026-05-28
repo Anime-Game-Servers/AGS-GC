@@ -42,9 +42,6 @@ public class HandlerSceneInitFinishReq extends TypedPacketHandler<SceneInitFinis
 			session.send(new PacketSceneAreaWeatherNotify(session.getPlayer()));
 		session.send(new PacketScenePlayerInfoNotify(session.getPlayer().getWorld()));
 
-		// Refresh avatar abilities with level entity
-		session.getPlayer().setAvatarsAbilityForScene(session.getPlayer().getScene());
-
 		// Team info
 		session.send(new PacketSceneTeamUpdateNotify(session.getPlayer()));
 		session.send(new PacketSyncTeamEntityNotify(session.getPlayer()));
