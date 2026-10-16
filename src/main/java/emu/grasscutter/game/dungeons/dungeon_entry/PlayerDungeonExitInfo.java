@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Getter
 @ToString
-@Builder(builderMethodName = "of", builderClassName = "Builder", setterPrefix = "set")
+@Builder(builderMethodName = "of", setterPrefix = "set")
 public class PlayerDungeonExitInfo {
     // allows optional lambda check operation
     @Setter private Integer sceneId;

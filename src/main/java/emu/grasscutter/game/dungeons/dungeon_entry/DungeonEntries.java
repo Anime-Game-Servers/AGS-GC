@@ -13,7 +13,7 @@ import java.util.Map;
  * */
 @Getter
 @ToString
-@Builder(builderMethodName = "of", builderClassName = "Builder", setterPrefix = "set")
+@Builder(builderMethodName = "of", setterPrefix = "set")
 public class DungeonEntries {
     private final int dungeonId;
     private final PointData entryPoint;
