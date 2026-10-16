@@ -428,6 +428,9 @@ public class ResourceLoader {
         val pattern = Pattern.compile("scene([0-9]+)_weather_areas\\.json");
         try (val dirStream = Files.newDirectoryStream(getResourcePath("Scripts/Scene"))) {
             dirStream.forEach(dirPath -> {
+                if(!Files.isDirectory(dirPath)){
+                    return;
+                }
                 try (val stream = Files.newDirectoryStream(dirPath, "scene*_weather_areas.json")){
                     stream.forEach(path -> {
                         val matcher = pattern.matcher(path.getFileName().toString());
@@ -924,6 +927,9 @@ public class ResourceLoader {
         val pattern = Pattern.compile("scene([0-9]+)_point_array\\.json");
         try (val dirStream = Files.newDirectoryStream(getResourcePath("Scripts/Scene"))) {
             dirStream.forEach(dirPath -> {
+                if(!Files.isDirectory(dirPath)){
+                    return;
+                }
                 try (val stream = Files.newDirectoryStream(dirPath, "scene*_point_array.json")) {
                     stream.forEach(path -> {
                         val matcher = pattern.matcher(path.getFileName().toString());
