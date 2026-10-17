@@ -2,7 +2,6 @@ package emu.grasscutter.game.dungeons;
 
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.excels.DungeonElementChallengeData;
 import emu.grasscutter.game.LogicTypeUtils;
 import emu.grasscutter.game.activity.trialavatar.TrialAvatarActivityHandler;
 import emu.grasscutter.game.dungeons.dungeon_results.BaseDungeonResult;
@@ -24,6 +23,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.val;
+import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonElementChallengeData;
 import org.anime_game_servers.multi_proto.gi.messages.general.avatar.GrantReason;
 import org.anime_game_servers.multi_proto.gi.messages.scene.entity.WeeklyBossResinDiscountInfo;
 import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonData;

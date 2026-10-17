@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
+// TODO phase out when moving to data models quests
+@Deprecated
 public enum LogicType {
     LOGIC_NONE(0),
     LOGIC_AND(1),

@@ -99,9 +99,7 @@ public class ResourceLoader {
         }));
 
         val jsonParser = new JsonDataParser(json);
-        dataLoader = new DefaultDataLoader();
-        // register GI Models
-        dataLoader.registerDataClassSource(GIDataModelRegistry.INSTANCE);
+        dataLoader = new DefaultDataLoader(true);
 
         // add default json parser
         dataLoader.setParser(FileType.JSON, jsonParser);
@@ -243,6 +241,8 @@ public class ResourceLoader {
             field.setAccessible(false);
             list.forEach(value -> map.put(value.getIntKey(), value));
             logger.info("loaded {} IntKey entries for {}", map.size(), targetClass.getName());
+        } else {
+            logger.info("null result for IntKey load of {}", targetClass.getName());
         }
     }
 
