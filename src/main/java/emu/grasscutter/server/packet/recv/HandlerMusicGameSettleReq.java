@@ -4,7 +4,7 @@ import emu.grasscutter.game.activity.musicgame.MusicGameActivityHandler;
 import emu.grasscutter.game.activity.musicgame.MusicGamePlayerData;
 import emu.grasscutter.net.packet.TypedPacketHandler;
 import emu.grasscutter.server.game.GameSession;
-import emu.grasscutter.server.packet.send.PacketActivityInfoNotify;
+import emu.grasscutter.server.packet.activity.PacketActivityInfoNotify;
 import emu.grasscutter.server.packet.send.PacketMusicGameSettleRsp;
 import lombok.val;
 import org.anime_game_servers.multi_proto.gi.messages.activity.music_game.MusicGameSettleReq;

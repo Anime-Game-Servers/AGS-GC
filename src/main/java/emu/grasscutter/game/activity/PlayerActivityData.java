@@ -7,7 +7,7 @@ import emu.grasscutter.data.GameData;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.ActionReason;
-import emu.grasscutter.server.packet.send.PacketActivityUpdateWatcherNotify;
+import emu.grasscutter.server.packet.activity.PacketActivityUpdateWatcherNotify;
 import emu.grasscutter.utils.JsonUtils;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

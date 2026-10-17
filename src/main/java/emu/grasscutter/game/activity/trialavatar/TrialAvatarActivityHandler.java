@@ -11,7 +11,7 @@ import emu.grasscutter.game.props.ActionReason;
 import emu.grasscutter.game.activity.ActivityHandler;
 import emu.grasscutter.game.activity.GameActivity;
 import emu.grasscutter.game.activity.PlayerActivityData;
-import emu.grasscutter.server.packet.send.PacketActivityInfoNotify;
+import emu.grasscutter.server.packet.activity.PacketActivityInfoNotify;
 import emu.grasscutter.server.packet.send.PacketScenePlayerLocationNotify;
 import emu.grasscutter.utils.JsonUtils;
 

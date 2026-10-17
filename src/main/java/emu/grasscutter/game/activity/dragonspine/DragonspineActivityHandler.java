@@ -4,7 +4,7 @@ import emu.grasscutter.game.activity.ActivityHandler;
 import emu.grasscutter.game.activity.GameActivity;
 import emu.grasscutter.game.activity.PlayerActivityData;
 import emu.grasscutter.game.inventory.Inventory;
-import emu.grasscutter.server.packet.send.*;
+import emu.grasscutter.server.packet.activity.dragonspine.PacketDragonspineCoinChangeNotify;
 import lombok.val;
 import org.anime_game_servers.game_data_models.gi.data.activity.ActivityType;
 import org.anime_game_servers.multi_proto.gi.messages.activity.dragonspine.DragonSpineActivityDetailInfo;

@@ -6,7 +6,7 @@ import emu.grasscutter.game.activity.musicgame.MusicGameBeatmap;
 import emu.grasscutter.game.activity.musicgame.MusicGamePlayerData;
 import emu.grasscutter.net.packet.TypedPacketHandler;
 import emu.grasscutter.server.game.GameSession;
-import emu.grasscutter.server.packet.send.PacketActivityInfoNotify;
+import emu.grasscutter.server.packet.activity.PacketActivityInfoNotify;
 import emu.grasscutter.server.packet.send.PacketMusicGameCreateBeatmapRsp;
 import emu.grasscutter.utils.Utils;
 import lombok.val;

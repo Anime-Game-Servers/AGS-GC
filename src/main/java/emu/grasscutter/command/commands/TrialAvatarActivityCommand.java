@@ -5,7 +5,7 @@ import emu.grasscutter.command.CommandHandler;
 import emu.grasscutter.game.activity.trialavatar.TrialAvatarActivityHandler;
 import emu.grasscutter.game.activity.trialavatar.TrialAvatarPlayerData;
 import emu.grasscutter.game.player.Player;
-import emu.grasscutter.server.packet.send.PacketActivityInfoNotify;
+import emu.grasscutter.server.packet.activity.PacketActivityInfoNotify;
 import emu.grasscutter.utils.JsonUtils;
 
 import java.util.List;

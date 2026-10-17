@@ -9,7 +9,7 @@ import emu.grasscutter.game.player.BasePlayerManager;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.world.Scene;
 import emu.grasscutter.server.packet.activity.PacketActivityBannerNotify;
-import emu.grasscutter.server.packet.send.PacketActivityScheduleInfoNotify;
+import emu.grasscutter.server.packet.activity.PacketActivityScheduleInfoNotify;
 import lombok.Getter;
 import lombok.val;
 import org.anime_game_servers.multi_proto.gi.messages.activity.general.ActivityInfo;

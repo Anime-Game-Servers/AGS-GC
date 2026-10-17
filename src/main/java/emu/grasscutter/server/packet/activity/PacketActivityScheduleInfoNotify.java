@@ -1,4 +1,4 @@
-package emu.grasscutter.server.packet.send;
+package emu.grasscutter.server.packet.activity;
 
 import emu.grasscutter.game.activity.ActivityConfigItem;
 import emu.grasscutter.net.packet.BaseTypedPacket;
