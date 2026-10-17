@@ -242,7 +242,7 @@ public class ResourceLoader {
             val map = (Int2ObjectMap<Object>) field.get(null);
             field.setAccessible(false);
             list.forEach(value -> map.put(value.getIntKey(), value));
-            logger.error("loaded {} IntKey entries for {}", map.size(), targetClass.getName());
+            logger.info("loaded {} IntKey entries for {}", map.size(), targetClass.getName());
         }
     }
 
@@ -254,7 +254,7 @@ public class ResourceLoader {
             val map = (Map<String, Object>) field.get(null);
             field.setAccessible(false);
             list.forEach(value -> map.put(value.getStringKey(), value));
-            logger.error("loaded {} StringKey entries for {}", map.size(), targetClass.getName());
+            logger.info("loaded {} StringKey entries for {}", map.size(), targetClass.getName());
         }
     }
 
