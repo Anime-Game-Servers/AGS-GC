@@ -41,6 +41,7 @@ import org.anime_game_servers.game_data_models.gi.data.activity.dragonspine.Drag
 import org.anime_game_servers.game_data_models.gi.data.city.CityData;
 import org.anime_game_servers.game_data_models.gi.data.city.CityLevelUpData;
 import org.anime_game_servers.game_data_models.gi.data.city.CityTaskOpenData;
+import org.anime_game_servers.game_data_models.gi.data.codex.CodexAnimalData;
 import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonData;
 import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonElementChallengeData;
 import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonEntryData;
@@ -65,6 +66,11 @@ import org.anime_game_servers.game_data_models.gi.data.trial.TrialAvatarData;
 import org.anime_game_servers.game_data_models.gi.data.trial.TrialAvatarTemplateData;
 import org.anime_game_servers.game_data_models.gi.data.trial.TrialAvatarFetterData;
 import org.anime_game_servers.game_data_models.gi.data.trial.TrialReliquaryData;
+import org.anime_game_servers.game_data_models.gi.data.codex.CodexMaterialData;
+import org.anime_game_servers.game_data_models.gi.data.codex.CodexQuestData;
+import org.anime_game_servers.game_data_models.gi.data.codex.CodexReliquaryData;
+import org.anime_game_servers.game_data_models.gi.data.codex.CodexViewpointData;
+import org.anime_game_servers.game_data_models.gi.data.codex.CodexWeaponData;
 import org.anime_game_servers.gi_lua.models.quest.QuestData;
 import org.anime_game_servers.gi_lua.models.quest.RewindData;
 import org.anime_game_servers.gi_lua.models.scene.DummyPoint;
@@ -146,13 +152,14 @@ public class GameData {
     @AutoResource @Getter private static final Int2ObjectMap<CityData> cityDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<CityLevelUpData> cityLevelUpDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<CityTaskOpenData> cityTaskOpenDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final ArrayList<CodexReliquaryData> codexReliquaryArrayList = new ArrayList<>();
-    @Getter private static final Int2ObjectMap<CodexAnimalData> codexAnimalDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<CodexMaterialData> codexMaterialDataIdMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<CodexQuestData> codexQuestDataIdMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<CodexReliquaryData> codexReliquaryDataIdMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<CodexWeaponData> codexWeaponDataIdMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<CodexViewpointData> codexViewpointDataIdMap = new Int2ObjectOpenHashMap<>();
+    // Codex/Archive
+    @AutoResource @Getter private static final Int2ObjectMap<CodexAnimalData> codexAnimalDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CodexMaterialData> codexMaterialDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CodexQuestData> codexQuestDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CodexReliquaryData> codexReliquaryDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CodexWeaponData> codexWeaponDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CodexViewpointData> codexViewpointDataMap = new Int2ObjectOpenHashMap<>();
+
     @Getter private static final Int2ObjectMap<CombineData> combineDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<CookBonusData> cookBonusDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<CookRecipeData> cookRecipeDataMap = new Int2ObjectOpenHashMap<>();
@@ -232,12 +239,6 @@ public class GameData {
     @Getter private static final Int2ObjectMap<QuestData> teleportDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<Map<String, DummyPoint>> dummyPointMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<RefreshPolicyExcelConfigData> refreshPolicyExcelConfigDataMap = new Int2ObjectOpenHashMap<>();
-    // The following are accessed via getMapByResourceDef, and will show as unused
-    private static final Int2ObjectMap<CodexMaterialData> codexMaterialDataMap = new Int2ObjectOpenHashMap<>();
-    private static final Int2ObjectMap<CodexQuestData> codexQuestDataMap = new Int2ObjectOpenHashMap<>();
-    private static final Int2ObjectMap<CodexReliquaryData> codexReliquaryDataMap = new Int2ObjectOpenHashMap<>();
-    private static final Int2ObjectMap<CodexWeaponData> codexWeaponDataMap = new Int2ObjectOpenHashMap<>();
-    private static final Int2ObjectMap<CodexViewpointData> codexViewpointDataMap = new Int2ObjectOpenHashMap<>();
 
     @Getter private static final Int2ObjectMap<List<DungeonDropEntry>> dungeonDropDataMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<TransPointRewardData> transPointRewardData = new Int2ObjectOpenHashMap<>();
@@ -292,6 +293,13 @@ public class GameData {
     @Getter private static final Map<Integer, List<ScenePointArrayData>> scenePointArrayData = new HashMap<>();
     @QuickAccessCache @Getter private static final Map<Integer, ChapterData> beginQuestChapterMap = new HashMap<>();
     @QuickAccessCache @Getter private static final Map<Integer, ChapterData> endQuestChapterMap = new HashMap<>();
+
+    // Codex/Archive
+    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexMaterialData> codexMaterialDataIdMap = new Int2ObjectOpenHashMap<>();
+    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexQuestData> codexQuestDataIdMap = new Int2ObjectOpenHashMap<>();
+    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexReliquaryData> codexReliquaryDataIdMap = new Int2ObjectOpenHashMap<>();
+    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexWeaponData> codexWeaponDataIdMap = new Int2ObjectOpenHashMap<>();
+    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexViewpointData> codexViewpointDataIdMap = new Int2ObjectOpenHashMap<>();
 
     // Getters with different names that stay for now
     public static Int2ObjectMap<QuestEncryptionKey> getMainQuestEncryptionMap() {return questsKeys;}
@@ -434,8 +442,47 @@ public class GameData {
         trialAvatarIndexIdTrialActivityDataDataMap.put(data.getTrialAvatarIndexId(), data.getId());
     }
 
+
+    public static void putCodexQuestDataCache(CodexQuestData data){
+        codexQuestDataIdMap.put(data.getParentQuestId(), data);
+    }
+    public static void putCodexMaterialDataCache(CodexMaterialData data){
+        codexMaterialDataIdMap.put(data.getMaterialId(), data);
+    }
+
+
+    public static int getReliquaryId(int suiteId, int levelId) {
+        return suiteId << 4 + levelId;
+    }
+    public static int getReliquaryId(CodexReliquaryData data) {
+        return getReliquaryId(data.getSuitId(), data.getLevel());
+    }
+
+    public static void putCodexReliquaryDataCache(CodexReliquaryData data){
+        codexReliquaryDataIdMap.put(getReliquaryId(data), data);
+    }
+
+    @Nullable
+    public static CodexReliquaryData getCodexReliquaryBySuiteId(int suiteId, int levelId){
+        return codexReliquaryDataIdMap.get(getReliquaryId(suiteId, levelId));
+    }
+
+    public static int getViewpointId(int groupId, int configId) {
+        return groupId << 32 + configId;
+    }
+    public static int getViewpointId(CodexViewpointData data) {
+        return getViewpointId(data.getGroupId(), data.getConfigId());
+    }
+
+    public static void putCodexViewpointDataCache(CodexViewpointData data){
+        codexViewpointDataIdMap.put(getViewpointId(data), data);
+    }
+    public static void putCodexWeaponDataCache(CodexWeaponData data){
+        codexWeaponDataIdMap.put(data.getWeaponId(), data);
+    }
+
     public static CodexViewpointData getViewCodexByGroupdCfg(int groupId, int cfgId) {
-        return codexViewpointDataIdMap.get(CodexViewpointData.getViewpointId(groupId, cfgId));
+        return codexViewpointDataIdMap.get(getViewpointId(groupId, cfgId));
     }
 
     public static WeatherTemplateData getWeatherTemplateData(@Nonnull String templateName, @Nonnull ClimateType climateType){

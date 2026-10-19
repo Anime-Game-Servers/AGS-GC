@@ -7,7 +7,6 @@ import emu.grasscutter.data.binout.SceneNpcBornEntry;
 import emu.grasscutter.data.binout.routes.Route;
 import emu.grasscutter.data.binout.routes.RouteType;
 import emu.grasscutter.data.common.ScenePointArrayData;
-import emu.grasscutter.data.excels.CodexAnimalData;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.avatar.Avatar;
 import emu.grasscutter.game.dungeons.DungeonManager;
@@ -38,6 +37,7 @@ import kotlin.Pair;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import org.anime_game_servers.game_data_models.gi.data.codex.CodexAnimalCountType;
 import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonData;
 import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonPassConditionType;
 import org.anime_game_servers.game_data_models.gi.data.scene.weather.ClimateType;
@@ -426,10 +426,10 @@ public class Scene {
             if (attacker instanceof EntityClientGadget gadgetAttacker) {
                 val clientGadgetOwner = getEntityById(gadgetAttacker.getOwnerEntityId());
                 if (clientGadgetOwner instanceof EntityAvatar) {
-                    gadgetAttacker.getOwner().getCodex().checkAnimal(target, CodexAnimalData.CountType.CODEX_COUNT_TYPE_KILL);
+                    gadgetAttacker.getOwner().getCodex().checkAnimal(target, CodexAnimalCountType.CODEX_COUNT_TYPE_KILL);
                 }
             } else if (attacker instanceof EntityAvatar avatarAttacker) {
-                avatarAttacker.getPlayer().getCodex().checkAnimal(target, CodexAnimalData.CountType.CODEX_COUNT_TYPE_KILL);
+                avatarAttacker.getPlayer().getCodex().checkAnimal(target, CodexAnimalCountType.CODEX_COUNT_TYPE_KILL);
             }
 
 

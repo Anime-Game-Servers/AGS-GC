@@ -49,6 +49,7 @@ import lombok.val;
 import org.anime_game_servers.core.base.interfaces.IntKey;
 import org.anime_game_servers.core.base.interfaces.StringKey;
 import org.anime_game_servers.game_data_models.gi.GIDataModelRegistry;
+import org.anime_game_servers.game_data_models.gi.data.codex.*;
 import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonType;
 import org.anime_game_servers.game_data_models.gi.helpers.TextHashUtilsKt;
 import org.anime_game_servers.game_data_models.loader.*;
@@ -288,6 +289,7 @@ public class ResourceLoader {
         initAvatarCaches();
         initTrialActivityCaches();
         initChaptersCache();
+        initCodexCaches();
     }
 
     public static void initAvatarCaches(){
@@ -297,6 +299,14 @@ public class ResourceLoader {
 
     public static void initTrialActivityCaches(){
         GameData.getTrialAvatarActivityDataDataMap().values().forEach(GameData::putTrialActivityDataCache);
+    }
+
+    public static void initCodexCaches(){
+        GameData.getCodexMaterialDataMap().values().stream().filter(CodexMaterialData::isDisuseNonNull).forEach(GameData::putCodexMaterialDataCache);
+        GameData.getCodexQuestDataMap().values().stream().filter(CodexQuestData::isDisuseNonNull).forEach(GameData::putCodexQuestDataCache);
+        GameData.getCodexReliquaryDataMap().values().stream().filter(CodexReliquaryData::isDisuseNonNull).forEach(GameData::putCodexReliquaryDataCache);
+        GameData.getCodexViewpointDataMap().values().stream().filter(CodexViewpointData::isDisuseNonNull).forEach(GameData::putCodexViewpointDataCache);
+        GameData.getCodexWeaponDataMap().values().stream().filter(CodexWeaponData::isDisuseNonNull).forEach(GameData::putCodexWeaponDataCache);
     }
 
     public static void initChaptersCache(){
