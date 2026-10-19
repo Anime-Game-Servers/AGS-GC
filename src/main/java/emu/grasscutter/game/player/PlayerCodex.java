@@ -3,16 +3,18 @@ package emu.grasscutter.game.player;
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Transient;
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.excels.CodexAnimalData;
-import emu.grasscutter.data.excels.CodexViewpointData;
 import emu.grasscutter.game.entity.EntityMonster;
 import emu.grasscutter.game.entity.GameEntity;
 import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.server.packet.send.PacketCodexDataUpdateNotify;
 import lombok.Getter;
 import lombok.val;
+import org.anime_game_servers.game_data_models.gi.data.codex.CodexAnimalCountType;
+import org.anime_game_servers.game_data_models.gi.data.codex.CodexReliquaryData;
+import org.anime_game_servers.game_data_models.gi.data.codex.CodexViewpointData;
 import org.anime_game_servers.multi_proto.gi.messages.codex.CodexType;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 @Entity
@@ -26,7 +28,6 @@ public class PlayerCodex {
     @Getter private Set<Integer> unlockedBook;
     @Getter private Set<Integer> unlockedTip;
     @Getter private Set<Integer> unlockedView;
-    @Getter private Set<Integer> unlockedReliquary;
     @Getter private Set<Integer> unlockedReliquarySuitCodex;
 
     public PlayerCodex() {
@@ -36,7 +37,6 @@ public class PlayerCodex {
         this.unlockedBook = new HashSet<>();
         this.unlockedTip = new HashSet<>();
         this.unlockedView = new HashSet<>();
-        this.unlockedReliquary = new HashSet<>();
         this.unlockedReliquarySuitCodex = new HashSet<>();
     }
 
@@ -78,15 +78,20 @@ public class PlayerCodex {
                 }
             }
             case ITEM_RELIQUARY -> {
-                val reliquaryId = (itemId/10) * 10;  // Normalize to 0-substat form
-                if (this.getUnlockedReliquary().add(reliquaryId))
-                    checkUnlockedSuits(reliquaryId);
+                val suiteId = itemData.getSetId();
+                val level = itemData.getRankLevel();
+                val codex = GameData.getCodexReliquaryBySuiteId(suiteId, level);
+                if(codex == null){
+                    // todo log warning/error
+                    return;
+                }
+                checkAndNotifyReliquaryUnlock(codex);
             }
             default -> {}
         }
     }
 
-    public void checkAnimal(GameEntity target, CodexAnimalData.CountType countType) {
+    public void checkAnimal(GameEntity target, CodexAnimalCountType countType) {
         if (target instanceof EntityMonster) {
             val monsterId = ((EntityMonster) target).getMonsterData().getId();
             val codexAnimal = GameData.getCodexAnimalDataMap().get(monsterId);
@@ -102,17 +107,16 @@ public class PlayerCodex {
         }
     }
 
-    public void checkUnlockedSuits(int reliquaryId) {
-        GameData.getCodexReliquaryArrayList().stream()
-            .filter(x -> !this.getUnlockedReliquarySuitCodex().contains(x.getId()))
-            .filter(x -> x.containsId(reliquaryId))
-            .filter(x -> this.getUnlockedReliquary().containsAll(x.getIds()))
-            .forEach(x -> {
-                int id = x.getId();
-                this.getUnlockedReliquarySuitCodex().add(id);
-                this.player.save();
-                this.player.sendPacket(new PacketCodexDataUpdateNotify(CodexType.CODEX_RELIQUARY, id));
-            });
+    public void checkAndNotifyReliquaryUnlock(@Nonnull CodexReliquaryData unlockedReliquary) {
+        if(unlockedReliquarySuitCodex.contains(unlockedReliquary.getId())){
+            return;
+        }
+
+        if(unlockedReliquary.isDisuseNonNull()){
+            return;
+        }
+        this.player.save();
+        this.player.sendPacket(new PacketCodexDataUpdateNotify(CodexType.CODEX_RELIQUARY, unlockedReliquary.getId()));
     }
 
     public void checkUnlockedViewPoints(CodexViewpointData viewpoint) {

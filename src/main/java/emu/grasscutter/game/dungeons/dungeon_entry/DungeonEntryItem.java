@@ -3,11 +3,12 @@ package emu.grasscutter.game.dungeons.dungeon_entry;
 import dev.morphia.annotations.Entity;
 import emu.grasscutter.GameConstants;
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.excels.DungeonData;
-import emu.grasscutter.data.excels.DungeonRosterData;
+import emu.grasscutter.utils.DateHelper;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.val;
+import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonData;
+import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonRosterData;
 
 import java.time.*;
 import java.time.temporal.TemporalAdjusters;
@@ -47,12 +48,27 @@ public class DungeonEntryItem {
         }
     }
 
+
+    public boolean nowIsAfterOpenTime(DungeonRosterData data) {
+        return DateHelper.isLocalDateTimeAfterNow(data.getOpenTime());
+    }
+
     public void buildRosterDungeon() {
-        GameData.getDungeonRosterDataMap().values().stream().filter(DungeonRosterData::nowIsAfterOpenTime)
-            .forEach(data -> data.getRosterPool().stream().map(DungeonRosterData.RosterPool::getDungeonList)
-                .flatMapToInt(Arrays::stream).mapToObj(GameData.getDungeonDataMap()::get).map(DungeonData::getSerialId)
-                .map(this.bossRecordMap::get).filter(Objects::nonNull).filter(record -> record.getRosterCycleRecord() == null)
-                .forEach(record -> record.buildRosterRecord(data.getId())));
+        GameData.getDungeonRosterDataMap().values().stream().filter(this::nowIsAfterOpenTime)
+            .forEach(data -> {
+                if(data.getRosterPool() == null){
+                    return;
+                }
+                data.getRosterPool().stream()
+                    .map(DungeonRosterData.RosterPool::getDungeonList)
+                    .flatMap(List::stream)
+                    .map(GameData.getDungeonDataMap()::get)
+                    .map(DungeonData::getSerialId)
+                    .map(this.bossRecordMap::get)
+                    .filter(Objects::nonNull)
+                    .filter(record -> record.getRosterCycleRecord() == null)
+                    .forEach(record -> record.buildRosterRecord(data.getId()));
+            });
     }
 
     public void resetWeeklyBoss(){

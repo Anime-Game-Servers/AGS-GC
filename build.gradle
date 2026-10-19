@@ -92,8 +92,14 @@ dependencies {
     implementation("org.anime_game_servers:grasskcpper:0.1")
     implementation("org.anime_game_servers.multi_proto:gi-jvm:0.2.32")
 
+    implementation("org.anime_game_servers.data_models:GIData:0.2")
+    implementation("org.anime_game_servers.data_models:loader-jvm:0.2")
+
     implementation "com.esotericsoftware:reflectasm:1.11.9"
     implementation "com.github.davidmoten:rtree-multi:0.1"
+
+    implementation group:  'com.esotericsoftware', name : 'reflectasm', version: '1.11.9'
+    implementation group:  'com.github.davidmoten', name : 'rtree-multi', version: '0.1'
 
     implementation "io.javalin:javalin:4.6.4"
     implementation "com.fasterxml.jackson.core:jackson-databind:2.13.3"
@@ -158,4 +164,9 @@ public final class BuildConfig {
     public static final String GIT_HASH = \"${gitCommitHash()}\";
 }"""
 
+}
+
+// For terminal interacting in IDEA running
+run {
+    standardInput = System.in
 }

@@ -5,9 +5,6 @@ import dev.morphia.annotations.Transient;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.common.quest.SubQuestData;
-import emu.grasscutter.data.excels.ChapterData;
-import emu.grasscutter.data.excels.TriggerExcelConfigData;
-import emu.grasscutter.game.dungeons.enums.DungeonPassConditionType;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.ActionReason;
 import emu.grasscutter.game.quest.enums.QuestCond;
@@ -20,8 +17,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import org.anime_game_servers.core.gi.enums.QuestState;
+import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopTaskCondType;
 import org.anime_game_servers.multi_proto.gi.messages.quest.chapter.ChapterState;
 import org.anime_game_servers.multi_proto.gi.messages.quest.child.Quest;
+import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonPassConditionType;
+import org.anime_game_servers.game_data_models.gi.data.quest.TriggerData;
 
 import javax.annotation.Nullable;
 import javax.script.Bindings;
@@ -47,7 +47,7 @@ public class GameQuest {
 
     @Getter private int[] finishProgressList;
     @Getter private int[] failProgressList;
-    @Transient @Getter private Map<String, TriggerExcelConfigData> triggerData;
+    @Transient @Getter private Map<String, TriggerData> triggerData;
     @Getter private Map<String, Boolean> triggers;
     private transient Bindings bindings;
 
@@ -84,7 +84,7 @@ public class GameQuest {
             .filter(p -> p.getType() == QuestContent.QUEST_CONTENT_TRIGGER_FIRE).toList();
         if (triggerCond.size() > 0) {
             for (val cond : triggerCond) {
-                TriggerExcelConfigData newTrigger = GameData.getTriggerExcelConfigDataMap().get(cond.getParam()[0]);
+                val newTrigger = GameData.getTriggerExcelConfigDataMap().get(cond.getParam()[0]);
                 if (newTrigger != null) {
                     if (this.triggerData == null) {
                         this.triggerData = new HashMap<>();
@@ -100,9 +100,9 @@ public class GameQuest {
 
         getOwner().sendPacket(new PacketQuestListUpdateNotify(this));
 
-        if (ChapterData.beginQuestChapterMap.containsKey(subQuestId)) {
+        if (GameData.getBeginQuestChapterMap().containsKey(subQuestId)) {
             getOwner().sendPacket(new PacketChapterStateNotify(
-                ChapterData.beginQuestChapterMap.get(subQuestId).getId(),
+                GameData.getBeginQuestChapterMap().get(subQuestId).getId(),
                 ChapterState.CHAPTER_STATE_BEGIN
             ));
         }
@@ -121,7 +121,7 @@ public class GameQuest {
     }
 
     public String getTriggerNameById(int id) {
-        TriggerExcelConfigData trigger = GameData.getTriggerExcelConfigDataMap().get(id);
+        val trigger = GameData.getTriggerExcelConfigDataMap().get(id);
         if (trigger != null) {
             String triggerName = trigger.getTriggerName();
             return triggerName;
@@ -131,7 +131,7 @@ public class GameQuest {
     }
 
     @Nullable
-    public TriggerExcelConfigData getTriggerByName(String name) {
+    public TriggerData getTriggerByName(String name) {
         if(triggerData==null){
             return null;
         }
@@ -202,9 +202,9 @@ public class GameQuest {
 
         getOwner().getProgressManager().tryUnlockOpenStates();
 
-        if (ChapterData.endQuestChapterMap.containsKey(subQuestId)) {
+        if (GameData.getEndQuestChapterMap().containsKey(subQuestId)) {
             mainQuest.getOwner().sendPacket(new PacketChapterStateNotify(
-                ChapterData.endQuestChapterMap.get(subQuestId).getId(),
+                GameData.getEndQuestChapterMap().get(subQuestId).getId(),
                 ChapterState.CHAPTER_STATE_END
             ));
         }
@@ -216,7 +216,7 @@ public class GameQuest {
             });
         }
         getOwner().getDungeonEntryManager().checkQuestForDungeonEntryUpdate(this);
-        getOwner().getCoopHandler().conditionMetChapterUpdateNotify(this.getSubQuestId(), "COOP_COND_FINISH_QUEST");
+        getOwner().getCoopHandler().conditionMetChapterUpdateNotify(this.getSubQuestId(), CoopTaskCondType.COOP_COND_FINISH_QUEST);
         getOwner().getDailyTaskManager().checkForCityUnlock(this.getSubQuestId());
 
         save();

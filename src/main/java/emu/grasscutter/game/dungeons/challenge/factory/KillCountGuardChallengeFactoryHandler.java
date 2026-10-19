@@ -3,7 +3,7 @@ package emu.grasscutter.game.dungeons.challenge.factory;
 import emu.grasscutter.game.dungeons.challenge.ChallengeInfo;
 import emu.grasscutter.game.dungeons.challenge.ChallengeScoreInfo;
 import emu.grasscutter.game.dungeons.challenge.WorldChallenge;
-import emu.grasscutter.game.dungeons.challenge.enums.ChallengeType;
+import org.anime_game_servers.game_data_models.gi.data.scene.challenge.ChallengeType;
 import emu.grasscutter.game.dungeons.challenge.trigger.GuardTrigger;
 import emu.grasscutter.game.dungeons.challenge.trigger.KillMonsterTrigger;
 import emu.grasscutter.game.world.Scene;
@@ -12,7 +12,7 @@ import org.anime_game_servers.gi_lua.models.scene.group.SceneGroup;
 
 import java.util.List;
 
-import static emu.grasscutter.game.dungeons.challenge.enums.ChallengeType.CHALLENGE_KILL_COUNT_GUARD_HP;
+import static org.anime_game_servers.game_data_models.gi.data.scene.challenge.ChallengeType.CHALLENGE_KILL_COUNT_GUARD_HP;
 
 @ChallengeTypeValue(type = CHALLENGE_KILL_COUNT_GUARD_HP)
 public class KillCountGuardChallengeFactoryHandler extends ChallengeFactoryHandler{

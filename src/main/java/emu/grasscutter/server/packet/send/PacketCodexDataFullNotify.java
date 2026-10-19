@@ -1,11 +1,11 @@
 package emu.grasscutter.server.packet.send;
 
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.excels.CodexAnimalData;
-import emu.grasscutter.data.excels.CodexMaterialData;
-import emu.grasscutter.data.excels.CodexWeaponData;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.net.packet.BaseTypedPacket;
+import org.anime_game_servers.game_data_models.gi.data.codex.CodexAnimalData;
+import org.anime_game_servers.game_data_models.gi.data.codex.CodexMaterialData;
+import org.anime_game_servers.game_data_models.gi.data.codex.CodexWeaponData;
 import org.anime_game_servers.multi_proto.gi.messages.codex.CodexDataFullNotify;
 import org.anime_game_servers.multi_proto.gi.messages.codex.CodexType;
 import org.anime_game_servers.multi_proto.gi.messages.codex.CodexTypeData;

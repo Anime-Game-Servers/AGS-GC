@@ -3,7 +3,7 @@ package emu.grasscutter.game.dungeons.challenge.factory;
 import emu.grasscutter.game.dungeons.challenge.ChallengeInfo;
 import emu.grasscutter.game.dungeons.challenge.ChallengeScoreInfo;
 import emu.grasscutter.game.dungeons.challenge.WorldChallenge;
-import emu.grasscutter.game.dungeons.challenge.enums.ChallengeType;
+import org.anime_game_servers.game_data_models.gi.data.scene.challenge.ChallengeType;
 import emu.grasscutter.game.dungeons.challenge.trigger.ElementReactionTrigger;
 import emu.grasscutter.game.props.ElementReactionType;
 import emu.grasscutter.game.world.Scene;
@@ -13,7 +13,7 @@ import org.anime_game_servers.gi_lua.models.scene.group.SceneGroup;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static emu.grasscutter.game.dungeons.challenge.enums.ChallengeType.*;
+import static org.anime_game_servers.game_data_models.gi.data.scene.challenge.ChallengeType.*;
 import static emu.grasscutter.game.props.ElementReactionType.*;
 
 @ChallengeTypeValue(type = {CHALLENGE_ELEMENT_REACTION_COUNT, CHALLENGE_SWIRL_ELEMENT_REACTION_COUNT, CHALLENGE_SWIRL_ELEMENT_REACTION_COUNT})

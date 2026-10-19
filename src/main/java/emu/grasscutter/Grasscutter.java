@@ -111,7 +111,11 @@ public final class Grasscutter {
         ResourceLoader.loadAll();
 
         // Generate handbooks.
-        Tools.createGmHandbooks();
+        try {
+            Tools.createGmHandbooks();
+        } catch (Exception e) {
+            getLogger().error("Failed to generate GM handbooks.", e);
+        }
 
         // Generate gacha mappings.
         Tools.generateGachaMappings();
