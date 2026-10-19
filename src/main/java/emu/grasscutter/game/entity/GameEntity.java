@@ -287,7 +287,11 @@ public abstract class GameEntity<T extends CreateEntityConfig<?>> {
     public boolean dropSubfieldItem(int dropId) {
         var drop = GameData.getDropSubfieldMappingMap().get(dropId);
         if(drop == null) return false;
-        var dropTableEntry = GameData.getDropTableExcelConfigDataMap().get(drop.getItemId());
+        return dropItem(drop.getItemId());
+    }
+
+    public boolean dropItem(int dropId) {
+        var dropTableEntry = GameData.getDropTableExcelConfigDataMap().get(dropId);
         if(dropTableEntry == null) return false;
 
         var dropRandom = getScene().getWorld().getWorldRandomGenerator();
@@ -313,7 +317,7 @@ public abstract class GameEntity<T extends CreateEntityConfig<?>> {
             case 1: //Select various
                 {
                     for(var entry : dropTableEntry.getDropVec()) {
-                        if(entry.getWeight() < dropRandom.nextInt(10000)) {
+                        if (entry.getWeight() > dropRandom.nextInt(10000)) {
                             var countRange = parseCountRange(entry.getCountRange());
                             itemsToDrop.put(entry.getItemId(), Integer.valueOf((dropRandom.nextBoolean() ? countRange[0] : countRange[1])));
                         }

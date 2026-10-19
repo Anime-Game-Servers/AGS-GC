@@ -258,6 +258,13 @@ public class EntityMonster extends GameEntity<CreateMonsterEntityConfig> impleme
         // first set the challenge data
         challenge.ifPresent(c -> c.onMonsterDeath(this));
 
+        //reward drops
+        if (killerId > 0) {
+            this.dropItem(this.getMonsterData().getKillDropId());
+            this.dropItem(this.getSpawnConfig().getDropId());
+            //TODO: handle dropTag
+        }
+
         if (scriptManager.isInit() && this.getGroupId() > 0) {
             Optional.ofNullable(scriptManager.getScriptMonsterSpawnService()).ifPresent(s -> s.onMonsterDead(this));
 

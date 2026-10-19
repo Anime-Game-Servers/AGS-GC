@@ -8,7 +8,6 @@ import emu.grasscutter.game.battlepass.BattlePassSystem;
 import emu.grasscutter.game.chat.ChatSystem;
 import emu.grasscutter.game.chat.ChatSystemHandler;
 import emu.grasscutter.game.combine.CombineManger;
-import emu.grasscutter.game.drop.DropSystem;
 import emu.grasscutter.game.dungeons.DungeonSystem;
 import emu.grasscutter.game.expedition.ExpeditionSystem;
 import emu.grasscutter.game.gacha.GachaSystem;
@@ -63,7 +62,6 @@ public final class GameServer extends KcpServer {
     private final MultiplayerSystem multiplayerSystem;
     private final DungeonSystem dungeonSystem;
     private final ExpeditionSystem expeditionSystem;
-    private final DropSystem dropSystem;
     private final WorldDataSystem worldDataSystem;
     private final BattlePassSystem battlePassSystem;
     private final CombineManger combineSystem;
@@ -116,7 +114,6 @@ public final class GameServer extends KcpServer {
         this.shopSystem = new ShopSystem(this);
         this.multiplayerSystem = new MultiplayerSystem(this);
         this.dungeonSystem = new DungeonSystem(this);
-        this.dropSystem = new DropSystem(this);
         this.expeditionSystem = new ExpeditionSystem(this);
         this.combineSystem = new CombineManger(this);
         this.towerSystem = new TowerSystem(this);

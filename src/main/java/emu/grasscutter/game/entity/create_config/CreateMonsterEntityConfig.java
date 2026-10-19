@@ -19,6 +19,7 @@ public class CreateMonsterEntityConfig extends CreateEntityConfig<CreateMonsterE
     private MonsterData monsterData = null;
     private ConfigEntityMonster configEntity = null;
     private int dropId;
+    private int dropTag;
     private int aiId = 0;
     private int poseId = 0;
     private int campId = 0;

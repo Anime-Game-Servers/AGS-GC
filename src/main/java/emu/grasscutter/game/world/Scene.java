@@ -441,11 +441,9 @@ public class Scene {
 
         // Death event
         target.onDeath(attackerId);
-        // Reward drop
-        if (target instanceof EntityMonster monster) {
-            if (getSceneType() != SceneType.SCENE_DUNGEON && attacker != null) {
-                getWorld().getServer().getDropSystem().callDrop(monster);
-            }
+
+        // Record kill
+        if (target instanceof EntityMonster) {
             triggerDungeonEvent(DungeonPassConditionType.DUNGEON_COND_KILL_MONSTER_COUNT, ++this.killedMonsterCount);
         } else if (target instanceof EntityGadget gadget) {
             Optional.ofNullable(gadget.getGadgetData())
