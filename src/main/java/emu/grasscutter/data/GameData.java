@@ -117,66 +117,17 @@ public class GameData {
     @Getter private static final Int2ObjectMap<Int2ObjectMap<Route>> sceneRouteData = new Int2ObjectOpenHashMap<>();
 
     // ExcelConfigs
-    @AutoResource @Getter private static final Int2ObjectMap<ActivityCondData> activityCondExcelConfigDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<DungeonPassData> dungeonPassConfigDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<ChallengeData> dungeonChallengeConfigDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<LevelTagData> levelTagDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<LevelTagGroupsData> levelTagGroupsDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<ActivityData> activityDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<ActivityShopOverallData> activityShopDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<ActivityShopSheetData> activityShopSheetDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<ActivityWatcherData> activityWatcherDataMap = new Int2ObjectOpenHashMap<>();
-    @QuickAccessCache @Getter private static final Int2ObjectMap<AvatarCostumeData> avatarCostumeDataItemIdMap = new Int2ObjectLinkedOpenHashMap<>();
-    @QuickAccessCache @Getter private static final Int2ObjectMap<AvatarDataCache> avatarInfoCacheMap = new Int2ObjectLinkedOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<AvatarCostumeData> avatarCostumeDataMap = new Int2ObjectLinkedOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<AvatarReplaceCostumeData> avatarReplaceCostumeDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<AvatarCurveData> avatarCurveDataMap = new Int2ObjectLinkedOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<AvatarData> avatarDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<AvatarFettersLevelData> avatarFetterLevelDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<AvatarFlycloakData> avatarFlycloakDataMap = new Int2ObjectLinkedOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<AvatarLevelData> avatarLevelDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<AvatarSkillData> avatarSkillDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<AvatarSkillDepotData> avatarSkillDepotDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<AvatarTalentData> avatarTalentDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<AvatarWeaponSkinData> avatarWeaponSkinDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<BargainData> bargainDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<BattlePassMissionData> battlePassMissionDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<BattlePassRewardData> battlePassRewardDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<BlossomChestData> blossomChestDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<BlossomGroupsData> blossomGroupsDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<BlossomOpenData> blossomOpenDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<BlossomRefreshData> blossomRefreshDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<BlossomSectionOrderData> blossomSectionOrderDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<BuffData> buffDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<ChapterData> chapterDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<CityData> cityDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<CityLevelUpData> cityLevelUpDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<CityTaskOpenData> cityTaskOpenDataMap = new Int2ObjectOpenHashMap<>();
-    // Codex/Archive
-    @AutoResource @Getter private static final Int2ObjectMap<CodexAnimalData> codexAnimalDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<CodexMaterialData> codexMaterialDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<CodexQuestData> codexQuestDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<CodexReliquaryData> codexReliquaryDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<CodexWeaponData> codexWeaponDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<CodexViewpointData> codexViewpointDataMap = new Int2ObjectOpenHashMap<>();
-
     @Getter private static final Int2ObjectMap<CombineData> combineDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<CookBonusData> cookBonusDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<CookRecipeData> cookRecipeDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<CoopCgData> coopCGDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<CoopChapterData> coopChapterDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<CoopPointData> coopPointDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<CoopRewardData> coopRewardDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<CompoundData> compoundDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<DailyDungeonData> dailyDungeonDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<DailyTaskData> dailyTaskDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<DailyTaskLevelData> dailyTaskLevelDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<DailyTaskRewardData> dailyTaskRewardDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<DungeonData> dungeonDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<DungeonElementChallengeData> dungeonElementChallengeDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<DungeonEntryData> dungeonEntryDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<DungeonRosterData> dungeonRosterDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<DungeonSerialData> dungeonSerialDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<EnvAnimalGatherConfigData> envAnimalGatherConfigDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<EquipAffixData> equipAffixDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<MonsterAffixData> monsterAffixDataMap = new Int2ObjectOpenHashMap<>();
@@ -207,43 +158,133 @@ public class GameData {
     @Getter private static final Int2ObjectMap<ReliquaryAffixData> reliquaryAffixDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<ReliquaryMainPropData> reliquaryMainPropDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<ReliquarySetData> reliquarySetDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<RewardData> rewardDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<RewardPreviewData> rewardPreviewDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<SceneData> sceneDataMap = new Int2ObjectLinkedOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<SceneTagConfigData> sceneTagConfigDataMap = new Int2ObjectLinkedOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<TalkData> talkDataMap = new Int2ObjectLinkedOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<TowerBuffData> towerBuffDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<TowerFloorData> towerFloorDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<TowerLevelData> towerLevelDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource private static final Int2ObjectMap<TowerRewardData> towerRewardDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<TowerScheduleData> towerScheduleDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<TrialAvatarData> trialAvatarDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<TrialAvatarActivityData> trialAvatarActivityDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<TrialAvatarActivityDataData> trialAvatarActivityDataDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<TrialAvatarTemplateData> trialAvatarTemplateDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<TrialReliquaryData> trialReliquaryDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<TriggerData> triggerExcelConfigDataMap = new Int2ObjectOpenHashMap<>();
-    @QuickAccessCache @Getter private static final Map<String, TriggerData> triggerDataByNameMap = new HashMap<>();
     @Getter private static final Int2ObjectMap<WeaponCurveData> weaponCurveDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<WeaponLevelData> weaponLevelDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<WeaponPromoteData> weaponPromoteDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<WeatherData> weatherDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Map<String, WeatherTemplateData> weatherTemplateDataMap = new HashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<WorldAreaConfigData> worldAreaDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<WorldLevelData> worldLevelDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<AvatarPromoteData> avatarPromoteDataMap = new Int2ObjectOpenHashMap<>();
     private static final Int2ObjectMap<FetterData> fetterDataMap = new Int2ObjectOpenHashMap<>();
     private static final Int2ObjectMap<ReliquaryLevelData> reliquaryLevelDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource private static final Int2ObjectMap<ShopGoodsData> shopGoodsDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<RewindData> rewindDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<QuestData> teleportDataMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<Map<String, DummyPoint>> dummyPointMap = new Int2ObjectOpenHashMap<>();
     @Getter private static final Int2ObjectMap<RefreshPolicyExcelConfigData> refreshPolicyExcelConfigDataMap = new Int2ObjectOpenHashMap<>();
 
     @Getter private static final Int2ObjectMap<List<DungeonDropEntry>> dungeonDropDataMap = new Int2ObjectOpenHashMap<>();
-    @AutoResource @Getter private static final Int2ObjectMap<TransPointRewardData> transPointRewardData = new Int2ObjectOpenHashMap<>();
 
     @Getter @Setter private static ConfigGlobalCombat configGlobalCombat = null;
+
+
+    @AutoResource @Getter private static final Int2ObjectMap<TalkData> talkDataMap = new Int2ObjectLinkedOpenHashMap<>();
+    @AutoResource private static final Int2ObjectMap<ShopGoodsData> shopGoodsDataMap = new Int2ObjectOpenHashMap<>();
+
+    // Avatar
+    @AutoResource @Getter private static final Int2ObjectMap<AvatarCurveData> avatarCurveDataMap = new Int2ObjectLinkedOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<AvatarData> avatarDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<AvatarFettersLevelData> avatarFetterLevelDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<AvatarLevelData> avatarLevelDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<AvatarCostumeData> avatarCostumeDataMap = new Int2ObjectLinkedOpenHashMap<>();
+    @QuickAccessCache @Getter private static final Int2ObjectMap<AvatarCostumeData> avatarCostumeDataItemIdMap = new Int2ObjectLinkedOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<AvatarReplaceCostumeData> avatarReplaceCostumeDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<AvatarFlycloakData> avatarFlycloakDataMap = new Int2ObjectLinkedOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<AvatarWeaponSkinData> avatarWeaponSkinDataMap = new Int2ObjectOpenHashMap<>();
+    @QuickAccessCache @Getter private static final Int2ObjectMap<AvatarDataCache> avatarInfoCacheMap = new Int2ObjectLinkedOpenHashMap<>();
+
+    // Blossom/LeyLine
+    @Getter private static final Int2ObjectMap<BlossomChestData> blossomChestDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<BlossomGroupsData> blossomGroupsDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<BlossomOpenData> blossomOpenDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<BlossomRefreshData> blossomRefreshDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<BlossomSectionOrderData> blossomSectionOrderDataMap = new Int2ObjectOpenHashMap<>();
+
+    // City
+    @AutoResource @Getter private static final Int2ObjectMap<CityData> cityDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CityLevelUpData> cityLevelUpDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CityTaskOpenData> cityTaskOpenDataMap = new Int2ObjectOpenHashMap<>();
+
+    // Codex/Archive
+    @AutoResource @Getter private static final Int2ObjectMap<CodexAnimalData> codexAnimalDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CodexMaterialData> codexMaterialDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CodexQuestData> codexQuestDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CodexReliquaryData> codexReliquaryDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CodexWeaponData> codexWeaponDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CodexViewpointData> codexViewpointDataMap = new Int2ObjectOpenHashMap<>();
+    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexMaterialData> codexMaterialDataIdMap = new Int2ObjectOpenHashMap<>();
+    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexQuestData> codexQuestDataIdMap = new Int2ObjectOpenHashMap<>();
+    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexReliquaryData> codexReliquaryDataIdMap = new Int2ObjectOpenHashMap<>();
+    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexWeaponData> codexWeaponDataIdMap = new Int2ObjectOpenHashMap<>();
+    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexViewpointData> codexViewpointDataIdMap = new Int2ObjectOpenHashMap<>();
+
+    // Coop/Hangouts
+    @AutoResource @Getter private static final Int2ObjectMap<CoopCgData> coopCGDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CoopChapterData> coopChapterDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CoopPointData> coopPointDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<CoopRewardData> coopRewardDataMap = new Int2ObjectOpenHashMap<>();
+
+    // Dailies
+    @Getter private static final Int2ObjectMap<DailyDungeonData> dailyDungeonDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<DailyTaskData> dailyTaskDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<DailyTaskLevelData> dailyTaskLevelDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<DailyTaskRewardData> dailyTaskRewardDataMap = new Int2ObjectOpenHashMap<>();
+
+    // Dungeons
+    @AutoResource @Getter private static final Int2ObjectMap<DungeonData> dungeonDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<DungeonPassData> dungeonPassConfigDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<DungeonElementChallengeData> dungeonElementChallengeDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<DungeonEntryData> dungeonEntryDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<DungeonRosterData> dungeonRosterDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<DungeonSerialData> dungeonSerialDataMap = new Int2ObjectOpenHashMap<>();
+
+    //Quests
+    @AutoResource @Getter private static final Int2ObjectMap<TriggerData> triggerExcelConfigDataMap = new Int2ObjectOpenHashMap<>();
+    @QuickAccessCache @Getter private static final Map<String, TriggerData> triggerDataByNameMap = new HashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<ChapterData> chapterDataMap = new Int2ObjectOpenHashMap<>();
+    @QuickAccessCache @Getter private static final Map<Integer, ChapterData> beginQuestChapterMap = new HashMap<>();
+    @QuickAccessCache @Getter private static final Map<Integer, ChapterData> endQuestChapterMap = new HashMap<>();
+
+    //Rewards/drops
+    @AutoResource @Getter private static final Int2ObjectMap<RewardData> rewardDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<RewardPreviewData> rewardPreviewDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<TransPointRewardData> transPointRewardData = new Int2ObjectOpenHashMap<>();
+
+    // Scene
+    @AutoResource @Getter private static final Int2ObjectMap<SceneData> sceneDataMap = new Int2ObjectLinkedOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<SceneTagConfigData> sceneTagConfigDataMap = new Int2ObjectLinkedOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<LevelTagData> levelTagDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<LevelTagGroupsData> levelTagGroupsDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<ChallengeData> dungeonChallengeConfigDataMap = new Int2ObjectOpenHashMap<>();
+
+    // Tower/SpiralAbyss
+    @Getter private static final Int2ObjectMap<TowerBuffData> towerBuffDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<TowerFloorData> towerFloorDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<TowerLevelData> towerLevelDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource private static final Int2ObjectMap<TowerRewardData> towerRewardDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<TowerScheduleData> towerScheduleDataMap = new Int2ObjectOpenHashMap<>();
+
+    // Trials
+    @AutoResource @Getter private static final Int2ObjectMap<TrialAvatarData> trialAvatarDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<TrialAvatarActivityData> trialAvatarActivityDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<TrialAvatarActivityDataData> trialAvatarActivityDataDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<TrialAvatarTemplateData> trialAvatarTemplateDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<TrialReliquaryData> trialReliquaryDataMap = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Int2ObjectMap<TrialAvatarCustomData> trialAvatarCustomData = new Int2ObjectOpenHashMap<>();
+    @Getter private static final Map<Integer, TrialAvatarActivityDataData> trialAvatarActivityDataCustomData = new HashMap<>();
+    @QuickAccessCache @Getter private static final Int2IntMap trialAvatarIndexIdTrialActivityDataDataMap = new Int2IntOpenHashMap();
+
+    //Weather
+    @AutoResource @Getter private static final Int2ObjectMap<WeatherData> weatherDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Map<String, WeatherTemplateData> weatherTemplateDataMap = new HashMap<>();
+
+    // World
+    @AutoResource @Getter private static final Int2ObjectMap<WorldAreaConfigData> worldAreaDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<WorldLevelData> worldLevelDataMap = new Int2ObjectOpenHashMap<>();
+
+    // Activities
+    // General Activity resources
+    @AutoResource @Getter private static final Int2ObjectMap<ActivityCondData> activityCondExcelConfigDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<ActivityData> activityDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<ActivityShopOverallData> activityShopDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<ActivityShopSheetData> activityShopSheetDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<ActivityWatcherData> activityWatcherDataMap = new Int2ObjectOpenHashMap<>();
 
     // Aster/Unreconsiled Stars activity Excels
     @AutoResource @Getter private static final Int2ObjectMap<AsterLittleData> asterLittleMap = new Int2ObjectLinkedOpenHashMap<>();
@@ -286,20 +327,8 @@ public class GameData {
     protected static Int2ObjectMap<IntSet> avatarSkillLevels = new Int2ObjectOpenHashMap<>();
     @Getter private static final Map<String, List<SubQuestData>> beginCondQuestMap = new HashMap<>(); // cache filled by QuestData
     @Getter private static final Map<Integer, Integer> questTalkMap = new HashMap<>();
-    @Getter private static final Int2ObjectMap<TrialAvatarCustomData> trialAvatarCustomData = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Map<Integer, TrialAvatarActivityDataData> trialAvatarActivityDataCustomData = new HashMap<>();
-    @QuickAccessCache @Getter private static final Int2IntMap trialAvatarIndexIdTrialActivityDataDataMap = new Int2IntOpenHashMap();
     @Getter private static final Map<Integer, List<WeatherAreaPointData>> weatherAreaPointData = new HashMap<>();
     @Getter private static final Map<Integer, List<ScenePointArrayData>> scenePointArrayData = new HashMap<>();
-    @QuickAccessCache @Getter private static final Map<Integer, ChapterData> beginQuestChapterMap = new HashMap<>();
-    @QuickAccessCache @Getter private static final Map<Integer, ChapterData> endQuestChapterMap = new HashMap<>();
-
-    // Codex/Archive
-    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexMaterialData> codexMaterialDataIdMap = new Int2ObjectOpenHashMap<>();
-    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexQuestData> codexQuestDataIdMap = new Int2ObjectOpenHashMap<>();
-    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexReliquaryData> codexReliquaryDataIdMap = new Int2ObjectOpenHashMap<>();
-    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexWeaponData> codexWeaponDataIdMap = new Int2ObjectOpenHashMap<>();
-    @QuickAccessCache @Getter private static final Int2ObjectMap<CodexViewpointData> codexViewpointDataIdMap = new Int2ObjectOpenHashMap<>();
 
     // Getters with different names that stay for now
     public static Int2ObjectMap<QuestEncryptionKey> getMainQuestEncryptionMap() {return questsKeys;}
