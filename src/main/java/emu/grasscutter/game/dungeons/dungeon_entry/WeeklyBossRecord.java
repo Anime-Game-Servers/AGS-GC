@@ -2,11 +2,11 @@ package emu.grasscutter.game.dungeons.dungeon_entry;
 
 import dev.morphia.annotations.Entity;
 import emu.grasscutter.GameConstants;
-import emu.grasscutter.data.excels.DungeonSerialData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonSerialData;
 import org.anime_game_servers.multi_proto.gi.messages.scene.entity.WeeklyBossResinDiscountInfo;
 
 import java.time.Duration;

@@ -5,10 +5,10 @@ import com.google.gson.annotations.SerializedName;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.excels.DailyDungeonData;
-import emu.grasscutter.data.excels.DungeonRosterData;
 import emu.grasscutter.utils.Position;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonRosterData;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -81,10 +81,15 @@ public class PointData {
 
         if (this.dungeonRosterList != null && this.dungeonRosterList.length > 0) {
             this.allDungeonIds = Arrays.stream(this.dungeonRosterList)
-                .mapToObj(GameData.getDungeonRosterDataMap()::get).filter(Objects::nonNull)
-                .map(DungeonRosterData::getRosterPool).flatMap(List::stream)
-                .map(DungeonRosterData.RosterPool::getDungeonList).flatMapToInt(Arrays::stream)
-                .distinct().boxed().toList();
+                .mapToObj(GameData.getDungeonRosterDataMap()::get)
+                .filter(Objects::nonNull)
+                .map(DungeonRosterData::getRosterPool)
+                .filter(Objects::nonNull)
+                .flatMap(List::stream)
+                .map(DungeonRosterData.RosterPool::getDungeonList)
+                .flatMap(List::stream)
+                .distinct()
+                .toList();
         }
 
         if (this.dungeonIds != null && this.dungeonIds.length > 0) {

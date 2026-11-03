@@ -1,55 +1,77 @@
 package emu.grasscutter.game.activity.condition;
 
 import emu.grasscutter.Grasscutter;
-import emu.grasscutter.data.excels.ActivityCondExcelConfigData;
+import emu.grasscutter.game.LogicTypeUtils;
 import emu.grasscutter.game.activity.ActivityConfigItem;
 import emu.grasscutter.game.activity.PlayerActivityData;
 import emu.grasscutter.game.activity.condition.all.UnknownActivityConditionHandler;
-import emu.grasscutter.game.quest.enums.LogicType;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import lombok.val;
+import org.anime_game_servers.game_data_models.gi.data.activity.ActivityCondData;
+import org.anime_game_servers.game_data_models.gi.data.activity.ActivityCondition;
+import org.anime_game_servers.game_data_models.gi.data.general.LogicType;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 public class BasicActivityConditionExecutor implements ActivityConditionExecutor {
 
     private final Map<Integer, ActivityConfigItem> activityConfigItemMap;
-    private final Int2ObjectMap<ActivityCondExcelConfigData> activityConditions;
+    private final Int2ObjectMap<ActivityCondData> activityConditions;
 
     private final Int2ObjectMap<PlayerActivityData> playerActivityDataByActivityCondId;
-    private final Map<ActivityConditions, ActivityConditionBaseHandler> activityConditionsHandlers;
+    private final Map<ActivityCondition, ActivityConditionBaseHandler> activityConditionsHandlers;
+    private final Set<Integer> forceActiveOverwrites;
+    private final Set<Integer> forceDisabledOverwrites;
 
     private static final UnknownActivityConditionHandler UNKNOWN_CONDITION_HANDLER = new UnknownActivityConditionHandler();
 
     public BasicActivityConditionExecutor(Map<Integer, ActivityConfigItem> activityConfigItemMap,
-                                          Int2ObjectMap<ActivityCondExcelConfigData> activityConditions,
+                                          Int2ObjectMap<ActivityCondData> activityConditions,
                                           Int2ObjectMap<PlayerActivityData> playerActivityDataByActivityCondId,
-                                          Map<ActivityConditions, ActivityConditionBaseHandler> activityConditionsHandlers) {
+                                          Map<ActivityCondition, ActivityConditionBaseHandler> activityConditionsHandlers) {
         this.activityConfigItemMap = activityConfigItemMap;
         this.activityConditions = activityConditions;
         this.playerActivityDataByActivityCondId = playerActivityDataByActivityCondId;
         this.activityConditionsHandlers = activityConditionsHandlers;
+        
+        // get and merge all condition force overwrites, since the cond check itself is not activity aware
+        this.forceActiveOverwrites = activityConfigItemMap.values().stream()
+            .flatMap((activityConfigItem -> activityConfigItem.getCondForceActiveList().stream()))
+            .collect(Collectors.toSet());
+        this.forceDisabledOverwrites = activityConfigItemMap.values().stream()
+            .flatMap((activityConfigItem -> activityConfigItem.getCondForceDisabledList().stream()))
+            .collect(Collectors.toSet());
     }
 
     @Override
     public List<Integer> getMeetActivitiesConditions(List<Integer> condIds) {
         return condIds.stream()
             .filter(this::meetsCondition)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @Override
     public boolean meetsCondition(int activityCondId) {
-        ActivityCondExcelConfigData condData = activityConditions.get(activityCondId);
+        val condData = activityConditions.get(activityCondId);
 
         if (condData == null) {
             Grasscutter.getLogger().error("Could not find condition for activity with id = {}", activityCondId);
             return false;
         }
 
-        LogicType condComb = condData.getCondComb();
+        // apply config overwrites, if set
+        if(forceActiveOverwrites.contains(activityCondId)){
+            return true;
+        }
+        if(forceDisabledOverwrites.contains(activityCondId)){
+            return false;
+        }
+
+        var condComb = condData.getCondComb();
         if (condComb == null) {
             condComb = LogicType.LOGIC_AND;
         }
@@ -59,13 +81,16 @@ public class BasicActivityConditionExecutor implements ActivityConditionExecutor
             return false;
         }
         ActivityConfigItem activityConfig = activityConfigItemMap.get(activity.getActivityId());
+        if(condData.getCond() == null){
+            return false;
+        }
         List<BooleanSupplier> predicates = condData.getCond()
             .stream()
             .map(c -> (BooleanSupplier) () ->
                 activityConditionsHandlers
-                    .getOrDefault(c.getType(), UNKNOWN_CONDITION_HANDLER).execute(activity, activityConfig, c.paramArray()))
+                    .getOrDefault(c.getType(), UNKNOWN_CONDITION_HANDLER).execute(activity, activityConfig, c.getParam()))
             .collect(Collectors.toList());
 
-        return LogicType.calculate(condComb, predicates);
+        return LogicTypeUtils.calculate(condComb, predicates);
     }
 }

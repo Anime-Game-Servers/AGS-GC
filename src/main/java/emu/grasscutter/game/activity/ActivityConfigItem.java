@@ -11,13 +11,13 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ActivityConfigItem {
     int activityId;
-    int activityType;
     int scheduleId;
-    List<Integer> meetCondList;
     Date beginTime;
     Date openTime;
     Date closeTime;
     Date endTime;
+    List<Integer> condForceActiveList;
+    List<Integer> condForceDisabledList;
 
     transient ActivityHandler<?> activityHandler;
 

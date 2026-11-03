@@ -3,7 +3,7 @@ package emu.grasscutter.game.dungeons.challenge.factory;
 import emu.grasscutter.game.dungeons.challenge.ChallengeInfo;
 import emu.grasscutter.game.dungeons.challenge.ChallengeScoreInfo;
 import emu.grasscutter.game.dungeons.challenge.WorldChallenge;
-import emu.grasscutter.game.dungeons.challenge.enums.ChallengeType;
+import org.anime_game_servers.game_data_models.gi.data.scene.challenge.ChallengeType;
 import emu.grasscutter.game.dungeons.challenge.trigger.ElementReactionTrigger;
 import emu.grasscutter.game.dungeons.challenge.trigger.TimeTrigger;
 import emu.grasscutter.game.world.Scene;
@@ -12,7 +12,7 @@ import org.anime_game_servers.gi_lua.models.scene.group.SceneGroup;
 import java.util.List;
 
 import static emu.grasscutter.game.props.ElementReactionType.Freeze;
-import static emu.grasscutter.game.dungeons.challenge.enums.ChallengeType.CHALLENGE_FREEZE_ENEMY_IN_TIME;
+import static org.anime_game_servers.game_data_models.gi.data.scene.challenge.ChallengeType.CHALLENGE_FREEZE_ENEMY_IN_TIME;
 
 @ChallengeTypeValue(type = CHALLENGE_FREEZE_ENEMY_IN_TIME)
 public class FreezeEnemyTimeChallengeFactoryHandler extends ChallengeFactoryHandler{
