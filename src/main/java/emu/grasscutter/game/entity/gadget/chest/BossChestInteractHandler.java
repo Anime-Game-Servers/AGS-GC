@@ -55,7 +55,7 @@ public class BossChestInteractHandler implements ChestInteractHandler{
             return false;
         }
 
-        val rewards = Arrays.stream(reward.getPreviewItems())
+        val rewards = reward.getItems().stream()
             .map(param -> new GameItem(param.getId(), Math.max(param.getCount(), 1)))
             .toList();
 

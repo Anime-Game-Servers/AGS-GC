@@ -58,6 +58,7 @@ import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopChapterData;
 import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopPointData;
 import org.anime_game_servers.game_data_models.gi.data.hangouts.CoopRewardData;
 import org.anime_game_servers.game_data_models.gi.data.quest.ChapterData;
+import org.anime_game_servers.game_data_models.gi.data.rewards.RewardPreviewData;
 import org.anime_game_servers.game_data_models.gi.data.scene.challenge.ChallengeData;
 import org.anime_game_servers.game_data_models.gi.data.scene.level_tag.LevelTagData;
 import org.anime_game_servers.game_data_models.gi.data.scene.level_tag.LevelTagGroupsData;
@@ -243,7 +244,8 @@ public class GameData {
 
     //Rewards/drops
     @AutoResource @Getter private static final Int2ObjectMap<RewardData> rewardDataMap = new Int2ObjectOpenHashMap<>();
-    @Getter private static final Int2ObjectMap<RewardPreviewData> rewardPreviewDataMap = new Int2ObjectOpenHashMap<>();
+    @AutoResource @Getter private static final Int2ObjectMap<RewardPreviewData> rewardPreviewDataMap = new Int2ObjectOpenHashMap<>();
+    @QuickAccessCache @Getter private static final Int2ObjectMap<RewardPreviewFallbackItemCache> rewardPreviewFallbackItemCacheMap = new Int2ObjectOpenHashMap<>();
     @AutoResource @Getter private static final Int2ObjectMap<TransPointRewardData> transPointRewardData = new Int2ObjectOpenHashMap<>();
 
     // Scene

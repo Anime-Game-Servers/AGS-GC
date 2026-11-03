@@ -164,10 +164,10 @@ public class BlossomManager extends BasePlayerDataManager {
         val payable = useCondensedResin ? resinManager.useCondensedResin(1) : resinManager.useResin(schedule.getResin());
         if (!payable) return false;
 
-        val blossomRewards = GameData.getRewardPreviewDataMap().get(schedule.getRewardId());
+        val blossomRewards = GameData.getRewardPreviewFallbackItemCacheMap().get(schedule.getRewardId());
         if (blossomRewards == null) return false;
 
-        player.getInventory().addItems(Stream.of(blossomRewards.getPreviewItems())
+        player.getInventory().addItems(blossomRewards.getItems().stream()
             .map(reward -> new GameItem(reward.getItemId(), reward.getCount() * (useCondensedResin ? 2 : 1)))
             .toList(), ActionReason.OpenBlossomChest);
 

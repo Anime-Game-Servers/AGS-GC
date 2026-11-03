@@ -3,8 +3,8 @@ package emu.grasscutter.game.world;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.DataLoader;
 import emu.grasscutter.data.GameData;
+import emu.grasscutter.data.custom.RewardPreviewFallbackItemCache;
 import emu.grasscutter.data.excels.InvestigationMonsterData;
-import emu.grasscutter.data.excels.RewardPreviewData;
 import emu.grasscutter.game.entity.gadget.chest.BossChestInteractHandler;
 import emu.grasscutter.game.entity.gadget.chest.ChestInteractHandler;
 import emu.grasscutter.game.entity.gadget.chest.NormalChestInteractHandler;
@@ -55,7 +55,7 @@ public class WorldDataSystem extends BaseGameSystem {
         return chestInteractHandlerMap;
     }
 
-    public RewardPreviewData getRewardByBossId(int monsterId) {
+    public RewardPreviewFallbackItemCache getRewardByBossId(int monsterId) {
         var investigationMonsterData = GameData.getInvestigationMonsterDataMap().values().parallelStream()
                 .filter(imd -> imd.getMonsterIdList() != null && !imd.getMonsterIdList().isEmpty())
                 .filter(imd -> imd.getMonsterIdList().get(0) == monsterId)
@@ -64,7 +64,7 @@ public class WorldDataSystem extends BaseGameSystem {
         if (investigationMonsterData.isEmpty()) {
             return null;
         }
-        return GameData.getRewardPreviewDataMap().get(investigationMonsterData.get().getRewardPreviewId());
+        return GameData.getRewardPreviewFallbackItemCacheMap().get(investigationMonsterData.get().getRewardPreviewId());
     }
 
     private SceneGroup getInvestigationGroup(int sceneId, int groupId) {
