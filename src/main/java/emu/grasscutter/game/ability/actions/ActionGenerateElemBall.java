@@ -36,7 +36,7 @@ public class ActionGenerateElemBall extends AbilityActionHandler {
                 return true;
             }
         } else if(action.dropType == DropType.BigWorldOnly) {
-            if(owner.getScene().getSceneData().getType() != SceneType.SCENE_WORLD) {
+            if(owner.getScene().getSceneData().getTypeNonNull() != SceneType.SCENE_WORLD) {
                 logger.warn("This level config only allows element balls on big world");
                 return true;
             }

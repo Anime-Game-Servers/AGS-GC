@@ -168,7 +168,7 @@ public final class Tools {
             if (avatarID >= 11000000) { // skip test avatar
                 return;
             }
-            val qualityType = data.getQualityType() !=null ? data.getQualityType() : QualityType.QUALITY_NONE;
+            val qualityType = data.getQualityType() !=null ? data.getQualityType().getValue() : QualityType.QUALITY_NONE;
             String color = switch (qualityType) {
                 case QUALITY_PURPLE -> "purple";
                 case QUALITY_ORANGE -> "yellow";

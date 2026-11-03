@@ -424,14 +424,14 @@ public class Player {
         val sceneTagData = GameData.getSceneTagConfigDataMap().values();
         val tags = this.sceneTags.computeIfAbsent(sceneId, k -> new HashMap<>());
         sceneTagData.stream()
-                .filter(tagData -> tagData.getSceneId() == sceneId && tagData.isDefaultValid())
+                .filter(tagData -> tagData.getSceneId() == sceneId && tagData.isDefaultValidNonNull())
                 .map(SceneTagConfigData::getId)
                 .forEach(k -> tags.putIfAbsent(k, true));
     }
 
     public void initializeLevelTags() {
         GameData.getLevelTagGroupsDataMap().values()
-            .forEach(group -> group.getInitialLevelTagIdList()
+            .forEach(group -> group.getInitialLevelTagIdListNonNull()
                 .forEach(tagId -> this.levelTags.put(tagId, true)));
     }
 
@@ -1584,7 +1584,7 @@ public class Player {
     public void setLevelTag(int levelTag) {
         //set all other levelTags in the levelTag groups to false
         GameData.getLevelTagGroupsDataMap().values()
-            .forEach(group -> group.getLevelTagGroupList()
+            .forEach(group -> group.getLevelTagGroupListNonNull()
                 .forEach(subgroup -> {
                     val tagList = subgroup.getLevelTagIdList();
                     if (tagList.contains(levelTag)) {

@@ -57,7 +57,7 @@ public class DungeonSystem extends BaseGameSystem {
     }
 
     public boolean triggerCondition(DungeonPassData.DungeonPassCondition condition, int... params) {
-        val handler = this.passCondHandlers.get(condition.getCondType().ordinal());
+        val handler = this.passCondHandlers.get(condition.getCondTypeNonNull().ordinal());
 
         if (handler == null) {
             Grasscutter.getLogger().debug("Could not trigger condition {} at {}", condition.getCondType(), params);
@@ -136,7 +136,7 @@ public class DungeonSystem extends BaseGameSystem {
             }
         }
         // if player is leaving from tower
-        if (Optional.ofNullable(dungeonData).map(DungeonData::getType)
+        if (Optional.ofNullable(dungeonData).map(DungeonData::getDungeonTypeNonNull)
                 .filter(type -> type == DungeonType.DUNGEON_TOWER).isPresent()) {
             player.getTowerManager().removeCurrentLevelBuff();
             player.getTowerManager().clearTeamOnExit();

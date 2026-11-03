@@ -26,7 +26,7 @@ public class PlayerDungeonExitInfo {
     }
 
     public void setAll(Player player, int dungeonId, int pointId) {
-        val fromBigWorld = Optional.ofNullable(player.getScene()).map(Scene::getSceneData).map(SceneData::getType)
+        val fromBigWorld = Optional.ofNullable(player.getScene()).map(Scene::getSceneData).map(SceneData::getTypeNonNull)
             .filter(sceneType -> sceneType == SceneType.SCENE_WORLD);
         if (fromBigWorld.isEmpty()) return; // only set player exits location if player comes in from big world
 

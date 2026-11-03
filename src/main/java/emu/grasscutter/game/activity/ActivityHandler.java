@@ -137,7 +137,7 @@ public abstract class ActivityHandler<PLAYER_DETAIL_DATA> {
 
     public ActivityInfo toProto(PlayerActivityData playerActivityData, ActivityConditionExecutor conditionExecutor){
         val activityId = activityConfigItem.getActivityId();
-        val typeId = activityData.getActivityType() != null ? activityData.getActivityType().getId() : 0;
+        val typeId = activityData.getActivityTypeNonNull().getId();
 
         val proto = new ActivityInfo();
         proto.setActivityId(activityId);

@@ -70,7 +70,7 @@ public class DungeonManager {
     public void triggerEvent(DungeonPassConditionType conditionType, int... params) {
         if (this.ended) return;
 
-        this.passConfigData.getConds().stream().filter(cond -> cond.getCondType() == conditionType)
+        this.passConfigData.getConds().stream().filter(cond -> cond.getCondTypeNonNull() == conditionType)
             .filter(cond -> getScene().getWorld().getServer().getDungeonSystem().triggerCondition(cond, params))
             .forEach(cond -> this.finishedConditions[this.passConfigData.getConds().indexOf(cond)] = 1);
 
@@ -227,10 +227,10 @@ public class DungeonManager {
     private void applyTrialTeam(Player player) {
         if (this.dungeonData == null) return;
 
-        switch (this.dungeonData.getType()) {
+        switch (this.dungeonData.getDungeonTypeNonNull()) {
             // case DUNGEON_PLOT is handled by quest execs
             case DUNGEON_ACTIVITY -> {
-                switch (this.dungeonData.getPlayType()) {
+                switch (this.dungeonData.getPlayTypeNonNull()) {
                     case DUNGEON_PLAY_TYPE_TRIAL_AVATAR ->
                         player.getActivityManager().getActivityHandlerAs(
                                 ActivityType.NEW_ACTIVITY_TRIAL_AVATAR, TrialAvatarActivityHandler.class)

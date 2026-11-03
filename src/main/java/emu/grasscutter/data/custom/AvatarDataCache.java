@@ -133,7 +133,7 @@ public class AvatarDataCache {
                     Grasscutter.getLogger().warn("Unknown prop: {}", growCurve.getType());
                     continue;
                 }
-                targetMap[level] = getGrowthCurveValue(curveData, growCurve.getGrowCurve());
+                targetMap[level] = getGrowthCurveValue(curveData, growCurve.getGrowthCurveNonNull());
             }
         }
 

@@ -20,7 +20,7 @@ public class PacketPlayerWorldSceneInfoListNotify extends BaseTypedPacket<Player
         // Iterate over all scenes
         for (var scene : GameData.getSceneDataMap().values()) {
             //only send big world info
-            if (scene.getType() != SceneType.SCENE_WORLD) continue;
+            if (scene.getTypeNonNull() != SceneType.SCENE_WORLD) continue;
 
             var worldInfoBuilder = new PlayerWorldSceneInfo();
             var isSceneUnlocked = player.getWorld().getHost().getUnlockedScenes()

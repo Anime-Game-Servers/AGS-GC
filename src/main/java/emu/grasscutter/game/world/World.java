@@ -273,7 +273,7 @@ public class World implements Iterable<Player> {
                 .enterReason(EnterReason.DungeonEnter);
         } else if (player.getSceneId() == sceneId) {
             teleportProps.enterType(EnterType.ENTER_GOTO);
-        } else if (sceneData!= null && sceneData.getType() == SceneType.SCENE_HOME_WORLD) {
+        } else if (sceneData!= null && sceneData.getTypeNonNull() == SceneType.SCENE_HOME_WORLD) {
             // Home
             teleportProps.enterType(EnterType.ENTER_SELF_HOME)
                 .enterReason(EnterReason.EnterHome);

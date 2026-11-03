@@ -22,7 +22,7 @@ public class HandlerAvatarChangeElementTypeReq extends TypedPacketHandler<Avatar
             return;
         }
 
-        val element = ElementType.getTypeByValue(area.getElementType().getId());
+        val element = ElementType.getTypeByValue(area.getElementTypeNonNull().getId());
         if(element.getDepotIndex() <=0){
             session.send(new PacketAvatarChangeElementTypeRsp(Retcode.RET_SVR_ERROR));
             return;

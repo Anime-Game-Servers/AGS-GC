@@ -53,6 +53,7 @@ import org.anime_game_servers.game_data_models.gi.data.codex.*;
 import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonType;
 import org.anime_game_servers.game_data_models.gi.helpers.TextHashUtilsKt;
 import org.anime_game_servers.game_data_models.loader.*;
+import org.anime_game_servers.game_data_models.loader.stripping.StripConfig;
 import org.anime_game_servers.gi_lua.models.loader.SceneReplacementScriptLoadParams;
 import org.anime_game_servers.gi_lua.models.loader.ShardQuestScriptLoadParams;
 import org.anime_game_servers.gi_lua.models.quest.QuestData;
@@ -100,7 +101,7 @@ public class ResourceLoader {
         }));
 
         val jsonParser = new JsonDataParser(json);
-        dataLoader = new DefaultDataLoader(true);
+        dataLoader = new DefaultDataLoader(StripConfig.SAFE, true);
 
         // add default json parser
         dataLoader.setParser(FileType.JSON, jsonParser);
@@ -499,7 +500,7 @@ public class ResourceLoader {
                     case "Effigy" -> DungeonType.DUNGEON_EFFIGY;
                     default -> DungeonType.DUNGEON_NONE;
                 };
-                GameData.getDungeonDataMap().values().stream().filter(dungeonData -> dungeonData.getType() == dungeonType)
+                GameData.getDungeonDataMap().values().stream().filter(dungeonData -> dungeonData.getType().getValue() == dungeonType)
                     .forEach(dungeonData -> tempEntriesMap.putIfAbsent(
                         dungeonData.getId(), DungeonEntries.create(dungeonData.getId(), pointData, tempExitHolderMap)));
             });

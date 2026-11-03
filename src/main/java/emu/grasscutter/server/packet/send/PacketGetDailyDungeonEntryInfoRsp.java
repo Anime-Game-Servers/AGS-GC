@@ -23,7 +23,7 @@ public class PacketGetDailyDungeonEntryInfoRsp extends BaseTypedPacket<GetDailyD
         proto.setDailyDungeonInfoList(GameData.getDungeonEntryDataMap().values().stream()
                 .filter(data -> data.getSceneId() == sceneId)
                 .filter(data -> Boolean.TRUE.equals(data.isShowInAdvHandbook()))
-                .filter(data -> isSatisfied(player, data.getCondComb(), data.getSatisfiedCond()))
+                .filter(data -> isSatisfied(player, data.getCondCombNonNull(), data.getSatisfiedCondNonNull()))
                 .map(data -> getDungeonEntryInfo(player, data))
                 .filter(e -> (e.getRecommendDungeonEntryInfo() != null ? e.getRecommendDungeonEntryInfo().getDungeonId() : 0) != 0)
                 .sorted(Comparator.comparing(DailyDungeonEntryInfo::getDungeonEntryConfigId))
@@ -44,14 +44,14 @@ public class PacketGetDailyDungeonEntryInfoRsp extends BaseTypedPacket<GetDailyD
 
     private boolean isSatisfied(Player player, LogicType condComb, List<DungeonEntryData.SatisfiedCond> conds) {
         return LogicTypeUtils.calculate(condComb, conds.stream()
-            .filter(cond -> Optional.ofNullable(cond).map(DungeonEntryData.SatisfiedCond::getType).isPresent())
-            .map(cond -> switch (cond.getType()) {
+            .filter(cond -> Optional.ofNullable(cond).map(DungeonEntryData.SatisfiedCond::getTypeNonNull).isPresent())
+            .map(cond -> switch (cond.getTypeNonNull()) {
                 case DUNGEON_ENTRY_CONDITION_LEVEL -> player.getLevel() >= cond.getParam1();
                 case DUNGEON_ENTRY_CONDITION_QUEST -> Optional.ofNullable(player.getQuestManager().getQuestById(cond.getParam1()))
                     .map(GameQuest::getState).filter(state -> state == QuestState.QUEST_STATE_FINISHED).isPresent();
                 case DUNGEON_ENTRY_CONDITION_NONE -> true;
                 case DUNGEON_ENTRY_CONDITION_UNKNOWN -> {
-                    Loggers.getDefaultLogger().warn("Unknown dungeonEntryCondition {}", cond.getTypeString());
+                    Loggers.getDefaultLogger().warn("Unknown dungeonEntryCondition {}", cond.getType());
                     yield false;
                 }
             })

@@ -133,7 +133,7 @@ public class Scene {
     }
 
     public SceneType getSceneType() {
-        return this.sceneData.getType();
+        return this.sceneData.getTypeNonNull();
     }
 
     public int getPlayerCount() {
