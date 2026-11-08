@@ -165,7 +165,7 @@ public class AvatarDataCache {
     private float getGrowthCurveValue(AvatarCurveData curveData, GrowthCurveType growthCurveType) {
         val curveInfos = curveData.getCurveInfosNonNull();
         return curveInfos.stream()
-            .filter(info -> growthCurveType.equals(info.getType()))
+            .filter(info -> growthCurveType.equals(info.getTypeNonNull()))
             .findFirst().map(AvatarCurveData.GrowCurveInfo::getValue).orElse(1f);
     }
 
@@ -188,7 +188,7 @@ public class AvatarDataCache {
     }
 
     public float getBaseDefense(int level) {
-        val defenseBase = avatarData.getAttackBase();
+        val defenseBase = avatarData.getDefenseBase();
         try {
             return defenseBase * this.defenseGrowthCurve[level - 1];
         } catch (Exception e) {

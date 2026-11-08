@@ -35,7 +35,7 @@ public class ChallengeFactory {
      * */
     public static WorldChallenge getChallenge(ChallengeInfo challengeInfo, List<Integer> params, ChallengeScoreInfo scoreInfo, Scene scene, SceneGroup group){
         val challengeType = Optional.ofNullable(GameData.getDungeonChallengeConfigDataMap().get(challengeInfo.challengeId()))
-            .map(ChallengeData::getChallengeType)
+            .map(ChallengeData::getChallengeTypeNonNull)
             .orElse(ChallengeType.CHALLENGE_NONE);
         return Optional.ofNullable(challengeFactoryHandlers.get(challengeType))
             .map(handler -> handler.build(challengeType, challengeInfo, params, scoreInfo, scene, group))

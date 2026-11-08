@@ -97,7 +97,7 @@ public class PlayerCodex {
             val codexAnimal = GameData.getCodexAnimalDataMap().get(monsterId);
             if (codexAnimal == null) return;
 
-            val animalCountType = codexAnimal.getCountType();
+            val animalCountType = codexAnimal.getCountTypeNonNull();
             if (animalCountType != countType && animalCountType != null) return;
 
             this.getUnlockedAnimal().merge(monsterId, 1, (i, j) -> i + 1);
@@ -115,6 +115,7 @@ public class PlayerCodex {
         if(unlockedReliquary.isDisuseNonNull()){
             return;
         }
+        this.unlockedReliquarySuitCodex.add(unlockedReliquary.getId());
         this.player.save();
         this.player.sendPacket(new PacketCodexDataUpdateNotify(CodexType.CODEX_RELIQUARY, unlockedReliquary.getId()));
     }

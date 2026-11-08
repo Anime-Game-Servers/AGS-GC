@@ -12,6 +12,7 @@ import emu.grasscutter.data.common.WeatherAreaPointData;
 import emu.grasscutter.data.common.quest.MainQuestData;
 import emu.grasscutter.data.common.quest.SubQuestData;
 import emu.grasscutter.data.excels.*;
+import emu.grasscutter.data.excels.ItemData;
 import emu.grasscutter.data.server.*;
 import emu.grasscutter.data.custom.*;
 import emu.grasscutter.data.server.DropSubfieldMapping;
@@ -23,6 +24,7 @@ import emu.grasscutter.game.dungeons.DungeonDropEntry;
 import emu.grasscutter.game.dungeons.dungeon_entry.DungeonEntries;
 import emu.grasscutter.game.quest.QuestEncryptionKey;
 import emu.grasscutter.game.quest.enums.QuestCond;
+import emu.grasscutter.game.tower.TowerData;
 import emu.grasscutter.utils.Utils;
 import it.unimi.dsi.fastutil.ints.*;
 import lombok.Getter;
@@ -344,7 +346,7 @@ public class GameData {
 
     // Multi-keyed getters
     public static TowerRewardData getTowerRewardData(int levelIndex, int floorIndex) {
-        return towerRewardDataMap.get((levelIndex << 4) + floorIndex);
+        return towerRewardDataMap.get(TowerRewardData.getKey(levelIndex, floorIndex));
     }
 
     public static WeaponPromoteData getWeaponPromoteData(int promoteId, int promoteLevel) {
@@ -426,7 +428,7 @@ public class GameData {
     public static Map<Integer, List<ShopGoodsData>> getShopGoodsDataEntries() {
         if (shopGoods.isEmpty()) {
             shopGoodsDataMap.forEach((k, v) -> {
-                val shopTypeId = v.getShopType().getIntKey();
+                val shopTypeId = v.getShopTypeNonNull().getIntKey();
                 shopGoods.computeIfAbsent(shopTypeId, key -> new ArrayList<>())
                     .add(v);
             });

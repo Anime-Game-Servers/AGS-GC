@@ -286,7 +286,7 @@ public class EntityAvatar extends GameEntity {
             val specifiedAvatars = sceneData.getSpecifiedAvatarList();
             if (specifiedAvatars == null || specifiedAvatars.isEmpty() || specifiedAvatars.contains(data.getAvatarId())){
                 val config = GameData.getConfigLevelEntityDataMap().get(sceneData.getLevelEntityConfig());
-                if(config != null && config.getMonsterAbilities() != null) {
+                if(config != null && config.getAvatarAbilities() != null) {
                     val configAbilitiesList = config.getAvatarAbilities().stream()
                         .map(ConfigAbilityData::getAbilityName)
                         .map(Utils::abilityHash)

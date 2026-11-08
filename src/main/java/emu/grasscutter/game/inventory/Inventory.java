@@ -271,7 +271,7 @@ public class Inventory extends BasePlayerManager implements Iterable<GameItem> {
             .filter(gainItem -> gainItem.getItemId() > 0)
             .map(param -> new GameItem(param.getItemId(), param.getCount()))
             .toList());
-        if(rewardData.getPlayerExp() != 0){
+        if(rewardData.getPlayerExp() > 0){
             rewards.add(new GameItem(102, rewardData.getPlayerExp()));
         }
         if(rewardData.getHcoin() > 0){

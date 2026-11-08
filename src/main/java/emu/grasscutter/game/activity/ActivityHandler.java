@@ -62,7 +62,7 @@ public abstract class ActivityHandler<PLAYER_DETAIL_DATA> {
                 // todo log
                 return;
             }
-            val triggerType = watcherData.getTriggerConfig().getTriggerType();
+            val triggerType = watcherData.getTriggerConfig().getTriggerTypeNonNull();
             var watcherType = activityWatcherTypeMap.get(triggerType);
             ActivityWatcher watcher;
             if(watcherType != null){

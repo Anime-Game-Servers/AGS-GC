@@ -306,24 +306,24 @@ public class SotSManager extends BasePlayerManager {
     private void handleLevelUpActions(List<CityLevelUpData.CityLevelUpAction> actions){
         actions.forEach(action -> {
             if(action.getType() == null) return;
-            switch (action.getType()) {
+            switch (action.getTypeNonNull()) {
                 case WORLD_AREA_ACTION_IMPROVE_STAMINA -> {
-                    if (action.getParam1() == null || action.getParam1().isEmpty()) {
+                    if (action.getParam1NonNull().isEmpty()) {
                         break;
                     }
                     // update max stamina and notify client
                     getPlayer().setProperty(
                         PlayerProperty.PROP_MAX_STAMINA,
                         getPlayer().getProperty(PlayerProperty.PROP_MAX_STAMINA)
-                            + action.getParam1().get(0) * 100,
+                            + action.getParam1NonNull().getFirst() * 100,
                         true);
                 }
                 case WORLD_AREA_ACTION_UNLOCK_FORCE -> {
-                    if (action.getParam1() == null || action.getParam1().isEmpty()) {
+                    if (action.getParam1NonNull().isEmpty()) {
                         break;
                     }
                     // this might need to be persisted
-                    getPlayer().getScene().unlockForce(action.getParam1().get(0));
+                    getPlayer().getScene().unlockForce(action.getParam1NonNull().getFirst());
                 }
                 case WORLD_AREA_ACTION_ACTIVATE_ITEM -> {
                     // TODO: implement

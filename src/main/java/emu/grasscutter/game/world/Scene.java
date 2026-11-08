@@ -41,6 +41,7 @@ import org.anime_game_servers.game_data_models.gi.data.codex.CodexAnimalCountTyp
 import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonData;
 import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonPassConditionType;
 import org.anime_game_servers.game_data_models.gi.data.scene.weather.ClimateType;
+import org.anime_game_servers.game_data_models.gi.data.scene.weather.ClimateTypeMetadata;
 import org.anime_game_servers.gi_lua.models.SceneGroupUserData;
 import org.anime_game_servers.gi_lua.models.ScriptArgs;
 import org.anime_game_servers.gi_lua.models.constants.EventType;
@@ -1157,7 +1158,7 @@ public class Scene {
 
             if(w != null && !this.weatherAreas.containsKey(e.getKey())) {
                 WeatherArea area = new WeatherArea(this, w);
-                area.setClimateType(ClimateType.getTypeByValue(e.getValue()));
+                area.setClimateType(ClimateTypeMetadata.INSTANCE.fromIntKeyOrUnknown(e.getValue()));
                 weatherAreas.put((int)e.getKey(), area);
             }
         });

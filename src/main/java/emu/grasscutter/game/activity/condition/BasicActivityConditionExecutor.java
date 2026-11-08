@@ -37,7 +37,7 @@ public class BasicActivityConditionExecutor implements ActivityConditionExecutor
         this.activityConditions = activityConditions;
         this.playerActivityDataByActivityCondId = playerActivityDataByActivityCondId;
         this.activityConditionsHandlers = activityConditionsHandlers;
-        
+
         // get and merge all condition force overwrites, since the cond check itself is not activity aware
         this.forceActiveOverwrites = activityConfigItemMap.values().stream()
             .flatMap((activityConfigItem -> activityConfigItem.getCondForceActiveList().stream()))
@@ -71,8 +71,8 @@ public class BasicActivityConditionExecutor implements ActivityConditionExecutor
             return false;
         }
 
-        var condComb = condData.getCondComb();
-        if (condComb == null) {
+        var condComb = condData.getCondCombNonNull();
+        if (condComb == LogicType.LOGIC_NONE || condComb == LogicType.LOGIC_UNKNOWN) {
             condComb = LogicType.LOGIC_AND;
         }
 
@@ -88,7 +88,7 @@ public class BasicActivityConditionExecutor implements ActivityConditionExecutor
             .stream()
             .map(c -> (BooleanSupplier) () ->
                 activityConditionsHandlers
-                    .getOrDefault(c.getType(), UNKNOWN_CONDITION_HANDLER).execute(activity, activityConfig, c.getParam()))
+                    .getOrDefault(c.getTypeNonNull(), UNKNOWN_CONDITION_HANDLER).execute(activity, activityConfig, c.getIntParamsNonNull()))
             .collect(Collectors.toList());
 
         return LogicTypeUtils.calculate(condComb, predicates);

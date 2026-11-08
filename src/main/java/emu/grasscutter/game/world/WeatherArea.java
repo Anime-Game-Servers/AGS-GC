@@ -13,6 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.mongodb.lang.Nullable;
 import org.anime_game_servers.game_data_models.gi.data.scene.weather.ClimateType;
+import org.anime_game_servers.game_data_models.gi.data.scene.weather.ClimateTypeMetadata;
 import org.anime_game_servers.game_data_models.gi.data.scene.weather.WeatherData;
 import org.anime_game_servers.game_data_models.gi.data.scene.weather.WeatherTemplateData;
 
@@ -113,7 +114,7 @@ public class WeatherArea {
         }
 
         var searchType = climateType;
-        if(searchType == ClimateType.CLIMATE_NONE && config.hasDefaultClimate()) searchType = config.getDefaultClimate();
+        if(searchType == ClimateType.CLIMATE_NONE && config.hasDefaultClimate()) searchType = config.getDefaultClimateNonNull();
         val templateData = GameData.getWeatherTemplateData(template, searchType);
         if(templateData == null) return ClimateType.CLIMATE_SUNNY;
 
@@ -123,7 +124,7 @@ public class WeatherArea {
                           templateData.thunderstormProb() +
                           templateData.snowProb() +
                           templateData.mistProb();
-        if(maxNumber == 0.0) return config.getDefaultClimate();
+        if(maxNumber == 0.0) return config.getDefaultClimateNonNull();
         float randomNumber = (float)Math.random() * maxNumber;
         if(randomNumber < templateData.getSunnyProb())
             return ClimateType.CLIMATE_SUNNY;
@@ -142,14 +143,14 @@ public class WeatherArea {
     }
 
     public ClimateType randWeather() {
-        return randWeather(config.getDefaultClimate());
+        return randWeather(config.getDefaultClimateNonNull());
     }
 
     public void refresh(WeatherRefreshType type) {
         if(config.getIsDefaultValid()) {
             //Easy part
 
-            setClimateType(config.getDefaultClimate());
+            setClimateType(config.getDefaultClimateNonNull());
         } else {
             if(scene.getWorld().isWeatherLocked()) return;
 
@@ -166,7 +167,7 @@ public class WeatherArea {
                 ClimateType cType = ClimateType.CLIMATE_NONE;
                 if(currentTime < nextTime) {
                     if(currentTime == 0) {
-                        cType = config.getDefaultClimate();
+                        cType = config.getDefaultClimateNonNull();
                     } else {
                         cType = randWeather();
                     }
@@ -179,9 +180,9 @@ public class WeatherArea {
                     if(forcastList.isEmpty()) {
                         forcastId = climateType.getId();
                     } else {
-                        forcastId = forcastList.get(forcastList.size() - 1);
+                        forcastId = forcastList.getLast();
                     }
-                    int newForcastId = randWeather(ClimateType.getTypeByValue(forcastId)).getId();
+                    int newForcastId = randWeather(ClimateTypeMetadata.INSTANCE.fromIntKeyOrUnknown(forcastId)).getId();
                     forcastList.add(newForcastId);
                 }
                 if(oldClimateType != climateType) {

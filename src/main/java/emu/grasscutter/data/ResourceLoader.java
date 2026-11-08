@@ -16,6 +16,7 @@ import emu.grasscutter.data.common.WeatherAreaPointData;
 import emu.grasscutter.data.common.quest.MainQuestData;
 import emu.grasscutter.data.common.quest.SubQuestData;
 import emu.grasscutter.data.custom.AvatarDataCache;
+import emu.grasscutter.data.custom.RewardPreviewFallbackItemCache;
 import emu.grasscutter.data.server.DropSubfieldMapping;
 import emu.grasscutter.data.server.DropTableExcelConfigData;
 import emu.grasscutter.data.server.GadgetMapping;
@@ -291,11 +292,14 @@ public class ResourceLoader {
         initTrialActivityCaches();
         initChaptersCache();
         initCodexCaches();
+        initRewardPreviewCache();
     }
 
     public static void initAvatarCaches(){
         GameData.getAvatarCostumeDataMap().values().forEach(GameData::putAvatarCostumeDataCache);
-        GameData.getAvatarDataMap().forEach((id, data) -> GameData.getAvatarInfoCacheMap().put(id, new AvatarDataCache(data)));
+        GameData.getAvatarDataMap().forEach((id, data) ->
+            GameData.getAvatarInfoCacheMap().put((int)id, new AvatarDataCache(data))
+        );
     }
 
     public static void initTrialActivityCaches(){
@@ -303,17 +307,34 @@ public class ResourceLoader {
     }
 
     public static void initCodexCaches(){
-        GameData.getCodexMaterialDataMap().values().stream().filter(CodexMaterialData::isDisuseNonNull).forEach(GameData::putCodexMaterialDataCache);
-        GameData.getCodexQuestDataMap().values().stream().filter(CodexQuestData::isDisuseNonNull).forEach(GameData::putCodexQuestDataCache);
-        GameData.getCodexReliquaryDataMap().values().stream().filter(CodexReliquaryData::isDisuseNonNull).forEach(GameData::putCodexReliquaryDataCache);
-        GameData.getCodexViewpointDataMap().values().stream().filter(CodexViewpointData::isDisuseNonNull).forEach(GameData::putCodexViewpointDataCache);
-        GameData.getCodexWeaponDataMap().values().stream().filter(CodexWeaponData::isDisuseNonNull).forEach(GameData::putCodexWeaponDataCache);
+        GameData.getCodexMaterialDataMap().values().stream()
+            .filter((value) -> !value.isDisuseNonNull())
+            .forEach(GameData::putCodexMaterialDataCache);
+        GameData.getCodexQuestDataMap().values().stream()
+            .filter((value) -> !value.isDisuseNonNull())
+            .forEach(GameData::putCodexQuestDataCache);
+        GameData.getCodexReliquaryDataMap().values().stream()
+            .filter((value) -> !value.isDisuseNonNull())
+            .forEach(GameData::putCodexReliquaryDataCache);
+        GameData.getCodexViewpointDataMap().values().stream()
+            .filter((value) -> !value.isDisuseNonNull())
+            .forEach(GameData::putCodexViewpointDataCache);
+        GameData.getCodexWeaponDataMap().values().stream()
+            .filter((value) -> !value.isDisuseNonNull())
+            .forEach(GameData::putCodexWeaponDataCache);
     }
 
     public static void initChaptersCache(){
         GameData.getChapterDataMap().forEach( (id, data ) ->{
                 GameData.getBeginQuestChapterMap().put(data.getBeginQuestId(), data);
                 GameData.getEndQuestChapterMap().put(data.getEndQuestId(), data);
+            }
+        );
+    }
+
+    public static void initRewardPreviewCache(){
+        GameData.getRewardPreviewDataMap().forEach((id, data) -> {
+                GameData.getRewardPreviewFallbackItemCacheMap().put((int)id, new RewardPreviewFallbackItemCache(data));
             }
         );
     }

@@ -59,7 +59,8 @@ public class ActivityManager extends BasePlayerManager {
                 }
 
                 // todo handle exception
-                val activityHandlerType = activityHandlerTypeMap.get(activityData.getActivityType());
+
+                val activityHandlerType = activityHandlerTypeMap.get(activityData.getActivityTypeNonNull());
                 ActivityHandler activityHandler;
 
                 if (activityHandlerType != null) {

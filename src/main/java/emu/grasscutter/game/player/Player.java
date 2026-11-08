@@ -449,7 +449,7 @@ public class Player {
         if (climate == ClimateType.CLIMATE_NONE) {
             val w = GameData.getWeatherDataMap().get(weatherId);
             if (w != null) {
-                climate = w.getDefaultClimate();
+                climate = w.getDefaultClimateNonNull();
             }
         }
         this.weatherId = weatherId;

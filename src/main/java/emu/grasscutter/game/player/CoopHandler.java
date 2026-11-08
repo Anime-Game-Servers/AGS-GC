@@ -103,7 +103,7 @@ public class CoopHandler extends BasePlayerDataManager {
         //get a list of everything we need to update
         val updateList = GameData.getCoopChapterDataMap().values().stream()
             .filter(x -> x.getUnlockCond() != null && !x.getUnlockCond().stream()
-                .filter(y -> y.getArgs() != null && y.getArgs().get(0) == arg && y.getCondType() == condType)
+                .filter(y -> !y.getArgsNonNull().isEmpty() && y.getArgsNonNull().get(0) == arg && y.getCondTypeNonNull() == condType)
                 .toList().isEmpty());
         val coopChapterList = new ArrayList<CoopChapter>();
         updateList.forEach(chapter -> {
@@ -177,12 +177,12 @@ public class CoopHandler extends BasePlayerDataManager {
             val condition = chapter.getUnlockCond().get(i);
             if(condition.getCondType() == null || condition.getArgs() == null || condition.getArgs().isEmpty()){
                 Grasscutter.getLogger().warn("Coop condition type null or args null or empty in coop chapter {} : {} {}",
-                    chapter.getId(), condition.getCondTypeString(), condition.getArgs());
+                    chapter.getId(), condition.getCondType(), condition.getArgs());
                 continue;
             }
 
-            val arg = condition.getArgs().get(0);
-            switch (condition.getCondType()) {
+            val arg = condition.getArgsNonNull().getFirst();
+            switch (condition.getCondTypeNonNull()) {
                 case COOP_COND_FINISH_QUEST -> {
                     val quest = this.player.getQuestManager().getQuestById(arg);
                     if (quest == null || !quest.getState().equals(QuestState.QUEST_STATE_FINISHED))
@@ -198,7 +198,7 @@ public class CoopHandler extends BasePlayerDataManager {
                         lockReasonList.add(i + 1);
                 }
                 default -> {
-                    Grasscutter.getLogger().warn("Unknown Coop condition type {} in coop chapter {}", condition.getCondTypeString(), chapter.getId());
+                    Grasscutter.getLogger().warn("Unknown Coop condition type {} in coop chapter {}", condition.getCondType(), chapter.getId());
                     lockReasonList.add(i + 1);
                 }
             }
@@ -211,7 +211,7 @@ public class CoopHandler extends BasePlayerDataManager {
         val coopPointCanidateList = GameData.getCoopPointDataMap().values().stream().filter(x -> x.getAcceptQuest() == questId).toList();
         if (coopPointCanidateList.isEmpty()) return;
         //there's always only one
-        val coopPointData = coopPointCanidateList.get(0);
+        val coopPointData = coopPointCanidateList.getFirst();
 
         //finish previous coopPoint if it exists
         if (this.curCoopPoint != 0) {
@@ -281,7 +281,7 @@ public class CoopHandler extends BasePlayerDataManager {
                     .filter(j -> j.getChapterId() == chapterId)
                     .toList();
             this.totalEndCount = (int) coopPoints.stream()
-                    .filter(j -> j.getType() == CoopPointType.POINT_END)
+                    .filter(j -> j.getTypeNonNull() == CoopPointType.POINT_END)
                     .count();
             this.points = new HashMap<>();
             coopPoints.forEach(j -> this.points.put(j.getId(), new CoopPointEntry()));

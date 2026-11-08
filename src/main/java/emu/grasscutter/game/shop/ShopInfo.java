@@ -75,7 +75,7 @@ public class ShopInfo {
             .map(x -> new ItemParamData(x.getItemId(), x.getCount()))
             .toList();
         this.secondarySheetId = getOrDefault(sgd.getSecondarySheetId());
-        this.shopRefreshType = sgd.getRefreshType();
+        this.shopRefreshType = sgd.getRefreshTypeNonNull();
         this.shopRefreshParam = getOrDefault(sgd.getRefreshParam());
     }
 

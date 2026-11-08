@@ -114,8 +114,8 @@ public class Avatar {
     public Avatar(AvatarDataCache data) {
         this();
         this.avatarId = data.getId();
-        this.nameCardRewardId = GameData.getFetterCharacterCardDataMap().get(this.avatarId).getRewardId();
-        this.nameCardId = GameData.getRewardDataMap().get(this.nameCardRewardId).getRewardItemList().get(0).getItemId();
+        this.nameCardRewardId = data.getNameCardRewardId();
+        this.nameCardId = data.getNameCardId();
         this.data = data;
         this.bornTime = (int) (System.currentTimeMillis() / 1000);
         this.flyCloak = 140001;

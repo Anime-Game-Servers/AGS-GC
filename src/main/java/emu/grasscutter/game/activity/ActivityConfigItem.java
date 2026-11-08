@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -27,6 +28,12 @@ public class ActivityConfigItem {
         }
         if(closeTime == null){
             this.closeTime = endTime;
+        }
+        if(condForceActiveList == null){
+            this.condForceActiveList = Collections.emptyList();
+        }
+        if(condForceDisabledList == null){
+            this.condForceDisabledList = Collections.emptyList();
         }
     }
 }
