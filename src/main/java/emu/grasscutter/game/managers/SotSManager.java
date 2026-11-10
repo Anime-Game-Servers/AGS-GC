@@ -233,6 +233,8 @@ public class SotSManager extends BasePlayerManager {
     public void levelUpSotS(int areaId, int sceneId, int itemNum) {
         if (itemNum <= 0) return;
 
+        val inventory = getPlayer().getInventory();
+
         // search city by areaId
         var city = this.getCityByAreaId(areaId);
         if (city == null) return; // TODO return error to allow sending packet with error
@@ -243,34 +245,33 @@ public class SotSManager extends BasePlayerManager {
 
         val completedLevels = new ArrayList<CityLevelUpData>();
         var level = cityInfo.getLevel();
-        var prevCrystalProgress = cityInfo.getNumCrystal();
         var itemCountLeft = itemNum;
-        var crystalProgress = 0;
+        var crystalProgress = cityInfo.getNumCrystal();
         while(level<10 && itemCountLeft > 0){
             val nextLevelUpData = GameData.getCityLevelUpData(cityId, level + 1);
             if(nextLevelUpData == null || nextLevelUpData.getConsumeItem() == null){
                 break;
             }
 
-            val cost = nextLevelUpData.getConsumeItem().getCount() - prevCrystalProgress;
+            val cost = nextLevelUpData.getConsumeItem().getCount() - crystalProgress;
 
             // TODO properly include already added oculi for the cost calculations
             // player might not want to level up all he can
             if(cost > itemCountLeft){
                 // pay the rest the payer wanted to offer
-                if(getPlayer().getInventory().payItem(nextLevelUpData.getConsumeItem().getItemId(), itemCountLeft)){
-                    crystalProgress = itemCountLeft + prevCrystalProgress;
+                if(inventory.payItem(nextLevelUpData.getConsumeItem().getItemId(), itemCountLeft)){
+                    crystalProgress = itemCountLeft + crystalProgress;
                     itemCountLeft = 0;
                 }
                 break;
             }
 
-
-            if(getPlayer().getInventory().payItem(nextLevelUpData.getConsumeItem().getItemId(), cost)){
+            // full level pay
+            if(inventory.payItem(nextLevelUpData.getConsumeItem().getItemId(), cost)){
                 completedLevels.add(nextLevelUpData);
                 level++;
                 itemCountLeft -= cost;
-                prevCrystalProgress = 0;
+                crystalProgress = 0;
             } else {
                 break;
             }

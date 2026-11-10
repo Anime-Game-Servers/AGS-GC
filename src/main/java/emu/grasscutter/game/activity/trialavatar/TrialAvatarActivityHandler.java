@@ -92,7 +92,8 @@ public class TrialAvatarActivityHandler extends ActivityHandler<TrialAvatarPlaye
     }
 
     public List<Integer> getBattleAvatarsList() {
-        return getActivityData(this.selectedTrialAvatarIndex).map(TrialAvatarActivityDataData::getBattleAvatarsList).get();
+        //noinspection unchecked
+        return getActivityData(this.selectedTrialAvatarIndex).map(TrialAvatarActivityDataData::getBattleAvatarsList).orElse(Collections.EMPTY_LIST);
     }
 
     public boolean getReward(@NonNull Player player, int trialAvatarIndexId) {

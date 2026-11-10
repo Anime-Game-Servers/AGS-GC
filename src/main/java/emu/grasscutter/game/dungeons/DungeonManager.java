@@ -215,10 +215,13 @@ public class DungeonManager {
             //val rewardData = GameData.getRewardDataMap().get(this.dungeonData.getPassRewardId());
 
             val rewardPreviewData = GameData.getRewardDataMap().get(this.dungeonData.getPassRewardPreviewId());
-
-            rewardPreviewData.getRewardItemList().stream()
-                .map(param -> new GameItem(param.getItemId(), Math.max(param.getCount(), 1)))
-                .forEach(rewards::add);
+            if(rewardPreviewData != null) {
+                rewardPreviewData.getRewardItemList().stream()
+                    .map(param -> new GameItem(param.getItemId(), Math.max(param.getCount(), 1)))
+                    .forEach(rewards::add);
+            } else if(this.dungeonData.getPassRewardPreviewId() > 0) {
+                Grasscutter.getLogger().warn("dugneon {}, drop preview data for previewId {} not found", dungeonId, this.dungeonData.getPassRewardPreviewId());
+            }
         }
 
         return rewards;

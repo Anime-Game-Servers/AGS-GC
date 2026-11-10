@@ -98,7 +98,7 @@ public class PlayerCodex {
             if (codexAnimal == null) return;
 
             val animalCountType = codexAnimal.getCountTypeNonNull();
-            if (animalCountType != countType && animalCountType != null) return;
+            if (animalCountType != countType && animalCountType != CodexAnimalCountType.CODEX_COUNT_TYPE_NONE) return;
 
             this.getUnlockedAnimal().merge(monsterId, 1, (i, j) -> i + 1);
 

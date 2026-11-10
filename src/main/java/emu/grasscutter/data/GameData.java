@@ -24,7 +24,6 @@ import emu.grasscutter.game.dungeons.DungeonDropEntry;
 import emu.grasscutter.game.dungeons.dungeon_entry.DungeonEntries;
 import emu.grasscutter.game.quest.QuestEncryptionKey;
 import emu.grasscutter.game.quest.enums.QuestCond;
-import emu.grasscutter.game.tower.TowerData;
 import emu.grasscutter.utils.Utils;
 import it.unimi.dsi.fastutil.ints.*;
 import lombok.Getter;
@@ -485,7 +484,7 @@ public class GameData {
 
 
     public static int getReliquaryId(int suiteId, int levelId) {
-        return suiteId << 4 + levelId;
+        return (suiteId << 4) + levelId;
     }
     public static int getReliquaryId(CodexReliquaryData data) {
         return getReliquaryId(data.getSuitId(), data.getLevel());
@@ -501,7 +500,7 @@ public class GameData {
     }
 
     public static int getViewpointId(int groupId, int configId) {
-        return groupId << 32 + configId;
+        return (groupId << 12) + configId;
     }
     public static int getViewpointId(CodexViewpointData data) {
         return getViewpointId(data.getGroupId(), data.getConfigId());
