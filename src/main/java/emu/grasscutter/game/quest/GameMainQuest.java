@@ -11,7 +11,6 @@ import emu.grasscutter.data.binout.ScriptSceneData;
 import emu.grasscutter.data.common.quest.MainQuestData;
 import emu.grasscutter.data.common.quest.MainQuestData.TalkData;
 import emu.grasscutter.data.common.quest.SubQuestData;
-import emu.grasscutter.data.excels.RewardData;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.ActionReason;
@@ -207,9 +206,9 @@ public class GameMainQuest {
         val mainQuestData = getMainQuestData();
         if (mainQuestData != null && mainQuestData.getRewardIdList() != null && mainQuestData.getRewardIdList().length > rewardIndex) {
             int rewardId = mainQuestData.getRewardIdList()[rewardIndex];
-            RewardData rewardData = GameData.getRewardDataMap().get(rewardId);
+            val rewardData = GameData.getRewardDataMap().get(rewardId);
             if (rewardData != null) {
-                getOwner().getInventory().addItemParamDatas(rewardData.getRewardItemList(), ActionReason.QuestReward);
+                getOwner().getInventory().addRewardData(rewardData, ActionReason.QuestReward);
             }
         }
 

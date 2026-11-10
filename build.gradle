@@ -81,7 +81,7 @@ dependencies {
     implementation "org.quartz-scheduler:quartz-jobs:2.3.2"
     implementation 'org.apache.commons:commons-lang3:3.14.0'
 
-    implementation("org.anime_game_servers.core:gi:0.1")
+    implementation("org.anime_game_servers.core:gi:0.2")
     implementation("org.anime_game_servers:luaj:3.0.3")
     implementation("org.anime_game_servers:JNLua_GC:0.1.0")
     implementation("org.anime_game_servers.lua:base:0.2")
@@ -91,6 +91,9 @@ dependencies {
 
     implementation("org.anime_game_servers:grasskcpper:0.1")
     implementation("org.anime_game_servers.multi_proto:gi-jvm:0.2.32")
+
+    implementation("org.anime_game_servers.data_models:GIData:0.2")
+    implementation("org.anime_game_servers.data_models:loader-jvm:0.2")
 
     implementation "com.esotericsoftware:reflectasm:1.11.9"
     implementation "com.github.davidmoten:rtree-multi:0.1"
@@ -158,4 +161,9 @@ public final class BuildConfig {
     public static final String GIT_HASH = \"${gitCommitHash()}\";
 }"""
 
+}
+
+// For terminal interacting in IDEA running
+run {
+    standardInput = System.in
 }

@@ -1,6 +1,5 @@
 package emu.grasscutter.game.dungeons.dungeon_results;
 
-import emu.grasscutter.data.excels.DungeonData;
 import emu.grasscutter.game.avatar.Avatar;
 import emu.grasscutter.game.dungeons.DungeonEndStats;
 import emu.grasscutter.game.entity.EntityAvatar;
@@ -11,14 +10,15 @@ import emu.grasscutter.utils.Utils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.val;
+import org.anime_game_servers.game_data_models.loader.enums.EnumWrapper;
 import org.anime_game_servers.multi_proto.gi.messages.dungeon.StrengthenPointData;
 import org.anime_game_servers.multi_proto.gi.messages.dungeon.progression.DungeonSettleNotify;
 import org.anime_game_servers.multi_proto.gi.messages.dungeon.progression.ParamList;
+import org.anime_game_servers.game_data_models.gi.data.dungeon.DungeonData;
+import org.anime_game_servers.game_data_models.gi.data.dungeon.InvolveType;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static emu.grasscutter.game.dungeons.enums.DungeonInvolveType.INVOLVE_SINGLE_MULTIPLE;
 
 /**
  * Shows dungeon results
@@ -46,7 +46,7 @@ public class BaseDungeonResult {
      * */
     private void getStrengthenPointData(DungeonSettleNotify builder) {
         if (this.dungeonStats.dungeonResult().isSuccess() ||
-            this.dungeonData.getInvolveType() != INVOLVE_SINGLE_MULTIPLE) return;
+            this.dungeonData.getInvolveTypeNonNull() != InvolveType.INVOLVE_SINGLE_MULTIPLE) return;
 
         val playerActiveTeam = this.player.getTeamManager().getActiveTeam();
         builder.setStrengthenPointDataMap(Arrays.stream(StrengthenPointType.values()).collect(
@@ -109,6 +109,7 @@ public class BaseDungeonResult {
         val tempSettleMap = new HashMap<Integer, ParamList>();
         Optional.ofNullable(this.dungeonData.getSettleShows()).stream()
             .flatMap(List::stream)
+            .map(EnumWrapper::getValue)
             .forEach(showType -> {
                 val paramList = tempSettleMap.computeIfAbsent(showType.getId(), f -> new ParamList());
                 val paramListList = new ArrayList<>(paramList.getParamList());

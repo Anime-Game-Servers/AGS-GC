@@ -1,12 +1,12 @@
 package emu.grasscutter.game.activity.trialavatar;
 
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.common.BaseTrialActivityData;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import org.anime_game_servers.game_data_models.gi.data.activity.trial.TrialAvatarActivityData;
 import org.anime_game_servers.multi_proto.gi.messages.activity.trial.TrialAvatarActivityDetailInfo;
 import org.anime_game_servers.multi_proto.gi.messages.activity.trial.TrialAvatarActivityRewardDetailInfo;
 
@@ -19,10 +19,9 @@ import java.util.stream.*;
 public class TrialAvatarPlayerData {
     List<RewardInfoItem> rewardInfoList;
 
-    private static BaseTrialActivityData getActivityData(int scheduleId){
+    private static TrialAvatarActivityData getActivityData(int scheduleId){
         // prefer custom data over official data
-        return GameData.getTrialAvatarActivityCustomData().isEmpty() ? GameData.getTrialAvatarActivityDataMap().get(scheduleId)
-            : GameData.getTrialAvatarActivityCustomData().get(scheduleId);
+        return GameData.getTrialAvatarActivityDataMap().get(scheduleId);
     }
 
     public static List<Integer> getAvatarIdList(int scheduleId) {

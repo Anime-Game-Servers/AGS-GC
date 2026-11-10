@@ -2,10 +2,6 @@ package emu.grasscutter.game.avatar;
 
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
-import emu.grasscutter.data.common.BaseTrialAvatarData;
-import emu.grasscutter.data.common.BaseTrialAvatarTemplateData;
-import emu.grasscutter.data.excels.AvatarCostumeData;
-import emu.grasscutter.data.excels.TrialReliquaryData;
 import emu.grasscutter.game.entity.EntityWeapon;
 import emu.grasscutter.game.entity.create_config.CreateGadgetEntityConfig;
 import emu.grasscutter.game.inventory.EquipType;
@@ -14,6 +10,8 @@ import emu.grasscutter.server.packet.send.PacketAvatarEquipChangeNotify;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import org.anime_game_servers.game_data_models.gi.data.entities.avatar.AvatarCostumeData;
+import org.anime_game_servers.game_data_models.gi.data.trial.TrialAvatarLoadout;
 import org.anime_game_servers.multi_proto.gi.messages.general.avatar.AvatarInfo;
 import org.anime_game_servers.multi_proto.gi.messages.general.avatar.GrantReason;
 import org.anime_game_servers.multi_proto.gi.messages.general.avatar.TrialAvatarGrantRecord;
@@ -50,8 +48,8 @@ public class TrialAvatar extends Avatar{
 
     public static List<Integer> getTrialAvatarParam(int trialAvatarId) {
         val trialData = TrialAvatar.useCustomData() ? GameData.getTrialAvatarCustomData() : GameData.getTrialAvatarDataMap();
-        BaseTrialAvatarData trialAvatarData = trialData.get(trialAvatarId);
-        return (trialAvatarData == null) ? List.of() : trialAvatarData.getTrialAvatarParamList();
+        val trialAvatarData = trialData.get(trialAvatarId);
+        return (trialAvatarData == null) ? List.of() : List.of(trialAvatarData.getAvatarId(),trialAvatarData.getAvatarLevel());
     }
 
     private int getTrialAvatarTemplateLevel(){
@@ -63,7 +61,7 @@ public class TrialAvatar extends Avatar{
     public int getTrialSkillLevel() {
         val trialData = useCustomData() ? GameData.getTrialAvatarCustomData() : GameData.getTrialAvatarTemplateDataMap();
         int skillOrId = useCustomData() ? getTrialAvatarId() : getTrialAvatarTemplateLevel();
-        BaseTrialAvatarTemplateData trialAvatarData = trialData.get(skillOrId);
+        val trialAvatarData = trialData.get(skillOrId);
         return (trialAvatarData == null) ? 1 : trialAvatarData.getTrialAvatarSkillLevel();
     }
 
@@ -73,18 +71,18 @@ public class TrialAvatar extends Avatar{
 
     public int getTrialWeaponId() {
         val trialData = useCustomData() ? GameData.getTrialAvatarCustomData() : GameData.getTrialAvatarDataMap();
-        BaseTrialAvatarData trialAvatarData = trialData.get(getTrialAvatarId());
+        val trialAvatarData = trialData.get(getTrialAvatarId());
 
-        return (trialAvatarData == null || trialAvatarData.getTrialAvatarWeaponList().size() < 1) ?
-            getAvatarData().getInitialWeapon() + 100 : trialAvatarData.getTrialAvatarWeaponList().get(0);
+        return (trialAvatarData == null || !trialAvatarData.hasWeapon()) ?
+            getAvatarData().getInitialWeapon() + 100 : trialAvatarData.getWeapon();
     }
 
     public List<Integer> getTrialReliquary() {
         val trialData = useCustomData() ? GameData.getTrialAvatarCustomData() : GameData.getTrialAvatarTemplateDataMap();
         int skillOrId = useCustomData() ? getTrialAvatarId() : getTrialAvatarTemplateLevel();
-        BaseTrialAvatarTemplateData trialAvatarData = trialData.get(skillOrId);
+        val trialAvatarData = trialData.get(skillOrId);
 
-        return (trialAvatarData == null || trialAvatarData.getTrialReliquaryList().isEmpty()) ?
+        return (trialAvatarData == null || !trialAvatarData.hasReliquaryList()) ?
             GameData.getTrialAvatarTemplateDataMap().get(getTrialAvatarTemplateLevel()).getTrialReliquaryList() :
             trialAvatarData.getTrialReliquaryList();
     }
@@ -100,7 +98,7 @@ public class TrialAvatar extends Avatar{
 
         // add Trial Artifacts
         getTrialReliquary().forEach(id -> {
-            TrialReliquaryData reliquaryData = GameData.getTrialReliquaryDataMap().get(id.intValue());
+            val reliquaryData = GameData.getTrialReliquaryDataMap().get(id.intValue());
             if (reliquaryData == null) return;
 
             GameItem relic = new GameItem(reliquaryData.getReliquaryId());
